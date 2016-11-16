@@ -9,6 +9,7 @@ buildscript {
 }
 plugins {
     id 'com.github.ben-manes.versions' version '0.13.0'
+    id 'application'
 }
 apply plugin: 'kotlin'
 
@@ -18,6 +19,8 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+mainClassName = 'com.github.am4dr.image.tagger.app.Main'
+
 repositories {
     jcenter()
 }
@@ -26,7 +29,7 @@ dependencies {
 //    compile 'org.codehaus.groovy:groovy:2.4.7'
     compile group:'org.jetbrains.kotlin', name :'kotlin-stdlib', version: kotlin_version
 
-//    commons-cli:commons-cli:1.3.1
+    compile 'commons-cli:commons-cli:1.3.1'
 
     compile 'org.slf4j:slf4j-api:1.7.21'
     runtime 'org.slf4j:slf4j-simple:1.7.21'
@@ -34,4 +37,8 @@ dependencies {
 //    testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
 }
 
-
+run {
+    if (project.hasProperty('args')) {
+        args = project.getProperty('args').split(/\s+/).grep()
+    }
+}
