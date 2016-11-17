@@ -25,7 +25,7 @@ class Main : Application() {
     override fun start(stage: Stage) {
         MainFrame(stage, parseArgs(parameters.raw.toTypedArray())).show()
     }
-    private fun parseArgs(args: Array<String>): CommandLine  = DefaultParser().parse(options, args)
+    private fun parseArgs(args: Array<String>): CommandLine = DefaultParser().parse(options, args)
     private fun makeOptions(): Options = with(Options()) {
         addOption(null, "saveto", true, "specify the directory path to save the tag file")
     }
