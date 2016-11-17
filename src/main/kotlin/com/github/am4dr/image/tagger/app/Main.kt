@@ -1,6 +1,8 @@
 package com.github.am4dr.image.tagger.app
 
 import javafx.application.Application
+import javafx.scene.Parent
+import javafx.scene.Scene
 import javafx.stage.Stage
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.DefaultParser
@@ -23,7 +25,12 @@ class Main : Application() {
         log.info("launched with the params: ${parameters.raw}")
     }
     override fun start(stage: Stage) {
-        MainFrame(stage, parseArgs(parameters.raw.toTypedArray())).show()
+        val mainNode: Parent = MainFrame(parseArgs(parameters.raw.toTypedArray())).mainPane
+        stage.run {
+            title = "Image Tagger"
+            scene = Scene(mainNode, 400.0, 300.0)
+            show()
+        }
     }
     private fun parseArgs(args: Array<String>): CommandLine = DefaultParser().parse(options, args)
     private fun makeOptions(): Options = with(Options()) {

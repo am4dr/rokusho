@@ -5,18 +5,15 @@ import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
-import javafx.collections.ObservableList
 import javafx.event.EventHandler
 import javafx.geometry.Pos
 import javafx.scene.Node
-import javafx.scene.Scene
 import javafx.scene.control.Hyperlink
 import javafx.scene.control.Label
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Pane
 import javafx.stage.DirectoryChooser
-import javafx.stage.Stage
 import org.apache.commons.cli.CommandLine
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -27,19 +24,15 @@ import java.util.stream.Collectors
 
 /*
 シーングラフのルート。全体で共有したいデータを保持し、子ノードにプロパティとして提供する。
-    TODO プロパティのゲッターはread onlyなプロパティを返すようにする。
-    TODO 監視されるだけのものはPropertyではなくObservableまででいいかもしれない
     TODO 対象のディレクトリの監視機能をつける
     TODO 対象が画像を含まないときに表示するためのNodeをつくる
-    TODO これをBorderPaneのサブクラスにしてstageへの参照を取り除く
  */
-class MainFrame(private val stage: Stage,
-                private val commandline: CommandLine) {
+class MainFrame(private val commandline: CommandLine) {
     val saveFileName = "info.tsv"
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
     private val emptyTargetPane = makeEmptyTargetPane()    // TODO 対象が画像を含まないときみたいな名前なので変える
-    private val mainPane = BorderPane().apply { center = emptyTargetPane }
-    private var contents: Node?
+    internal val mainPane = BorderPane().apply { center = emptyTargetPane }
+    private var contents: Node
         get() = mainPane.center
         set(value) { mainPane.center = value }
     internal val targetDirProperty: ObjectProperty<Path?> = SimpleObjectProperty()
@@ -58,8 +51,6 @@ class MainFrame(private val stage: Stage,
             }
         }
     init {
-        stage.title = "Image Tagger"
-        stage.scene = Scene(mainPane, 400.0, 300.0)
         val filer = ImageFiler(this)
         targetDirProperty.addListener { observable, old, new ->
             log.debug("target directory changed: $old -> $new")
@@ -68,12 +59,11 @@ class MainFrame(private val stage: Stage,
         }
         setDirectories()
     }
-    fun show() = stage.show()
     fun selectTargetDirectory() {
         DirectoryChooser().run {
             title = "対象ディレクトリの選択"
             targetDir?.let { initialDirectory = it.toFile() }
-            targetDir = showDialog(stage)?.toPath()
+            targetDir = showDialog(mainPane.scene.window)?.toPath()
         }
     }
     private fun setDirectories() {
