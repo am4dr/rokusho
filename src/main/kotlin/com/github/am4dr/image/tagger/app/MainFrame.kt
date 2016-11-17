@@ -30,8 +30,8 @@ import java.util.stream.Collectors
 class MainFrame(private val commandline: CommandLine) {
     val saveFileName = "info.tsv"
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
-    private val emptyTargetPane = makeEmptyTargetPane()    // TODO 対象が画像を含まないときみたいな名前なので変える
-    internal val mainPane = BorderPane().apply { center = emptyTargetPane }
+    private val directorySelectorPane = makeDirectorySelectorPane()
+    internal val mainPane = BorderPane().apply { center = directorySelectorPane }
     private var contents: Node
         get() = mainPane.center
         set(value) { mainPane.center = value }
@@ -54,7 +54,7 @@ class MainFrame(private val commandline: CommandLine) {
         val filer = ImageFiler(this)
         targetDirProperty.addListener { observable, old, new ->
             log.debug("target directory changed: $old -> $new")
-            contents = if (new == null) emptyTargetPane
+            contents = if (new == null) directorySelectorPane
                        else BorderPane().apply { center = filer.node }
         }
         setDirectories()
@@ -82,7 +82,7 @@ class MainFrame(private val commandline: CommandLine) {
             }
         }
     }
-    internal fun makeEmptyTargetPane(): Pane {
+    internal fun makeDirectorySelectorPane(): Pane {
         val link = Hyperlink("選択ダイアログを開く")
         link.onAction = EventHandler { selectTargetDirectory() }
         return HBox(Label("対象のディレクトリを選択してください: "), link).apply {

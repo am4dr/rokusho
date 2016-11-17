@@ -29,7 +29,7 @@ class ImageFiler(val mainFrame: MainFrame) {
         VBox.setVgrow(this, Priority.ALWAYS)
         centerProperty().bind(
                 When(mainFrame.imagesProperty.sizeProperty().isEqualTo(0))
-                        .then<Node>(mainFrame.makeEmptyTargetPane())
+                        .then<Node>(mainFrame.makeDirectorySelectorPane())
                         .otherwise(selectedView))
     }
     val node: Node = VBox(Label("画像ファイラー 仮置きテキスト"), currentView)
