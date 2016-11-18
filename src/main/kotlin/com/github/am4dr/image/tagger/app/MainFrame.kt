@@ -26,6 +26,7 @@ import java.util.stream.Collectors
 シーングラフのルート。全体で共有したいデータを保持し、子ノードにプロパティとして提供する。
     TODO 対象のディレクトリの監視機能をつける
     TODO 対象が画像を含まないときに表示するためのNodeをつくる
+    TODO imagedatabaseをファイルから構築する
  */
 class MainFrame(private val commandline: CommandLine) {
     val saveFileName = "info.tsv"
@@ -40,6 +41,7 @@ class MainFrame(private val commandline: CommandLine) {
         get() = targetDirProperty.get()
         set(value) = targetDirProperty.set(value)
     internal val imagesProperty: ListProperty<ImageData> = SimpleListProperty(FXCollections.observableArrayList<ImageData>())
+    private val imageDatabase = mutableMapOf<Path, ImageData>()
     private val imageFileNameMatcher = Regex(".*\\.(bmp|gif|jpe?g|png)$", RegexOption.IGNORE_CASE)
     init {
         val filer = ImageFiler(this)
@@ -52,14 +54,16 @@ class MainFrame(private val commandline: CommandLine) {
                     Files.list(targetDir)
                             .filter { imageFileNameMatcher.matches(it.fileName.toString()) }
                             .collect(Collectors.toList<Path>())
-                            .let { imagesProperty.setAll(it.map(::ImageData)) }
+                            .let { imagesProperty.setAll(it.map { lookupOrCreateImageData(it) }) }
                 }
-                else {
-                    imagesProperty.clear()
-                }
+                else { imagesProperty.clear() }
             }
         }
         setDirectories()
+    }
+    private fun lookupOrCreateImageData(path: Path): ImageData {
+        imageDatabase.get(path)?.let { return it }
+        return ImageData(path).apply { imageDatabase.put(path, this) }
     }
     fun selectTargetDirectory() {
         DirectoryChooser().run {
