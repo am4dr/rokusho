@@ -62,8 +62,8 @@ class MainFrame(private val commandline: CommandLine) {
         setDirectories()
     }
     private fun lookupOrCreateImageData(path: Path): ImageData {
-        imageDatabase.get(path)?.let { return it }
-        return ImageData(path).apply { imageDatabase.put(path, this) }
+        val data: ImageData? = imageDatabase[path]
+        return data ?: ImageData(path).apply { imageDatabase[path] = this }
     }
     fun selectTargetDirectory() {
         DirectoryChooser().run {

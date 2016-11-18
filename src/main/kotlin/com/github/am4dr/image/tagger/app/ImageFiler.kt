@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory
 import java.util.concurrent.Callable
 
 // TODO Mainをプロパティに持っているが、必要なimagesプロパティのみに制限する
+// TODO ビューの種類を選択可能にする
 // TODO サムネイルビューに拡大表示を実装する
 class ImageFiler(val mainFrame: MainFrame) {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
@@ -35,7 +36,7 @@ class ImageFiler(val mainFrame: MainFrame) {
         }
         bind(Bindings.createObjectBinding(callable, images))
         addListener { observable, old, new ->
-            log.info("tiles changed: $old -> $new")
+            log.debug("tiles changed: $old -> $new")
             flowPane.children.setAll(new)
         }
     }
