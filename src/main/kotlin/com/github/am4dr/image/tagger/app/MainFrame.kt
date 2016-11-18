@@ -36,26 +36,28 @@ class MainFrame(private val commandline: CommandLine) {
         get() = mainPane.center
         set(value) { mainPane.center = value }
     internal val targetDirProperty: ObjectProperty<Path?> = SimpleObjectProperty()
+    private var targetDir: Path?
+        get() = targetDirProperty.get()
+        set(value) = targetDirProperty.set(value)
     internal val imagesProperty: ListProperty<ImageData> = SimpleListProperty(FXCollections.observableArrayList<ImageData>())
     private val imageFileNameMatcher = Regex(".*\\.(bmp|gif|jpe?g|png)$", RegexOption.IGNORE_CASE)
-    internal var targetDir: Path?
-        get() = targetDirProperty.get()
-        set(value) {
-            targetDirProperty.value = value?.toRealPath()
-            log.info("set target directory: $targetDir")
-            targetDir?.let { dir: Path ->
-                Files.list(dir)
-                        .filter { imageFileNameMatcher.matches(it.fileName.toString()) }
-                        .collect(Collectors.toList<Path>())
-                        .let { imagesProperty.setAll(it.map(::ImageData)) }
-            }
-        }
     init {
         val filer = ImageFiler(this)
         targetDirProperty.addListener { observable, old, new ->
             log.debug("target directory changed: $old -> $new")
             contents = if (new == null) directorySelectorPane
                        else BorderPane().apply { center = filer.node }
+            if (old != new) {
+                if (targetDir != null) {
+                    Files.list(targetDir)
+                            .filter { imageFileNameMatcher.matches(it.fileName.toString()) }
+                            .collect(Collectors.toList<Path>())
+                            .let { imagesProperty.setAll(it.map(::ImageData)) }
+                }
+                else {
+                    imagesProperty.clear()
+                }
+            }
         }
         setDirectories()
     }
