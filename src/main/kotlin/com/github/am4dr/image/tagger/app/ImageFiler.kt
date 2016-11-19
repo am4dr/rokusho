@@ -2,6 +2,7 @@ package com.github.am4dr.image.tagger.app
 
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.When
+import javafx.beans.property.ListProperty
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
@@ -21,19 +22,19 @@ import org.slf4j.LoggerFactory
 import java.util.concurrent.Callable
 
 // TODO Mainをプロパティに持っているが、必要なimagesプロパティのみに制限する
-// TODO ビューの種類を選択可能にする
 // TODO サムネイルビューに拡大表示を実装する
+//          拡大表示PaneをflowPane.childrenにおける対象の次に挿入する
 class ImageFiler(val mainFrame: MainFrame) {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
+    private val imagesProperty: ListProperty<ImageData> = SimpleListProperty<ImageData>().apply { bind(mainFrame.imagesProperty) }
     private val listNode = ListView<ImageData>().apply {
-        itemsProperty().bind(mainFrame.imagesProperty)
+        itemsProperty().bind(imagesProperty)
     }
     private val tiles = SimpleListProperty<ImageTile>().apply {
-        val images = mainFrame.imagesProperty
         val callable = Callable<ObservableList<ImageTile>> {
-            FXCollections.observableList(images.get().filterNotNull().map(::ImageTile))
+            FXCollections.observableList(imagesProperty.get().filterNotNull().map(::ImageTile))
         }
-        bind(Bindings.createObjectBinding(callable, images))
+        bind(Bindings.createObjectBinding(callable, imagesProperty))
     }
     private val thumbnailNode = ScrollPane().apply {
         fitToWidthProperty().set(true)
@@ -48,7 +49,7 @@ class ImageFiler(val mainFrame: MainFrame) {
     private val currentView: Node = BorderPane().apply {
         VBox.setVgrow(this, Priority.ALWAYS)
         centerProperty().bind(
-                When(mainFrame.imagesProperty.sizeProperty().isEqualTo(0))
+                When(imagesProperty.sizeProperty().isEqualTo(0))
                         .then<Node>(mainFrame.makeDirectorySelectorPane())
                         .otherwise(selectedView))
     }
