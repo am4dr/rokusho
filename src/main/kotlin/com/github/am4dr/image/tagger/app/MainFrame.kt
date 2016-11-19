@@ -59,8 +59,13 @@ class MainFrame(private val commandline: CommandLine) {
                 else { imagesProperty.clear() }
             }
         }
-        setDirectories()
+        if (commandline.args.size == 1) {
+            Paths.get(commandline.args[0])?.let { path ->
+                if (Files.isDirectory(path)) { targetDir = path }
+            }
+        }
     }
+    // TODO クラスImageStoreに抽出
     private fun lookupOrCreateImageData(path: Path): ImageData {
         val data: ImageData? = imageDatabase[path]
         return data ?: ImageData(path).apply { imageDatabase[path] = this }
@@ -70,22 +75,6 @@ class MainFrame(private val commandline: CommandLine) {
             title = "対象ディレクトリの選択"
             targetDir?.let { initialDirectory = it.toFile() }
             targetDir = showDialog(mainPane.scene.window)?.toPath()
-        }
-    }
-    private fun setDirectories() {
-        when (commandline.args.size) {
-            0 -> {
-                System.err.println("対象のディレクトリを引数に指定せよ")
-            }
-            1 -> {
-                val path = Paths.get(commandline.args[0])
-                if (Files.isDirectory(path)) {
-                    targetDir = path
-                }
-            }
-            else -> {
-                System.err.println("対象のディレクトリはひとつまでにせよ")
-            }
         }
     }
     internal fun makeDirectorySelectorPane(): Pane {
