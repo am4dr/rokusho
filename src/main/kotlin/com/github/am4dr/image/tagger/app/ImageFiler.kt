@@ -25,17 +25,18 @@ class ImageFiler(val mainFrame: MainFrame) {
     private val listNode = ListView<ImageData>().apply {
         itemsProperty().bind(mainFrame.imagesProperty)
     }
-    private val flowPane = javafx.scene.layout.FlowPane(10.0, 10.0)
-    private val thumbnailNode = ScrollPane(flowPane).apply {
-        fitToWidthProperty().set(true)
-    }
     private val tiles = SimpleListProperty<ImageTile>().apply {
         val images = mainFrame.imagesProperty
         val callable = Callable<ObservableList<ImageTile>> {
             FXCollections.observableList(images.get().filterNotNull().map(::ImageTile))
         }
         bind(Bindings.createObjectBinding(callable, images))
-        addListener { observable, old, new ->
+    }
+    private val thumbnailNode = ScrollPane().apply {
+        fitToWidthProperty().set(true)
+        val flowPane = javafx.scene.layout.FlowPane(10.0, 10.0)
+        content = flowPane
+        tiles.addListener { observable, old, new ->
             log.debug("tiles changed: $old -> $new")
             flowPane.children.setAll(new)
         }
