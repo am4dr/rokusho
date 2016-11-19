@@ -8,6 +8,8 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.event.EventHandler
+import javafx.geometry.Pos
+import javafx.geometry.VPos
 import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.Label
@@ -38,7 +40,10 @@ class ImageFiler(val mainFrame: MainFrame) {
     }
     private val thumbnailNode = ScrollPane().apply {
         fitToWidthProperty().set(true)
-        val flowPane = javafx.scene.layout.FlowPane(10.0, 10.0)
+        val flowPane = javafx.scene.layout.FlowPane(10.0, 10.0).apply {
+            alignment = Pos.CENTER
+            rowValignment = VPos.BASELINE
+        }
         content = flowPane
         tiles.addListener { observable, old, new ->
             log.debug("tiles changed: $old -> $new")
