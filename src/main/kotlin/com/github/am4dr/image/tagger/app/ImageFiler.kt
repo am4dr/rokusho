@@ -2,9 +2,8 @@ package com.github.am4dr.image.tagger.app
 
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.When
-import javafx.beans.property.ListProperty
-import javafx.beans.property.SimpleListProperty
-import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.property.*
+import javafx.beans.value.ObservableObjectValue
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.event.EventHandler
@@ -15,10 +14,8 @@ import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.ListView
 import javafx.scene.control.ScrollPane
-import javafx.scene.layout.BorderPane
-import javafx.scene.layout.HBox
-import javafx.scene.layout.Priority
-import javafx.scene.layout.VBox
+import javafx.scene.input.MouseEvent
+import javafx.scene.layout.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.concurrent.Callable
@@ -26,6 +23,8 @@ import java.util.concurrent.Callable
 // TODO Mainをプロパティに持っているが、必要なimagesプロパティのみに制限する
 // TODO サムネイルビューに拡大表示を実装する
 //          拡大表示PaneをflowPane.childrenにおける対象の次に挿入する
+// TODO ダブルクリックに限って拡大表示をする
+// TODO thumbnailNodeを別クラスに分割する
 class ImageFiler(val mainFrame: MainFrame) {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
     private val imagesProperty: ListProperty<ImageData> = SimpleListProperty<ImageData>().apply { bind(mainFrame.imagesProperty) }
@@ -45,10 +44,48 @@ class ImageFiler(val mainFrame: MainFrame) {
             rowValignment = VPos.BASELINE
         }
         content = flowPane
+        val selectedTileProperty = SimpleObjectProperty<ImageTile>()
         tiles.addListener { observable, old, new ->
             log.debug("tiles changed: $old -> $new")
+            selectedTileProperty.set(null)
+            val lastIndexOfSelectedRow = SimpleIntegerProperty()
+            var lastIndexBindingCreated = false
             flowPane.children.setAll(new)
+
+            val tileClickHandler = EventHandler<MouseEvent> { e ->
+                val tile = e.source
+                if (tile !is ImageTile) { return@EventHandler }
+                if (selectedTileProperty.get() === tile) {
+                    selectedTileProperty.set(null)
+                    return@EventHandler
+                }
+                selectedTileProperty.set(tile)
+                if (!lastIndexBindingCreated) {
+                    createLastIndexOfSelectedRowBinding(flowPane, selectedTileProperty, lastIndexOfSelectedRow)
+                    lastIndexBindingCreated = true
+                }
+            }
+            new.map { tile -> tile.onMouseClicked = tileClickHandler }
         }
+    }
+    // TODO 生成したバインディングを返す程度にとどめ、この中ではバインドしない
+    private fun createLastIndexOfSelectedRowBinding(flowPane: Pane, selectedTileProperty: ObservableObjectValue<ImageTile>, lastIndexOfSelectedRow: IntegerProperty) {
+        val callable = Callable<Int> {
+            val selectedTile = selectedTileProperty.get()
+            selectedTile ?: return@Callable flowPane.children.size - 1
+            val selectedRowBaseline = selectedTile.boundsInParent.maxY
+            val index = flowPane.children.indexOf(selectedTile)
+            for (i in index+1..flowPane.children.size-1) {
+                if (flowPane.children[i].boundsInParent.maxY > selectedRowBaseline + 10) {
+                    return@Callable i - 1
+                }
+            }
+            return@Callable flowPane.children.size - 1
+        }
+        lastIndexOfSelectedRow.addListener { observableValue, old, new -> log.debug("last index of selected row: ${lastIndexOfSelectedRow.get()}") }
+        lastIndexOfSelectedRow.bind(Bindings.createObjectBinding(callable,// flowPane.widthProperty(), selectedTileProperty))
+                flowPane.scene.window.widthProperty(), selectedTileProperty)) // TODO windowの幅ではなく行の最後の要素の位置に依存させる
+        log.info("binding created")
     }
     private val selectedView = SimpleObjectProperty<Node>().apply { set(thumbnailNode) }
     private val currentView: Node = BorderPane().apply {
