@@ -2,7 +2,10 @@ package com.github.am4dr.image.tagger.app
 
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.When
-import javafx.beans.property.*
+import javafx.beans.property.IntegerProperty
+import javafx.beans.property.ListProperty
+import javafx.beans.property.SimpleListProperty
+import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.value.ObservableObjectValue
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
@@ -37,54 +40,75 @@ class ImageFiler(val mainFrame: MainFrame) {
         }
         bind(Bindings.createObjectBinding(callable, imagesProperty))
     }
+    private val labelTmp = Label()
     private val thumbnailNode = ScrollPane().apply {
         fitToWidthProperty().set(true)
-        val flowPane = javafx.scene.layout.FlowPane(10.0, 10.0).apply {
+        val flowPane = FlowPane(10.0, 10.0).apply {
             alignment = Pos.CENTER
             rowValignment = VPos.BASELINE
         }
         content = flowPane
         val selectedTileProperty = SimpleObjectProperty<ImageTile>()
+        selectedTileProperty.addListener { obs, old, new -> log.debug("set selectedTileProperty: $new") }
         tiles.addListener { observable, old, new ->
-            log.debug("tiles changed: $old -> $new")
+            log.debug("tiles changed - new.size: ${new.size}")
             selectedTileProperty.set(null)
-            val lastIndexOfSelectedRow = SimpleIntegerProperty()
-            var lastIndexBindingCreated = false
             flowPane.children.setAll(new)
+            val nextRowStartIndexProperty = SimpleObjectProperty<Int>().apply {
+                addListener { observableValue, old, new -> log.debug("next row index of selected row: $new") }
+                labelTmp.textProperty().bind(this.asString())
+                bind(Bindings.createObjectBinding(
+                        Callable<Int> {
+                            val tile = selectedTileProperty.get()
+                            if (tile != null) calcNextRowStartIndex(flowPane.children, flowPane.children.indexOf(tile)) else 0
+                        },
+                        selectedTileProperty,
+                        flowPane.children.last().layoutXProperty()))
+            }
+
+            var lastIndexBindingCreated = false
 
             val tileClickHandler = EventHandler<MouseEvent> { e ->
                 val tile = e.source
                 if (tile !is ImageTile) { return@EventHandler }
+                log.debug("tile clicked")
                 if (selectedTileProperty.get() === tile) {
                     selectedTileProperty.set(null)
                     return@EventHandler
                 }
                 selectedTileProperty.set(tile)
+                /*
                 if (!lastIndexBindingCreated) {
-                    createLastIndexOfSelectedRowBinding(flowPane, selectedTileProperty, lastIndexOfSelectedRow)
+                    //createLastIndexOfSelectedRowBinding(flowPane, selectedTileProperty, nextRowStartIndexProperty)
                     lastIndexBindingCreated = true
                 }
+                */
             }
             new.map { tile -> tile.onMouseClicked = tileClickHandler }
         }
     }
+    private fun calcNextRowStartIndex(nodes: List<Node>, index: Int): Int {
+        val selectedBaseline = nodes[index].boundsInParent.maxY
+        return (index+1..nodes.size-1)
+                .firstOrNull { nodes[it].boundsInParent.maxY > selectedBaseline + 10 } ?: 0
+    }
     // TODO 生成したバインディングを返す程度にとどめ、この中ではバインドしない
-    private fun createLastIndexOfSelectedRowBinding(flowPane: Pane, selectedTileProperty: ObservableObjectValue<ImageTile>, lastIndexOfSelectedRow: IntegerProperty) {
+    private fun createLastIndexOfSelectedRowBinding(flowPane: Pane, selectedTileProperty: ObservableObjectValue<ImageTile>, nextRowStartIndexProperty: IntegerProperty) {
         val callable = Callable<Int> {
             val selectedTile = selectedTileProperty.get()
-            selectedTile ?: return@Callable flowPane.children.size - 1
+            selectedTile ?: return@Callable 0
             val selectedRowBaseline = selectedTile.boundsInParent.maxY
             val index = flowPane.children.indexOf(selectedTile)
             for (i in index+1..flowPane.children.size-1) {
                 if (flowPane.children[i].boundsInParent.maxY > selectedRowBaseline + 10) {
-                    return@Callable i - 1
+                    return@Callable i
                 }
             }
-            return@Callable flowPane.children.size - 1
+            return@Callable 0
         }
-        lastIndexOfSelectedRow.addListener { observableValue, old, new -> log.debug("last index of selected row: ${lastIndexOfSelectedRow.get()}") }
-        lastIndexOfSelectedRow.bind(Bindings.createObjectBinding(callable,// flowPane.widthProperty(), selectedTileProperty))
-                flowPane.scene.window.widthProperty(), selectedTileProperty)) // TODO windowの幅ではなく行の最後の要素の位置に依存させる
+        nextRowStartIndexProperty.addListener { observableValue, old, new -> log.info("next row index of selected row: $new") }
+        nextRowStartIndexProperty.bind(
+                Bindings.createObjectBinding(callable, selectedTileProperty, flowPane.children.last().layoutXProperty()))
         log.info("binding created")
     }
     private val selectedView = SimpleObjectProperty<Node>().apply { set(thumbnailNode) }
@@ -96,7 +120,7 @@ class ImageFiler(val mainFrame: MainFrame) {
                         .otherwise(selectedView))
     }
     val node: Node = VBox(
-            Label("画像ファイラー 仮置きテキスト"),
+            HBox(Label("画像ファイラー 仮置きテキスト"), labelTmp),
             HBox(
                 Button("リスト").apply { onAction = EventHandler { selectedView.set(listNode) } },
                 Button("サムネイル").apply { onAction = EventHandler { selectedView.set(thumbnailNode) } }),
