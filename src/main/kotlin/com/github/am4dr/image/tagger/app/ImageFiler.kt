@@ -34,7 +34,7 @@ class ImageFiler(val mainFrame: MainFrame) {
     }
     private val tiles = SimpleListProperty<ImageTile>().apply {
         val callable = Callable<ObservableList<ImageTile>> {
-            FXCollections.observableList(imagesProperty.get().filterNotNull().map(::ImageTile))
+            FXCollections.observableList(imagesProperty.filterNotNull().map(::ImageTile))
         }
         bind(Bindings.createObjectBinding(callable, imagesProperty))
     }
