@@ -28,7 +28,7 @@ import java.util.concurrent.Callable
 // TODO thumbnailNodeを別クラスに分割する
 class ImageFiler(val mainFrame: MainFrame) {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
-    private val imagesProperty: ListProperty<ImageData> = SimpleListProperty<ImageData>().apply { bind(mainFrame.imagesProperty) }
+    private val imagesProperty = mainFrame.imagesProperty
     private val listNode = ListView<ImageData>().apply {
         itemsProperty().bind(imagesProperty)
     }
