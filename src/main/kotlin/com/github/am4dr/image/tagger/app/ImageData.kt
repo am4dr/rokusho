@@ -1,12 +1,18 @@
 package com.github.am4dr.image.tagger.app
 
 import javafx.scene.image.Image
+import java.lang.ref.SoftReference
 import java.nio.file.Path
 
-// TODO 一時的に原寸大の画像を得られるようにする。メモリ削減のために弱参照で持って破棄する。
 class ImageData(path: Path, val tags: MutableList<String>) {
     constructor(path: Path) : this(path, mutableListOf())
     val path: Path = path.toRealPath()
-    val thumnail: Image by lazy { Image(path.toUri().toURL().toString(), 200.0, 200.0, true, true, true) }
-    val image: Image by lazy { Image(path.toUri().toURL().toString()) }
+    val thumnail: Image by lazy { loadImage(200.0, 200.0) }
+    val image: Image by lazy { loadImage(0.0, 0.0) }
+    private var tempImageRef: SoftReference<Image> = SoftReference<Image>(null)
+    val tempImage: Image
+        get() = tempImageRef.get() ?: loadImage(0.0, 0.0, false).apply { tempImageRef = SoftReference<Image>(this) }
+    private fun loadImage(width: Double, height: Double, background: Boolean = true): Image {
+        return Image(path.toUri().toURL().toString(), width, height, true, true, background)
+    }
 }
