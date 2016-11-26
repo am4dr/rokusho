@@ -63,9 +63,9 @@ class ThumbnailPaneView : StackPane() {
     val overlayVisibleProperty: BooleanProperty = SimpleBooleanProperty(false)
     val overlayImageProperty: Property<Image> = SimpleObjectProperty<Image>()
     init {
-        val overlay = OverlayTile()
+        val overlay = ImageOverlayPane()
         overlay.visibleProperty().bind(overlayVisibleProperty)
-        overlay.image.bind(overlayImageProperty)
+        overlay.imageProperty.bind(overlayImageProperty)
         overlay.onMouseClicked = EventHandler<MouseEvent> { overlayVisibleProperty.set(false) }
         this.children.addAll(
                 ScrollPane().apply {
@@ -81,25 +81,25 @@ class ThumbnailPaneView : StackPane() {
                 },
                 overlay)
     }
-    private class OverlayTile() : VBox() {
-        val imageView = ImageView().apply {
-            isPreserveRatio = true
-            fitWidthProperty().bind(
-                    When(this@OverlayTile.widthProperty().multiply(2.0).lessThan(400.0))
-                            .then(0.9).otherwise(0.75)
-                            .multiply(this@OverlayTile.widthProperty()))
-            fitHeightProperty().bind(
-                    When(this@OverlayTile.heightProperty().multiply(2.0).lessThan(400.0))
-                            .then(0.9).otherwise(0.75)
-                            .multiply(this@OverlayTile.heightProperty()))
-        }
-        val image: Property<Image>
-            get() = imageView.imageProperty()
-        init {
-            fillWidthProperty().set(true)
-            alignment = Pos.CENTER
-            background = Background(BackgroundFill(Color.rgb(30, 30, 30, 0.75), null, null))
-            children.add(imageView)
-        }
+}
+class ImageOverlayPane : VBox() {
+    val imageView = ImageView().apply {
+        isPreserveRatio = true
+        fitWidthProperty().bind(
+                When(this@ImageOverlayPane.widthProperty().multiply(2.0).lessThan(400.0))
+                        .then(0.9).otherwise(0.75)
+                        .multiply(this@ImageOverlayPane.widthProperty()))
+        fitHeightProperty().bind(
+                When(this@ImageOverlayPane.heightProperty().multiply(2.0).lessThan(400.0))
+                        .then(0.9).otherwise(0.75)
+                        .multiply(this@ImageOverlayPane.heightProperty()))
+    }
+    val imageProperty: Property<Image>
+        get() = imageView.imageProperty()
+    init {
+        fillWidthProperty().set(true)
+        alignment = Pos.CENTER
+        background = Background(BackgroundFill(Color.rgb(30, 30, 30, 0.75), null, null))
+        children.add(imageView)
     }
 }
