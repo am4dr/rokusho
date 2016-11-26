@@ -2,11 +2,9 @@ package com.github.am4dr.image.tagger.app
 
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.When
-import javafx.beans.property.ListProperty
-import javafx.beans.property.Property
-import javafx.beans.property.SimpleListProperty
-import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.property.*
 import javafx.collections.FXCollections
+import javafx.collections.ObservableList
 import javafx.event.EventHandler
 import javafx.geometry.Pos
 import javafx.geometry.VPos
@@ -26,25 +24,13 @@ class ThumbnailPane(imageDataList: ListProperty<ImageData>) {
     var imageData: ListProperty<ImageData>
         get() = imagesProperty
         set(value) = imagesProperty.bind(value)
-    val pane: Pane
-    private val sp = ScrollPane().apply {
-        fitToWidthProperty().set(true)
-        hbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
-    }
-    private val tiles = SimpleListProperty<ImageTile>()
+    val view = ThumbnailPaneView()
     private val selectedTileProperty = SimpleObjectProperty<ImageTile>().apply {
         addListener { obs, old, new -> log.debug("change selectedTileProperty: $old -> $new") }
     }
-    private val overlayTile = OverlayTile()
-    private val flowPane = FlowPane(10.0, 10.0).apply {
-        alignment = Pos.CENTER
-        rowValignment = VPos.BASELINE
-    }
+    val tiles = SimpleListProperty<ImageTile>()
     init {
         this.imageData = imageDataList
-        pane = StackPane(
-                sp.apply { content = flowPane },
-                overlayTile.apply { visibleProperty().set(false) })
         tiles.bind(Bindings.createObjectBinding(
                 Callable { FXCollections.observableList(imagesProperty.filterNotNull().map(::ImageTile)) },
                 imagesProperty))
@@ -59,24 +45,41 @@ class ThumbnailPane(imageDataList: ListProperty<ImageData>) {
                     return@EventHandler
                 }
                 selectedTileProperty.set(tile)
-                showOverlayTile()
+                view.overlayVisibleProperty.set(true)
             }
             new.map { tile -> tile.onMouseClicked = tileClickHandler }
-            flowPane.children.setAll(new)
+            view.tiles = new
         }
-        overlayTile.apply {
-            image.bind(Bindings.createObjectBinding(
+        view.overlayImageProperty.bind(Bindings.createObjectBinding(
                     Callable { selectedTileProperty.get()?.data?.tempImage },
                     selectedTileProperty))
-            onMouseClicked = EventHandler<MouseEvent> { e -> hideOverlayTile() }
-        }
     }
-    private fun showOverlayTile() {
-        overlayTile.visibleProperty().set(true)
-    }
-    private fun hideOverlayTile() {
-        overlayTile.visibleProperty().set(false)
-        selectedTileProperty.set(null)
+}
+class ThumbnailPaneView : StackPane() {
+    val tilesProperty: ListProperty<ImageTile> = SimpleListProperty<ImageTile>()
+    var tiles: ObservableList<ImageTile>
+        get() = tilesProperty.get()
+        set(value) = tilesProperty.set(value)
+    val overlayVisibleProperty: BooleanProperty = SimpleBooleanProperty(false)
+    val overlayImageProperty: Property<Image> = SimpleObjectProperty<Image>()
+    init {
+        val overlay = OverlayTile()
+        overlay.visibleProperty().bind(overlayVisibleProperty)
+        overlay.image.bind(overlayImageProperty)
+        overlay.onMouseClicked = EventHandler<MouseEvent> { overlayVisibleProperty.set(false) }
+        this.children.addAll(
+                ScrollPane().apply {
+                    fitToWidthProperty().set(true)
+                    hbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
+                    content = FlowPane(10.0, 10.0).apply {
+                        alignment = Pos.CENTER
+                        rowValignment = VPos.BASELINE
+                        tilesProperty.addListener { observableValue, old, new ->
+                            children.setAll(new)
+                        }
+                    }
+                },
+                overlay)
     }
     private class OverlayTile() : VBox() {
         val imageView = ImageView().apply {

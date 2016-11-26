@@ -22,7 +22,7 @@ class ImageFiler(val mainFrame: MainFrame) {
         itemsProperty().bind(imagesProperty)
     }
     private val labelTmp = Label()
-    private val thumbnailNode = ThumbnailPane(imagesProperty).pane
+    private val thumbnailNode = ThumbnailPane(imagesProperty).view
     private val selectedView = SimpleObjectProperty<Node>().apply { set(thumbnailNode) }
     private val currentView: Node = BorderPane().apply {
         VBox.setVgrow(this, Priority.ALWAYS)
