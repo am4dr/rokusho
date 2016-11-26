@@ -39,11 +39,7 @@ class ThumbnailPane(imageDataList: ListProperty<ImageData>) {
             selectedTileProperty.set(null)
             val tileClickHandler = EventHandler<MouseEvent> { e ->
                 val tile = e.source as? ImageTile ?: return@EventHandler
-                log.debug("tile clicked")
-                if (selectedTileProperty.get() === tile) {
-                    selectedTileProperty.set(null)
-                    return@EventHandler
-                }
+                log.info("tile clicked: $tile")
                 selectedTileProperty.set(tile)
                 view.overlayVisibleProperty.set(true)
             }
