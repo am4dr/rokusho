@@ -52,8 +52,7 @@ class ThumbnailPane(imageDataList: ListProperty<ImageData>) {
             log.debug("tiles changed - new.size: ${new.size}")
             selectedTileProperty.set(null)
             val tileClickHandler = EventHandler<MouseEvent> { e ->
-                val tile = e.source
-                if (tile !is ImageTile) { return@EventHandler }
+                val tile = e.source as? ImageTile ?: return@EventHandler
                 log.debug("tile clicked")
                 if (selectedTileProperty.get() === tile) {
                     selectedTileProperty.set(null)
