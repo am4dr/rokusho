@@ -30,9 +30,6 @@ class MainFrame(private val commandline: CommandLine) {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
     internal val mainPane = BorderPane()
     internal val targetDirProperty: ObjectProperty<Path?> = SimpleObjectProperty()
-    private var targetDir: Path?
-        get() = targetDirProperty.get()
-        set(value) = targetDirProperty.set(value)
     private val imageDataStore = ImageDataStore()
     private val imageFileNameMatcher = Regex(".*\\.(bmp|gif|jpe?g|png)$", RegexOption.IGNORE_CASE)
     init {
@@ -63,15 +60,15 @@ class MainFrame(private val commandline: CommandLine) {
         }
         if (commandline.args.size == 1) {
             Paths.get(commandline.args[0])?.let { path ->
-                if (Files.isDirectory(path)) { targetDir = path }
+                if (Files.isDirectory(path)) { targetDirProperty.set(path) }
             }
         }
     }
     private fun selectTargetDirectory() {
         DirectoryChooser().run {
             title = "対象ディレクトリの選択"
-            targetDir?.let { initialDirectory = it.toFile() }
-            targetDir = showDialog(mainPane.scene.window)?.toPath()
+            initialDirectory = targetDirProperty.get()?.toFile()
+            targetDirProperty.set(showDialog(mainPane.scene.window)?.toPath())
         }
     }
     private fun makeDirectorySelectorPane(): Pane {
