@@ -1,6 +1,5 @@
 package com.github.am4dr.image.tagger.app
 
-import javafx.beans.binding.When
 import javafx.beans.property.ListProperty
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
@@ -23,7 +22,6 @@ class ImageFiler {
     private val listNode = ListView<ImageData>().apply {
         itemsProperty().bind(imagesProperty)
     }
-    private val labelTmp = Label()
     private val thumbnailNode = ThumbnailPane(imagesProperty).view
     private val selectedView = SimpleObjectProperty<Node>().apply { set(thumbnailNode) }
     private val currentView: Node = BorderPane().apply {
@@ -31,7 +29,7 @@ class ImageFiler {
         centerProperty().bind(selectedView)
     }
     val node: Node = VBox(
-            HBox(Label("画像ファイラー 仮置きテキスト"), labelTmp),
+            HBox(Label("画像ファイラー 仮置きテキスト")),
             HBox(
                 Button("リスト").apply { onAction = EventHandler { selectedView.set(listNode) } },
                 Button("サムネイル").apply { onAction = EventHandler { selectedView.set(thumbnailNode) } }),
