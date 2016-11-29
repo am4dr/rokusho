@@ -1,5 +1,6 @@
 package com.github.am4dr.image.tagger.app
 
+import javafx.beans.binding.When
 import javafx.beans.property.ListProperty
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleListProperty
@@ -7,7 +8,6 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.event.EventHandler
 import javafx.geometry.Pos
-import javafx.scene.Node
 import javafx.scene.control.Hyperlink
 import javafx.scene.control.Label
 import javafx.scene.layout.BorderPane
@@ -33,22 +33,22 @@ class MainFrame(private val commandline: CommandLine) {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
     private val directorySelectorPane = makeDirectorySelectorPane()
     internal val mainPane = BorderPane().apply { center = directorySelectorPane }
-    private var contents: Node
-        get() = mainPane.center
-        set(value) { mainPane.center = value }
     internal val targetDirProperty: ObjectProperty<Path?> = SimpleObjectProperty()
     private var targetDir: Path?
         get() = targetDirProperty.get()
         set(value) = targetDirProperty.set(value)
-    internal val imagesProperty: ListProperty<ImageData> = SimpleListProperty(FXCollections.observableArrayList<ImageData>())
     private val imageDatabase = mutableMapOf<Path, ImageData>()
     private val imageFileNameMatcher = Regex(".*\\.(bmp|gif|jpe?g|png)$", RegexOption.IGNORE_CASE)
     init {
-        val filer = ImageFiler(this)
+        val imagesProperty: ListProperty<ImageData> = SimpleListProperty(FXCollections.observableArrayList<ImageData>())
+        val filer = ImageFiler()
+        filer.imagesProperty.bind(imagesProperty)
+        mainPane.centerProperty().bind(
+                When(imagesProperty.sizeProperty().greaterThan(0))
+                        .then(filer.node)
+                        .otherwise(directorySelectorPane))
         targetDirProperty.addListener { observable, old, new ->
             log.debug("target directory changed: $old -> $new")
-            contents = if (new == null) directorySelectorPane
-                       else BorderPane().apply { center = filer.node }
             if (old != new) {
                 if (targetDir != null) {
                     Files.list(targetDir)

@@ -1,6 +1,8 @@
 package com.github.am4dr.image.tagger.app
 
 import javafx.beans.binding.When
+import javafx.beans.property.ListProperty
+import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.event.EventHandler
 import javafx.scene.Node
@@ -15,9 +17,9 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 // TODO ダブルクリックに限って拡大表示をする
-class ImageFiler(val mainFrame: MainFrame) {
+class ImageFiler {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
-    private val imagesProperty = mainFrame.imagesProperty
+    val imagesProperty: ListProperty<ImageData> = SimpleListProperty<ImageData>()
     private val listNode = ListView<ImageData>().apply {
         itemsProperty().bind(imagesProperty)
     }
@@ -26,10 +28,7 @@ class ImageFiler(val mainFrame: MainFrame) {
     private val selectedView = SimpleObjectProperty<Node>().apply { set(thumbnailNode) }
     private val currentView: Node = BorderPane().apply {
         VBox.setVgrow(this, Priority.ALWAYS)
-        centerProperty().bind(
-                When(imagesProperty.sizeProperty().isEqualTo(0))
-                        .then<Node>(mainFrame.makeDirectorySelectorPane())
-                        .otherwise(selectedView))
+        centerProperty().bind(selectedView)
     }
     val node: Node = VBox(
             HBox(Label("画像ファイラー 仮置きテキスト"), labelTmp),
