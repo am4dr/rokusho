@@ -67,14 +67,14 @@ class MainFrame(private val commandline: CommandLine) {
             }
         }
     }
-    fun selectTargetDirectory() {
+    private fun selectTargetDirectory() {
         DirectoryChooser().run {
             title = "対象ディレクトリの選択"
             targetDir?.let { initialDirectory = it.toFile() }
             targetDir = showDialog(mainPane.scene.window)?.toPath()
         }
     }
-    internal fun makeDirectorySelectorPane(): Pane {
+    private fun makeDirectorySelectorPane(): Pane {
         val link = Hyperlink("選択ダイアログを開く")
         link.onAction = EventHandler { selectTargetDirectory() }
         return HBox(Label("対象のディレクトリを選択してください: "), link).apply {
