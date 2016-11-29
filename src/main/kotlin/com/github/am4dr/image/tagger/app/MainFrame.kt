@@ -28,7 +28,6 @@ const val defaultSaveFileName = "image_tag_info.tsv"
  */
 class MainFrame(private val commandline: CommandLine) {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
-    private val directorySelectorPane = makeDirectorySelectorPane()
     internal val mainPane = BorderPane()
     internal val targetDirProperty: ObjectProperty<Path?> = SimpleObjectProperty()
     private var targetDir: Path?
@@ -43,7 +42,7 @@ class MainFrame(private val commandline: CommandLine) {
         mainPane.centerProperty().bind(
                 When(imagesProperty.sizeProperty().greaterThan(0))
                         .then(filer.node)
-                        .otherwise(directorySelectorPane))
+                        .otherwise(makeDirectorySelectorPane()))
         targetDirProperty.addListener { observable, old, new ->
             log.debug("target directory changed: $old -> $new")
             if (new == null) {
