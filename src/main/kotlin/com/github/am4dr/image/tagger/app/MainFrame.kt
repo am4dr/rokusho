@@ -25,9 +25,6 @@ import java.util.stream.Collectors
 const val defaultSaveFileName = "image_tag_info.tsv"
 /*
 シーングラフのルート。全体で共有したいデータを保持し、子ノードにプロパティとして提供する。
-    TODO 対象のディレクトリの監視機能をつける
-    TODO 対象が画像を含まないときに表示するためのNodeをつくる
-    TODO imagedatabaseをファイルから構築する
  */
 class MainFrame(private val commandline: CommandLine) {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)

@@ -15,7 +15,6 @@ import javafx.scene.layout.VBox
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-// TODO ダブルクリックに限って拡大表示をする
 class ImageFiler {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
     val imagesProperty: ListProperty<ImageData> = SimpleListProperty<ImageData>()
