@@ -49,13 +49,15 @@ class MainFrame(private val commandline: CommandLine) {
                         .otherwise(directorySelectorPane))
         targetDirProperty.addListener { observable, old, new ->
             log.debug("target directory changed: $old -> $new")
-            if (new != null) {
-                Files.list(new)
-                        .filter { imageFileNameMatcher.matches(it.fileName.toString()) }
-                        .collect(Collectors.toList<Path>())
-                        .let { imagesProperty.setAll(it.map { lookupOrCreateImageData(it) }) }
+            if (new == null) {
+                imagesProperty.clear()
+                return@addListener
             }
-            else { imagesProperty.clear() }
+            Files.list(new)
+                    .filter { imageFileNameMatcher.matches(it.fileName.toString()) }
+                    .map { lookupOrCreateImageData(it) }
+                    .collect(Collectors.toList<ImageData>())
+                    .let { imagesProperty.setAll(it) } // listener of imagesProperty should be called only once
         }
         if (commandline.args.size == 1) {
             Paths.get(commandline.args[0])?.let { path ->
