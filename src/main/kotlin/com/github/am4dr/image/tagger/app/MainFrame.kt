@@ -29,7 +29,7 @@ const val defaultSaveFileName = "image_tag_info.tsv"
 class MainFrame(private val commandline: CommandLine) {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
     private val directorySelectorPane = makeDirectorySelectorPane()
-    internal val mainPane = BorderPane().apply { center = directorySelectorPane }
+    internal val mainPane = BorderPane()
     internal val targetDirProperty: ObjectProperty<Path?> = SimpleObjectProperty()
     private var targetDir: Path?
         get() = targetDirProperty.get()
