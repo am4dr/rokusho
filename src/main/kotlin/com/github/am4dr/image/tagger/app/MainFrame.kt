@@ -53,6 +53,12 @@ class MainFrame(private val commandline: CommandLine) {
                 imagesProperty.clear()
                 return@addListener
             }
+            val saveFile = new.resolve(defaultSaveFileName)
+            if(Files.exists(saveFile)) {
+                log.info("load save file: $saveFile")
+                imageDataStore.load(new, saveFile)
+            }
+            else { log.info("save file not found: $saveFile") }
             Files.list(new)
                     .filter { imageFileNameMatcher.matches(it.fileName.toString()) }
                     .map { imageDataStore.getData(it) }
