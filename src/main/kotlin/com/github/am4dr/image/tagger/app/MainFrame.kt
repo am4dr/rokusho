@@ -23,6 +23,7 @@ import java.nio.file.Paths
 import java.util.stream.Collectors
 
 const val defaultSaveFileName = "image_tag_info.tsv"
+private val imageFileNameMatcher = Regex(".*\\.(bmp|gif|jpe?g|png)$", RegexOption.IGNORE_CASE)
 /*
 シーングラフのルート。全体で共有したいデータを保持し、子ノードにプロパティとして提供する。
  */
@@ -31,7 +32,6 @@ class MainFrame(private val commandline: CommandLine) {
     internal val mainPane = BorderPane()
     internal val targetDirProperty: ObjectProperty<Path?> = SimpleObjectProperty()
     private val imageDataStore = ImageDataStore()
-    private val imageFileNameMatcher = Regex(".*\\.(bmp|gif|jpe?g|png)$", RegexOption.IGNORE_CASE)
     init {
         val imagesProperty: ListProperty<ImageData> = SimpleListProperty(FXCollections.observableArrayList<ImageData>())
         val filer = ImageFiler()
