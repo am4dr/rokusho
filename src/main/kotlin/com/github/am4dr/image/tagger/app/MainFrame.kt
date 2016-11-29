@@ -40,11 +40,12 @@ class MainFrame(private val commandline: CommandLine) {
     private var targetDir: Path?
         get() = targetDirProperty.get()
         set(value) = targetDirProperty.set(value)
-    internal val imagesProperty: ListProperty<ImageData> = SimpleListProperty(FXCollections.observableArrayList<ImageData>())
     private val imageDatabase = mutableMapOf<Path, ImageData>()
     private val imageFileNameMatcher = Regex(".*\\.(bmp|gif|jpe?g|png)$", RegexOption.IGNORE_CASE)
     init {
+        val imagesProperty: ListProperty<ImageData> = SimpleListProperty(FXCollections.observableArrayList<ImageData>())
         val filer = ImageFiler(this)
+        filer.imagesProperty.bind(imagesProperty)
         targetDirProperty.addListener { observable, old, new ->
             log.debug("target directory changed: $old -> $new")
             contents = if (new == null) directorySelectorPane

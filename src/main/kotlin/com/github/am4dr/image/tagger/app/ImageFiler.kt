@@ -1,6 +1,8 @@
 package com.github.am4dr.image.tagger.app
 
 import javafx.beans.binding.When
+import javafx.beans.property.ListProperty
+import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.event.EventHandler
 import javafx.scene.Node
@@ -17,7 +19,7 @@ import org.slf4j.LoggerFactory
 // TODO ダブルクリックに限って拡大表示をする
 class ImageFiler(val mainFrame: MainFrame) {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
-    private val imagesProperty = mainFrame.imagesProperty
+    val imagesProperty: ListProperty<ImageData> = SimpleListProperty<ImageData>()
     private val listNode = ListView<ImageData>().apply {
         itemsProperty().bind(imagesProperty)
     }
