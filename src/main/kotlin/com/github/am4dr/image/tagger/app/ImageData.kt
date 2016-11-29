@@ -15,4 +15,5 @@ class ImageData(path: Path, val tags: List<String>) {
     private fun loadImage(width: Double, height: Double, background: Boolean = true): Image {
         return Image(path.toUri().toURL().toString(), width, height, true, true, background)
     }
+    override fun toString(): String = "path: $path, tags: $tags"
 }
