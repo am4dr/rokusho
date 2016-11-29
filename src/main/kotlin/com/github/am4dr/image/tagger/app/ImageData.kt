@@ -4,7 +4,7 @@ import javafx.scene.image.Image
 import java.lang.ref.SoftReference
 import java.nio.file.Path
 
-class ImageData(path: Path, val tags: MutableList<String>) {
+class ImageData(path: Path, val tags: List<String>) {
     constructor(path: Path) : this(path, mutableListOf())
     val path: Path = path.toRealPath()
     val thumnail: Image by lazy { loadImage(200.0, 200.0) }

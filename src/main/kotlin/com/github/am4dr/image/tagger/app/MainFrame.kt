@@ -22,6 +22,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.stream.Collectors
 
+const val defaultSaveFileName = "image_tag_info.tsv"
 /*
 シーングラフのルート。全体で共有したいデータを保持し、子ノードにプロパティとして提供する。
     TODO 対象のディレクトリの監視機能をつける
@@ -29,7 +30,6 @@ import java.util.stream.Collectors
     TODO imagedatabaseをファイルから構築する
  */
 class MainFrame(private val commandline: CommandLine) {
-    val saveFileName = "info.tsv"
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
     private val directorySelectorPane = makeDirectorySelectorPane()
     internal val mainPane = BorderPane().apply { center = directorySelectorPane }
@@ -37,7 +37,7 @@ class MainFrame(private val commandline: CommandLine) {
     private var targetDir: Path?
         get() = targetDirProperty.get()
         set(value) = targetDirProperty.set(value)
-    private val imageDatabase = mutableMapOf<Path, ImageData>()
+    private val imageDataStore = ImageDataStore()
     private val imageFileNameMatcher = Regex(".*\\.(bmp|gif|jpe?g|png)$", RegexOption.IGNORE_CASE)
     init {
         val imagesProperty: ListProperty<ImageData> = SimpleListProperty(FXCollections.observableArrayList<ImageData>())
@@ -55,7 +55,7 @@ class MainFrame(private val commandline: CommandLine) {
             }
             Files.list(new)
                     .filter { imageFileNameMatcher.matches(it.fileName.toString()) }
-                    .map { lookupOrCreateImageData(it) }
+                    .map { imageDataStore.getData(it) }
                     .collect(Collectors.toList<ImageData>())
                     .let { imagesProperty.setAll(it) } // listener of imagesProperty should be called only once
         }
@@ -64,11 +64,6 @@ class MainFrame(private val commandline: CommandLine) {
                 if (Files.isDirectory(path)) { targetDir = path }
             }
         }
-    }
-    // TODO クラスImageStoreに抽出
-    private fun lookupOrCreateImageData(path: Path): ImageData {
-        val data: ImageData? = imageDatabase[path]
-        return data ?: ImageData(path).apply { imageDatabase[path] = this }
     }
     fun selectTargetDirectory() {
         DirectoryChooser().run {
