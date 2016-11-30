@@ -29,7 +29,7 @@ const val defaultSaveFileName = "image_tag_info.tsv"
 class MainFrame(private val commandline: CommandLine) {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
     internal val mainPane = BorderPane()
-    internal val targetDirProperty: ObjectProperty<Path?> = SimpleObjectProperty()
+    private val targetDirProperty: ObjectProperty<Path?> = SimpleObjectProperty()
     private val imageDataStore = ImageDataStore()
     init {
         val imagesProperty: ListProperty<ImageData> = SimpleListProperty(FXCollections.observableArrayList<ImageData>())
