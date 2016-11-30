@@ -20,10 +20,9 @@ import org.slf4j.LoggerFactory
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.util.stream.Collectors
 
 const val defaultSaveFileName = "image_tag_info.tsv"
-private val imageFileNameMatcher = Regex(".*\\.(bmp|gif|jpe?g|png)$", RegexOption.IGNORE_CASE)
+
 /*
 シーングラフのルート。全体で共有したいデータを保持し、子ノードにプロパティとして提供する。
  */
@@ -46,25 +45,13 @@ class MainFrame(private val commandline: CommandLine) {
                 imagesProperty.clear()
                 return@addListener
             }
-            imagesProperty.setAll(createImageDataList(new))
+            imagesProperty.setAll(imageDataStore.loadImageData(new, new.resolve(defaultSaveFileName)))
         }
         if (commandline.args.size == 1) {
             Paths.get(commandline.args[0])?.let { path ->
                 if (Files.isDirectory(path)) { targetDirProperty.set(path) }
             }
         }
-    }
-    private fun createImageDataList(targetDir: Path): List<ImageData> {
-        val saveFile = targetDir.resolve(defaultSaveFileName)
-        if(Files.exists(saveFile)) {
-            log.info("load save file: $saveFile")
-            imageDataStore.load(targetDir, saveFile)
-        }
-        else { log.info("save file not found: $saveFile") }
-        return Files.list(targetDir)
-                .filter { imageFileNameMatcher.matches(it.fileName.toString()) }
-                .map { imageDataStore.getData(it) }
-                .collect(Collectors.toList<ImageData>())
     }
     private fun selectTargetDirectory() {
         DirectoryChooser().run {
