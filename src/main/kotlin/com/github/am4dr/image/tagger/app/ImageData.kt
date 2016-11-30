@@ -4,10 +4,13 @@ import javafx.scene.image.Image
 import java.lang.ref.SoftReference
 import java.nio.file.Path
 
+private const val thumbnailMaxWidth: Double = 500.0
+private const val thumbnailMaxHeight: Double = 200.0
+
 class ImageData(path: Path, val tags: List<String>) {
     constructor(path: Path) : this(path, mutableListOf())
     val path: Path = path.toRealPath()
-    val thumnail: Image by lazy { loadImage(200.0, 200.0) }
+    val thumnail: Image by lazy { loadImage(thumbnailMaxWidth, thumbnailMaxHeight) }
     val image: Image by lazy { loadImage(0.0, 0.0) }
     private var tempImageRef: SoftReference<Image> = SoftReference<Image>(null)
     val tempImage: Image
