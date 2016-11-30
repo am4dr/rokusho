@@ -18,10 +18,12 @@ class ImageDataStore {
     }
     fun loadImageInfo(baseDir: Path, infoPath: Path) {
         val base = baseDir.toRealPath()
+        if(Files.notExists(infoPath)) {
+            log.info("info file not found: $infoPath")
+            return
+        }
+        log.info("load image info from file: $infoPath")
         val save = infoPath.toRealPath()
-        log.info(
-                if(Files.exists(infoPath)) "load image info from file: $infoPath"
-                else "info file not found: $infoPath")
         Files.lines(save, Charset.forName("utf-8"))
                 .forEach {
                     val d = recordToImageData(base, it)
