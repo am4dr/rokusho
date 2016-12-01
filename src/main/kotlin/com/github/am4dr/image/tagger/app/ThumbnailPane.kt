@@ -10,9 +10,11 @@ import javafx.geometry.Pos
 import javafx.geometry.VPos
 import javafx.scene.control.ScrollPane
 import javafx.scene.image.Image
-import javafx.scene.image.ImageView
 import javafx.scene.input.MouseEvent
-import javafx.scene.layout.*
+import javafx.scene.layout.Background
+import javafx.scene.layout.BackgroundFill
+import javafx.scene.layout.FlowPane
+import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -56,10 +58,11 @@ class ThumbnailPaneView : StackPane() {
     val overlayVisibleProperty: BooleanProperty = SimpleBooleanProperty(false)
     val overlayImageProperty: Property<Image> = SimpleObjectProperty<Image>()
     init {
-        val overlay = ImageOverlayPane()
+        val overlay = ImageOverlay()
         overlay.visibleProperty().bind(overlayVisibleProperty)
         overlay.imageProperty.bind(overlayImageProperty)
         overlay.onMouseClicked = EventHandler<MouseEvent> { overlayVisibleProperty.set(false) }
+        overlay.background = Background(BackgroundFill(Color.rgb(30, 30, 30, 0.75), null, null))
         this.children.addAll(
                 ScrollPane().apply {
                     fitToWidthProperty().set(true)
@@ -72,22 +75,5 @@ class ThumbnailPaneView : StackPane() {
                     }
                 },
                 overlay)
-    }
-}
-class ImageOverlayPane : VBox() {
-    val imageView = ImageView().apply {
-        isPreserveRatio = true
-        fitWidthProperty().bind(this@ImageOverlayPane.widthProperty().multiply(0.8))
-        fitHeightProperty().bind(this@ImageOverlayPane.heightProperty().multiply(0.8))
-    }
-    val imageProperty: Property<Image>
-        get() = imageView.imageProperty()
-    init {
-        minWidth = 0.0
-        minHeight = 0.0
-        fillWidthProperty().set(true)
-        alignment = Pos.CENTER
-        background = Background(BackgroundFill(Color.rgb(30, 30, 30, 0.75), null, null))
-        children.add(imageView)
     }
 }
