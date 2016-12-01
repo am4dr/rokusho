@@ -6,6 +6,7 @@ import javafx.beans.property.*
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.event.EventHandler
+import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.geometry.VPos
 import javafx.scene.control.ScrollPane
@@ -68,6 +69,7 @@ class ThumbnailPaneView : StackPane() {
                     fitToWidthProperty().set(true)
                     hbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
                     content = FlowPane(10.0, 10.0).apply {
+                        padding = Insets(25.0, 0.0, 25.0, 0.0)
                         alignment = Pos.CENTER
                         rowValignment = VPos.BASELINE
                         tilesProperty.addListener { observableValue, old, new ->
