@@ -1,7 +1,6 @@
 package com.github.am4dr.image.tagger.app
 
 import javafx.beans.binding.Bindings
-import javafx.beans.binding.When
 import javafx.beans.property.*
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
@@ -69,9 +68,7 @@ class ThumbnailPaneView : StackPane() {
                         padding = Insets(25.0, 0.0, 25.0, 0.0)
                         alignment = Pos.CENTER
                         rowValignment = VPos.BASELINE
-                        tilesProperty.addListener { observableValue, old, new ->
-                            children.setAll(new)
-                        }
+                        Bindings.bindContent(children, tilesProperty)
                     }
                 },
                 overlay)
