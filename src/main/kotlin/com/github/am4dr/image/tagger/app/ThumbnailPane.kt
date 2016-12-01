@@ -45,8 +45,8 @@ class ThumbnailPane(imageDataList: ListProperty<ImageData>) {
                 view.overlayVisibleProperty.set(true)
             }
             new.map { tile -> tile.onMouseClicked = tileClickHandler }
-            view.tiles = new
         }
+        view.tilesProperty.bind(tiles)
         view.overlayImageProperty.bind(Bindings.createObjectBinding(
                     Callable { selectedTileProperty.get()?.data?.tempImage },
                     selectedTileProperty))
