@@ -52,9 +52,6 @@ class ThumbnailPane(imageDataList: ListProperty<ImageData>) {
 }
 class ThumbnailPaneView : StackPane() {
     val tilesProperty: ListProperty<ImageTile> = SimpleListProperty<ImageTile>()
-    var tiles: ObservableList<ImageTile>
-        get() = tilesProperty.get()
-        set(value) = tilesProperty.set(value)
     val overlayVisibleProperty: BooleanProperty = SimpleBooleanProperty(false)
     val overlayImageProperty: Property<Image> = SimpleObjectProperty<Image>()
     init {
