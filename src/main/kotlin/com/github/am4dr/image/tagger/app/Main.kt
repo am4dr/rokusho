@@ -28,7 +28,7 @@ class Main : Application() {
         val mainNode: Parent = MainFrame(parseArgs(parameters.raw.toTypedArray())).mainPane
         stage.run {
             title = "Image Tagger"
-            scene = Scene(mainNode, 400.0, 300.0)
+            scene = Scene(mainNode, 800.0, 500.0)
             show()
         }
     }
