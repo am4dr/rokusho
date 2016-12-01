@@ -21,17 +21,14 @@ import java.util.concurrent.Callable
 
 class ThumbnailPane(imageDataList: ListProperty<ImageData>) {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
-    private val imagesProperty = SimpleListProperty<ImageData>()
-    var imageData: ListProperty<ImageData>
-        get() = imagesProperty
-        set(value) = imagesProperty.bind(value)
+    val imagesProperty = SimpleListProperty<ImageData>()
     val view = ThumbnailPaneView()
     private val selectedTileProperty = SimpleObjectProperty<ImageTile>().apply {
         addListener { obs, old, new -> log.debug("change selectedTileProperty: $old -> $new") }
     }
     val tiles = SimpleListProperty<ImageTile>()
     init {
-        this.imageData = imageDataList
+        imagesProperty.bind(imageDataList)
         tiles.bind(Bindings.createObjectBinding(
                 Callable { FXCollections.observableList(imagesProperty.filterNotNull().map(::ImageTile)) },
                 imagesProperty))
