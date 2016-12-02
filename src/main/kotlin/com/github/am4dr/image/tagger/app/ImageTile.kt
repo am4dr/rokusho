@@ -8,6 +8,7 @@ import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.scene.text.Font
 
+private val transparentBlackBackground = Background(BackgroundFill(Color.rgb(0, 0, 0, 0.5), null, null))
 class ImageTile(val data: ImageData) : StackPane() {
     init {
         val image = ImageView(data.thumnail)
@@ -20,7 +21,7 @@ class ImageTile(val data: ImageData) : StackPane() {
             AnchorPane.setRightAnchor(tagsPane, d)
             AnchorPane.setBottomAnchor(tagsPane, d)
             children.add(tagsPane)
-            background = Background(BackgroundFill(Color.rgb(0, 0, 0, 0.5), null, null))
+            background = transparentBlackBackground
             visibleProperty().bind(this@ImageTile.hoverProperty())
             prefWidthProperty().bind(image.image.widthProperty())
             prefHeightProperty().bind(image.image.heightProperty())
