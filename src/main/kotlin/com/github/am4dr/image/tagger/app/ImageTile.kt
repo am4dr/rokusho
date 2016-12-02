@@ -1,5 +1,7 @@
 package com.github.am4dr.image.tagger.app
 
+import javafx.beans.property.BooleanProperty
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.geometry.Insets
 import javafx.scene.Node
 import javafx.scene.control.Label
@@ -10,6 +12,7 @@ import javafx.scene.text.Font
 
 private val transparentBlackBackground = Background(BackgroundFill(Color.rgb(0, 0, 0, 0.5), null, null))
 class ImageTile(val data: ImageData) : StackPane() {
+    val imageVisibleProperty: BooleanProperty = SimpleBooleanProperty(true)
     init {
         val image = ImageView(data.thumnail)
         val overlay = FlowPane(7.5, 5.0).apply {
@@ -21,6 +24,7 @@ class ImageTile(val data: ImageData) : StackPane() {
             prefHeightProperty().bind(image.image.heightProperty())
         }
         children.setAll(image, overlay)
+        image.visibleProperty().bind(imageVisibleProperty)
     }
 }
 private fun createTagLabel(name: String): Node =
