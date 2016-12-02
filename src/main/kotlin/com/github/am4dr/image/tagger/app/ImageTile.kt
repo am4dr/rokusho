@@ -12,16 +12,10 @@ private val transparentBlackBackground = Background(BackgroundFill(Color.rgb(0, 
 class ImageTile(val data: ImageData) : StackPane() {
     init {
         val image = ImageView(data.thumnail)
-        val overlay = AnchorPane().apply {
-            val tagsPane = FlowPane(7.5, 5.0)
-            tagsPane.children.addAll(data.tags.map(::createTagLabel))
-            val d = 10.0
-            AnchorPane.setTopAnchor(tagsPane, d)
-            AnchorPane.setLeftAnchor(tagsPane, d)
-            AnchorPane.setRightAnchor(tagsPane, d)
-            AnchorPane.setBottomAnchor(tagsPane, d)
-            children.add(tagsPane)
+        val overlay = FlowPane(7.5, 5.0).apply {
+            padding = Insets(10.0)
             background = transparentBlackBackground
+            children.addAll(data.tags.map(::createTagLabel))
             visibleProperty().bind(this@ImageTile.hoverProperty())
             prefWidthProperty().bind(image.image.widthProperty())
             prefHeightProperty().bind(image.image.heightProperty())
