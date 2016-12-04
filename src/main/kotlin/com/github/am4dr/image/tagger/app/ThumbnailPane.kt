@@ -3,6 +3,7 @@ package com.github.am4dr.image.tagger.app
 import javafx.beans.binding.Bindings
 import javafx.beans.property.*
 import javafx.collections.FXCollections
+import javafx.collections.ListChangeListener
 import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.geometry.Pos
@@ -21,17 +22,17 @@ import java.util.concurrent.Callable
 
 class ThumbnailPane(imageDataList: ListProperty<ImageData>) {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
-    val imagesProperty = SimpleListProperty<ImageData>()
+    private val imagesProperty = SimpleListProperty<ImageData>()
     val view = ThumbnailPaneView()
     private val selectedTileProperty = SimpleObjectProperty<ImageTile>().apply {
         addListener { obs, old, new -> log.debug("change selectedTileProperty: $old -> $new") }
     }
-    val tiles = SimpleListProperty<ImageTile>()
+    private val tiles = SimpleListProperty<ImageTile>(FXCollections.observableList(mutableListOf()))
     init {
         imagesProperty.bind(imageDataList)
-        tiles.bind(Bindings.createObjectBinding(
-                Callable { FXCollections.observableList(imagesProperty.filterNotNull().map(::ImageTile)) },
-                imagesProperty))
+        imagesProperty.addListener(ListChangeListener {
+            tiles.setAll(FXCollections.observableList(imagesProperty.filterNotNull().map(::ImageTile)))
+        })
         tiles.addListener { observable, old, new ->
             log.debug("tiles changed - new.size: ${new.size}")
             selectedTileProperty.set(null)
