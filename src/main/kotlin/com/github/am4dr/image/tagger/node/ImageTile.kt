@@ -1,5 +1,6 @@
-package com.github.am4dr.image.tagger.app
+package com.github.am4dr.image.tagger.node
 
+import com.github.am4dr.image.tagger.app.ImageData
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.geometry.Insets

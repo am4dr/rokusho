@@ -1,5 +1,7 @@
 package com.github.am4dr.image.tagger.app
 
+import com.github.am4dr.image.tagger.node.ImageOverlay
+import com.github.am4dr.image.tagger.node.ImageTile
 import javafx.beans.binding.Bindings
 import javafx.beans.property.*
 import javafx.collections.FXCollections
