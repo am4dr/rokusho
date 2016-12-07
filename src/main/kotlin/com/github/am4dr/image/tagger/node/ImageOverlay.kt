@@ -1,4 +1,4 @@
-package com.github.am4dr.image.tagger.app
+package com.github.am4dr.image.tagger.node
 
 import javafx.beans.property.DoubleProperty
 import javafx.beans.property.Property
