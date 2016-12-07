@@ -1,11 +1,10 @@
 package com.github.am4dr.image.tagger.app
 
+import com.github.am4dr.image.tagger.util.createEmptyListProperty
 import javafx.beans.binding.When
 import javafx.beans.property.ListProperty
 import javafx.beans.property.ObjectProperty
-import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
-import javafx.collections.FXCollections
 import javafx.event.EventHandler
 import javafx.geometry.Pos
 import javafx.scene.control.Hyperlink
@@ -32,7 +31,7 @@ class MainFrame(private val commandline: CommandLine) {
     private val targetDirProperty: ObjectProperty<Path?> = SimpleObjectProperty()
     private val imageDataStore = ImageDataStore()
     init {
-        val imagesProperty: ListProperty<ImageData> = SimpleListProperty(FXCollections.observableArrayList<ImageData>())
+        val imagesProperty: ListProperty<ImageData> = createEmptyListProperty()
         val filer = ImageFiler()
         filer.imagesProperty.bind(imagesProperty)
         mainPane.centerProperty().bind(

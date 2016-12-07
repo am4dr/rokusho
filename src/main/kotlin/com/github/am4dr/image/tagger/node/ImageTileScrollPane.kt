@@ -1,5 +1,6 @@
 package com.github.am4dr.image.tagger.node
 
+import com.github.am4dr.image.tagger.util.createEmptyListProperty
 import javafx.beans.binding.Bindings
 import javafx.beans.property.*
 import javafx.geometry.Insets
@@ -12,7 +13,7 @@ import org.slf4j.LoggerFactory
 
 class ImageTileScrollPane : ScrollPane() {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
-    val tilesProperty: ListProperty<ImageTile> = SimpleListProperty()
+    val tilesProperty: ListProperty<ImageTile> = createEmptyListProperty()
     private val vValueHeightProperty = SimpleDoubleProperty()
     private var ranges = mutableListOf<TileRange>()
     private val maxRangeSize: Int = 200

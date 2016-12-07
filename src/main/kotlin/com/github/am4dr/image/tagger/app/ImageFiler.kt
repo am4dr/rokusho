@@ -1,7 +1,7 @@
 package com.github.am4dr.image.tagger.app
 
+import com.github.am4dr.image.tagger.util.createEmptyListProperty
 import javafx.beans.property.ListProperty
-import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.event.EventHandler
 import javafx.scene.Node
@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory
 
 class ImageFiler {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
-    val imagesProperty: ListProperty<ImageData> = SimpleListProperty<ImageData>()
+    val imagesProperty: ListProperty<ImageData> = createEmptyListProperty()
     private val listNode = ListView<ImageData>().apply {
         itemsProperty().bind(imagesProperty)
     }

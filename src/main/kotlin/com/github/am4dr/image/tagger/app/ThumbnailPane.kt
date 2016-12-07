@@ -3,6 +3,7 @@ package com.github.am4dr.image.tagger.app
 import com.github.am4dr.image.tagger.node.ImageOverlay
 import com.github.am4dr.image.tagger.node.ImageTile
 import com.github.am4dr.image.tagger.node.ImageTileScrollPane
+import com.github.am4dr.image.tagger.util.createEmptyListProperty
 import javafx.beans.binding.Bindings
 import javafx.beans.property.*
 import javafx.collections.FXCollections
@@ -20,12 +21,12 @@ import java.util.concurrent.Callable
 
 class ThumbnailPane(imageDataList: ListProperty<ImageData>) {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
-    private val imagesProperty = SimpleListProperty<ImageData>()
+    private val imagesProperty = createEmptyListProperty<ImageData>()
     val view = ThumbnailPaneView()
     private val selectedTileProperty = SimpleObjectProperty<ImageTile>().apply {
         addListener { obs, old, new -> log.debug("change selectedTileProperty: $old -> $new") }
     }
-    private val tiles = SimpleListProperty<ImageTile>(FXCollections.observableList(mutableListOf()))
+    private val tiles = createEmptyListProperty<ImageTile>()
     init {
         imagesProperty.bind(imageDataList)
         imagesProperty.addListener(ListChangeListener {
@@ -50,7 +51,7 @@ class ThumbnailPane(imageDataList: ListProperty<ImageData>) {
 }
 class ThumbnailPaneView : StackPane() {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
-    val tilesProperty: ListProperty<ImageTile> = SimpleListProperty<ImageTile>()
+    val tilesProperty: ListProperty<ImageTile> = createEmptyListProperty()
     val overlayVisibleProperty: BooleanProperty = SimpleBooleanProperty(false)
     val overlayImageProperty: Property<Image> = SimpleObjectProperty<Image>()
     init {
