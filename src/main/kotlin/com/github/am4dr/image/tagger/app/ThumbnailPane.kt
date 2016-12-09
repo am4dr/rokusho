@@ -28,7 +28,7 @@ class ThumbnailPane(imageDataList: ListProperty<ImageData>) : StackPane() {
             background = Background(BackgroundFill(Color.rgb(30, 30, 30, 0.75), null, null))
         }
         children.addAll(
-                ImageTileScrollPane().apply { tilesProperty.bind(tiles) },
+                ImageTileScrollPane(tiles),
                 overlay)
         val tileClickHandler = EventHandler<MouseEvent> { e ->
             val tile = e.source as? ImageTile ?: return@EventHandler
