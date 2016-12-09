@@ -54,15 +54,15 @@ class MainFrame(private val commandline: CommandLine) {
     }
     private fun selectTargetDirectory() {
         DirectoryChooser().run {
-            title = "対象ディレクトリの選択"
+            title = "画像があるディレクトリを選択してください"
             initialDirectory = targetDirProperty.get()?.toFile()
             targetDirProperty.set(showDialog(mainPane.scene.window)?.toPath())
         }
     }
     private fun makeDirectorySelectorPane(): Pane {
-        val link = Hyperlink("選択ダイアログを開く")
+        val link = Hyperlink("選択ウィンドウを開く")
         link.onAction = EventHandler { selectTargetDirectory() }
-        return HBox(Label("対象のディレクトリを選択してください: "), link).apply {
+        return HBox(Label("対象とする画像があるディレクトリを選択してください: "), link).apply {
             alignment = Pos.CENTER
         }
     }
