@@ -21,7 +21,7 @@ class ImageFiler {
     private val listNode = ListView<ImageData>().apply {
         itemsProperty().bind(imagesProperty)
     }
-    private val thumbnailNode = ThumbnailPane(imagesProperty).view
+    private val thumbnailNode = ThumbnailPane(imagesProperty)
     private val selectedView = SimpleObjectProperty<Node>().apply { set(thumbnailNode) }
     private val currentView: Node = BorderPane().apply {
         VBox.setVgrow(this, Priority.ALWAYS)
