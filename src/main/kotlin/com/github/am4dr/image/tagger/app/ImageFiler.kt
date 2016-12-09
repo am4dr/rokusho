@@ -1,5 +1,6 @@
 package com.github.am4dr.image.tagger.app
 
+import com.github.am4dr.image.tagger.node.ThumbnailPane
 import com.github.am4dr.image.tagger.util.createEmptyListProperty
 import javafx.beans.property.ListProperty
 import javafx.beans.property.SimpleObjectProperty
@@ -21,7 +22,7 @@ class ImageFiler {
     private val listNode = ListView<ImageData>().apply {
         itemsProperty().bind(imagesProperty)
     }
-    private val thumbnailNode = ThumbnailPane(imagesProperty).view
+    private val thumbnailNode = ThumbnailPane(imagesProperty)
     private val selectedView = SimpleObjectProperty<Node>().apply { set(thumbnailNode) }
     private val currentView: Node = BorderPane().apply {
         VBox.setVgrow(this, Priority.ALWAYS)
