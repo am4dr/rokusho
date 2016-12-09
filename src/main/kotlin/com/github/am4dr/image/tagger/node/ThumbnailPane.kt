@@ -1,8 +1,6 @@
-package com.github.am4dr.image.tagger.app
+package com.github.am4dr.image.tagger.node
 
-import com.github.am4dr.image.tagger.node.ImageOverlay
-import com.github.am4dr.image.tagger.node.ImageTile
-import com.github.am4dr.image.tagger.node.ImageTileScrollPane
+import com.github.am4dr.image.tagger.app.ImageData
 import com.github.am4dr.image.tagger.util.createEmptyListProperty
 import javafx.beans.property.ListProperty
 import javafx.beans.property.SimpleListProperty
