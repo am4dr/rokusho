@@ -29,20 +29,20 @@ class ThumbnailPane(imageDataList: ListProperty<ImageData>) {
     private val tiles = createEmptyListProperty<ImageTile>()
     init {
         imagesProperty.bind(imageDataList)
-        imagesProperty.addListener(ListChangeListener {
-            tiles.setAll(FXCollections.observableList(imagesProperty.filterNotNull().map(::ImageTile)))
-        })
-        tiles.addListener { observable, old, new ->
-            log.debug("tiles changed - new.size: ${new.size}")
-            selectedTileProperty.set(null)
-            val tileClickHandler = EventHandler<MouseEvent> { e ->
-                val tile = e.source as? ImageTile ?: return@EventHandler
-                log.info("tile clicked: $tile")
-                selectedTileProperty.set(tile)
-                view.overlayVisibleProperty.set(true)
-            }
-            new.forEach { tile -> tile.onMouseClicked = tileClickHandler }
+        val tileClickHandler = EventHandler<MouseEvent> { e ->
+            val tile = e.source as? ImageTile ?: return@EventHandler
+            log.info("tile clicked: $tile")
+            selectedTileProperty.set(tile)
+            view.overlayVisibleProperty.set(true)
         }
+        imagesProperty.addListener(ListChangeListener {
+            val newTiles = imagesProperty.map {
+                ImageTile(it).apply { onMouseClicked = tileClickHandler }
+            }
+            selectedTileProperty.set(null)
+            tiles.setAll(FXCollections.observableList(newTiles))
+            log.debug("tiles changed - new.size: ${tiles.size}")
+        })
         view.tilesProperty.bind(tiles)
         view.overlayImageProperty.bind(Bindings.createObjectBinding(
                     Callable { selectedTileProperty.get()?.data?.tempImage },
