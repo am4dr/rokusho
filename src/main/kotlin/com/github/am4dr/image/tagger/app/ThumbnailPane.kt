@@ -33,8 +33,7 @@ class ThumbnailPane(imageDataList: ListProperty<ImageData>) : StackPane() {
         val tileClickHandler = EventHandler<MouseEvent> { e ->
             val tile = e.source as? ImageTile ?: return@EventHandler
             log.info("tile clicked: $tile")
-            overlay.imageProperty.value = tile.data.tempImage
-            overlay.visibleProperty().set(true)
+            overlay.show(tile.data.tempImage)
         }
         imagesProperty.addListener(ListChangeListener {
             val newTiles = imagesProperty.map {

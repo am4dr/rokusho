@@ -25,4 +25,8 @@ class ImageOverlay : VBox() {
         alignment = Pos.CENTER
         children.add(imageView)
     }
+    fun show(image: Image) {
+        imageProperty.value = image
+        visibleProperty().set(true)
+    }
 }
