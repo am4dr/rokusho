@@ -1,10 +1,13 @@
 buildscript {
     ext.kotlin_version = '1.0.5'
+    // [IntelliJ IDEA 2016.3.1 RC Updates JUnit 5 Support to M3 | IntelliJ IDEA Blog](https://blog.jetbrains.com/idea/2016/12/intellij-idea-2016-3-1-rc-updates-junit-5-support-to-m3/)
+    ext.junit_milestone = '-M2'
     repositories {
         jcenter()
     }
     dependencies {
         classpath group:'org.jetbrains.kotlin', name:'kotlin-gradle-plugin', version: kotlin_version
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.0'+junit_milestone
     }
 }
 plugins {
@@ -12,6 +15,7 @@ plugins {
     id 'application'
 }
 apply plugin: 'kotlin'
+apply plugin: 'org.junit.platform.gradle.plugin'
 
 group = 'com.github.am4dr'
 version = '0.0.1-SNAPSHOT'
@@ -22,10 +26,12 @@ mainClassName = 'com.github.am4dr.image.tagger.app.Main'
 
 repositories {
     jcenter()
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots/"
+    }
 }
 
 dependencies {
-//    compile 'org.codehaus.groovy:groovy:2.4.7'
     compile group:'org.jetbrains.kotlin', name :'kotlin-stdlib', version: kotlin_version
 
     compile 'commons-cli:commons-cli:1.3.1'
@@ -33,9 +39,12 @@ dependencies {
     compile 'org.slf4j:slf4j-api:1.7.21'
     runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.7'
 
-//    testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.0.0'+junit_milestone
+    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.0.0'+junit_milestone
 }
-
+junitPlatform {
+    platformVersion '1.0.0'+junit_milestone
+}
 run {
     if (project.hasProperty('args')) {
         args = project.getProperty('args').split(/\s+/).grep()
