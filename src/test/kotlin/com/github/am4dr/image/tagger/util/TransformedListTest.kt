@@ -56,4 +56,18 @@ class TransformedListTest {
         assertEquals("2", transformed[2])
         assertEquals("100", transformed[1])
     }
+    @Test
+    fun bindingTest() {
+        val source = FXCollections.observableList(mutableListOf<Int>())
+        val transformed = TransformedList(source, Int::toString)
+        source.addAll(0, 1, 2)
+        val listProperty = createEmptyListProperty<String>()
+        listProperty.bindContent(transformed)
+        assertEquals(3, listProperty.size)
+        source.add(100)
+        assertEquals(4, transformed.size)
+        assertEquals(4, listProperty.size)
+        source.clear()
+        assertEquals(0, listProperty.size)
+    }
 }
