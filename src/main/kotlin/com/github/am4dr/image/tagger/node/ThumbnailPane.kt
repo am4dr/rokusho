@@ -1,6 +1,6 @@
 package com.github.am4dr.image.tagger.node
 
-import com.github.am4dr.image.tagger.app.ImageData
+import com.github.am4dr.image.tagger.core.ImageData
 import com.github.am4dr.image.tagger.util.TransformedList
 import javafx.beans.property.ListProperty
 import javafx.beans.property.ReadOnlyObjectWrapper

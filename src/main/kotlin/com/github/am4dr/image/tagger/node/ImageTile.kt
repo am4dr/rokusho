@@ -1,6 +1,6 @@
 package com.github.am4dr.image.tagger.node
 
-import com.github.am4dr.image.tagger.app.ImageData
+import com.github.am4dr.image.tagger.core.ImageData
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.geometry.Insets
@@ -19,7 +19,7 @@ class ImageTile(val data: ImageData) : StackPane() {
         val overlay = FlowPane(7.5, 5.0).apply {
             padding = Insets(10.0)
             background = transparentBlackBackground
-            children.addAll(data.tags.map(::createTagLabel))
+            children.addAll(data.metaData.tags.map(::createTagLabel))
             visibleProperty().bind(this@ImageTile.hoverProperty())
             prefWidthProperty().bind(image.image.widthProperty())
             prefHeightProperty().bind(image.image.heightProperty())
