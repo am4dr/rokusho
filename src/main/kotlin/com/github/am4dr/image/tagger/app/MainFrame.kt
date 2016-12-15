@@ -1,5 +1,9 @@
 package com.github.am4dr.image.tagger.app
 
+import com.github.am4dr.image.tagger.core.ImageData
+import com.github.am4dr.image.tagger.core.ImageMetaData
+import com.github.am4dr.image.tagger.core.ImageLoader
+import com.github.am4dr.image.tagger.core.loadImageMataData
 import com.github.am4dr.image.tagger.util.createEmptyListProperty
 import javafx.beans.binding.When
 import javafx.beans.property.ListProperty
@@ -19,8 +23,10 @@ import org.slf4j.LoggerFactory
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.util.stream.Collectors
 
-const val defaultSaveFileName = "image_tag_info.tsv"
+private const val defaultMetaDataFileName = "image_tag_info.tsv"
+private val imageFileNameMatcher = Regex(".*\\.(bmp|gif|jpe?g|png)$", RegexOption.IGNORE_CASE)
 
 /*
 シーングラフのルート。全体で共有したいデータを保持し、子ノードにプロパティとして提供する。
@@ -29,7 +35,8 @@ class MainFrame(private val commandline: CommandLine) {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
     internal val mainPane = BorderPane()
     private val targetDirProperty: ObjectProperty<Path?> = SimpleObjectProperty()
-    private val imageDataStore = ImageDataStore()
+    private val imageMetaDataStore = mutableMapOf<Path, ImageMetaData>()
+    private val imageLoader = ImageLoader()
     init {
         val imagesProperty: ListProperty<ImageData> = createEmptyListProperty()
         val filer = ImageFiler()
@@ -40,18 +47,41 @@ class MainFrame(private val commandline: CommandLine) {
                         .otherwise(makeDirectorySelectorPane()))
         targetDirProperty.addListener { observable, old, new ->
             log.debug("target directory changed: $old -> $new")
-            if (new == null) {
-                imagesProperty.clear()
-                return@addListener
-            }
-            imagesProperty.setAll(imageDataStore.loadImageData(new, new.resolve(defaultSaveFileName)))
+            imagesProperty.clear()
+            imageMetaDataStore.clear()
+            new ?: return@addListener
+            loadMetaData(new)
+            imagesProperty.setAll(loadImageData(new))
         }
         if (commandline.args.size == 1) {
             Paths.get(commandline.args[0])?.let { path ->
-                if (Files.isDirectory(path)) { targetDirProperty.set(path) }
+                if (Files.isDirectory(path)) {
+                    targetDirProperty.set(path)
+                }
             }
         }
     }
+    private fun loadMetaData(metaDataFilePath: Path) {
+        val metaDataFile = metaDataFilePath.resolve(defaultMetaDataFileName).toFile()
+        if (metaDataFile.exists()) {
+            log.info("load image info from file: $metaDataFile")
+            imageMetaDataStore.putAll(loadImageMataData(metaDataFile))
+            log.info("loaded image info number: ${imageMetaDataStore.size}")
+        }
+        else {
+            log.info("info file not found: $metaDataFile")
+        }
+    }
+    private fun loadImageData(targetDirPath: Path): List<ImageData> {
+        fun Path.toImageData(): ImageData =
+                imageLoader.getImageData(targetDirPath.resolve(this).toUri().toURL(),
+                        imageMetaDataStore.getOrPut(this.normalize()) { ImageMetaData() })
+        return Files.list(targetDirPath)
+                .filter { Files.isRegularFile(it) && imageFileNameMatcher.matches(it.fileName.toString()) }
+                .map { targetDirPath.relativize(it).toImageData() }
+                .collect(Collectors.toList<ImageData>())
+    }
+
     private fun selectTargetDirectory() {
         DirectoryChooser().run {
             title = "画像があるディレクトリを選択してください"
@@ -59,6 +89,7 @@ class MainFrame(private val commandline: CommandLine) {
             targetDirProperty.set(showDialog(mainPane.scene.window)?.toPath())
         }
     }
+
     private fun makeDirectorySelectorPane(): Pane {
         val link = Hyperlink("選択ウィンドウを開く")
         link.onAction = EventHandler { selectTargetDirectory() }
