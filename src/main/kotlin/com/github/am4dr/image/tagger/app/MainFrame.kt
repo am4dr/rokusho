@@ -50,28 +50,8 @@ class MainFrame(private val commandline: CommandLine) {
             imagesProperty.clear()
             imageMetaData.clear()
             new ?: return@addListener
-
-            val metaDataFile = new.resolve(defaultSaveFileName).toFile()
-            if (metaDataFile.exists()) {
-                log.info("load image info from file: $metaDataFile")
-                imageMetaData.putAll(loadImageMataData(metaDataFile).map { Pair(it.path.normalize(), it) })
-                log.info("loaded image info number: ${imageMetaData.size}")
-            }
-            else {
-                log.info("info file not found: $metaDataFile")
-            }
-            log.debug("metadata: ${imageMetaData}")
-            fun Path.toImageData(): ImageData =
-                    ImageData(new.resolve(this).toUri().toURL(),
-                            imageMetaData.getOrPut(this.normalize()) { ImageMetaData(this) },
-                            imageDataStore)
-            val dataList =
-                    Files.list(new)
-                            .filter { Files.isRegularFile(it) }
-                            .filter { imageFileNameMatcher.matches(it.fileName.toString()) }
-                            .map { new.relativize(it).toImageData() }
-                            .collect(Collectors.toList<ImageData>())
-            imagesProperty.setAll(dataList)
+            loadMetaData(new)
+            imagesProperty.setAll(loadImageData(new))
         }
         if (commandline.args.size == 1) {
             Paths.get(commandline.args[0])?.let { path ->
@@ -80,6 +60,27 @@ class MainFrame(private val commandline: CommandLine) {
                 }
             }
         }
+    }
+    private fun loadMetaData(metaDataFilePath: Path) {
+        val metaDataFile = metaDataFilePath.resolve(defaultSaveFileName).toFile()
+        if (metaDataFile.exists()) {
+            log.info("load image info from file: $metaDataFile")
+            imageMetaData.putAll(loadImageMataData(metaDataFile).map { Pair(it.path.normalize(), it) })
+            log.info("loaded image info number: ${imageMetaData.size}")
+        }
+        else {
+            log.info("info file not found: $metaDataFile")
+        }
+    }
+    private fun loadImageData(targetDirPath: Path): List<ImageData> {
+        fun Path.toImageData(): ImageData =
+                ImageData(targetDirPath.resolve(this).toUri().toURL(),
+                        imageMetaData.getOrPut(this.normalize()) { ImageMetaData(this) },
+                        imageDataStore)
+        return Files.list(targetDirPath)
+                .filter { Files.isRegularFile(it) && imageFileNameMatcher.matches(it.fileName.toString()) }
+                .map { targetDirPath.relativize(it).toImageData() }
+                .collect(Collectors.toList<ImageData>())
     }
 
     private fun selectTargetDirectory() {

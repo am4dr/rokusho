@@ -1,7 +1,5 @@
 package com.github.am4dr.image.tagger.core
 
-import com.github.am4dr.image.tagger.core.ImageMetaData
-import com.github.am4dr.image.tagger.core.ImageDataStore
 import javafx.scene.image.Image
 import java.net.URL
 
