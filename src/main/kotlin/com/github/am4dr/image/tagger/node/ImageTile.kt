@@ -15,7 +15,7 @@ private val transparentBlackBackground = Background(BackgroundFill(Color.rgb(0, 
 class ImageTile(val data: ImageData) : StackPane() {
     val imageVisibleProperty: BooleanProperty = SimpleBooleanProperty(true)
     init {
-        val image = ImageView(data.thumnail)
+        val image = ImageView(data.thumbnail)
         val overlay = FlowPane(7.5, 5.0).apply {
             padding = Insets(10.0)
             background = transparentBlackBackground

@@ -36,7 +36,7 @@ class MainFrame(private val commandline: CommandLine) {
     internal val mainPane = BorderPane()
     private val targetDirProperty: ObjectProperty<Path?> = SimpleObjectProperty()
     private val imageMetaDataStore = mutableMapOf<Path, ImageMetaData>()
-    private val imageCache = ImageLoader()
+    private val imageLoader = ImageLoader()
     init {
         val imagesProperty: ListProperty<ImageData> = createEmptyListProperty()
         val filer = ImageFiler()
@@ -74,9 +74,8 @@ class MainFrame(private val commandline: CommandLine) {
     }
     private fun loadImageData(targetDirPath: Path): List<ImageData> {
         fun Path.toImageData(): ImageData =
-                ImageData(targetDirPath.resolve(this).toUri().toURL(),
-                        imageMetaDataStore.getOrPut(this.normalize()) { ImageMetaData() },
-                        imageCache)
+                imageLoader.getImageData(targetDirPath.resolve(this).toUri().toURL(),
+                        imageMetaDataStore.getOrPut(this.normalize()) { ImageMetaData() })
         return Files.list(targetDirPath)
                 .filter { Files.isRegularFile(it) && imageFileNameMatcher.matches(it.fileName.toString()) }
                 .map { targetDirPath.relativize(it).toImageData() }

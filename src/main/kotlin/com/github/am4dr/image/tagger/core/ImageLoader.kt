@@ -21,4 +21,16 @@ class ImageLoader {
             }
     fun getTemporaryImage(url: URL, backgroundLoading: Boolean = false): Image =
             getTemporaryImage(url, 0.0, 0.0, backgroundLoading)
+    fun getImageData(url: URL, metaData: ImageMetaData): ImageData =
+            URLImageData(url, metaData, this)
+}
+private class URLImageData(private val url: URL,
+                           override val metaData: ImageMetaData,
+                           private val loader: ImageLoader) : BaseImageData() {
+    override val thumbnail: Image
+            by lazy { loader.getImage(url, thumbnailMaxWidth, thumbnailMaxHeight, true) }
+    override val tempThumbnail: Image
+        get() = loader.getTemporaryImage(url, thumbnailMaxWidth, thumbnailMaxHeight)
+    override val image: Image by lazy { loader.getImage(url) }
+    override val tempImage: Image get() = loader.getTemporaryImage(url)
 }
