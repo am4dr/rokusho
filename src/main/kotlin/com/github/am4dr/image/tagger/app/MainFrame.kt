@@ -25,7 +25,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.stream.Collectors
 
-const val defaultSaveFileName = "image_tag_info.tsv"
+private const val defaultMetaDataFileName = "image_tag_info.tsv"
 private val imageFileNameMatcher = Regex(".*\\.(bmp|gif|jpe?g|png)$", RegexOption.IGNORE_CASE)
 
 /*
@@ -35,7 +35,7 @@ class MainFrame(private val commandline: CommandLine) {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
     internal val mainPane = BorderPane()
     private val targetDirProperty: ObjectProperty<Path?> = SimpleObjectProperty()
-    private val imageMetaData = mutableMapOf<Path, ImageMetaData>()
+    private val imageMetaDataStore = mutableMapOf<Path, ImageMetaData>()
     private val imageDataStore = ImageDataStore()
     init {
         val imagesProperty: ListProperty<ImageData> = createEmptyListProperty()
@@ -48,7 +48,7 @@ class MainFrame(private val commandline: CommandLine) {
         targetDirProperty.addListener { observable, old, new ->
             log.debug("target directory changed: $old -> $new")
             imagesProperty.clear()
-            imageMetaData.clear()
+            imageMetaDataStore.clear()
             new ?: return@addListener
             loadMetaData(new)
             imagesProperty.setAll(loadImageData(new))
@@ -62,11 +62,11 @@ class MainFrame(private val commandline: CommandLine) {
         }
     }
     private fun loadMetaData(metaDataFilePath: Path) {
-        val metaDataFile = metaDataFilePath.resolve(defaultSaveFileName).toFile()
+        val metaDataFile = metaDataFilePath.resolve(defaultMetaDataFileName).toFile()
         if (metaDataFile.exists()) {
             log.info("load image info from file: $metaDataFile")
-            imageMetaData.putAll(loadImageMataData(metaDataFile).map { Pair(it.path.normalize(), it) })
-            log.info("loaded image info number: ${imageMetaData.size}")
+            imageMetaDataStore.putAll(loadImageMataData(metaDataFile))
+            log.info("loaded image info number: ${imageMetaDataStore.size}")
         }
         else {
             log.info("info file not found: $metaDataFile")
@@ -75,7 +75,7 @@ class MainFrame(private val commandline: CommandLine) {
     private fun loadImageData(targetDirPath: Path): List<ImageData> {
         fun Path.toImageData(): ImageData =
                 ImageData(targetDirPath.resolve(this).toUri().toURL(),
-                        imageMetaData.getOrPut(this.normalize()) { ImageMetaData(this) },
+                        imageMetaDataStore.getOrPut(this.normalize()) { ImageMetaData() },
                         imageDataStore)
         return Files.list(targetDirPath)
                 .filter { Files.isRegularFile(it) && imageFileNameMatcher.matches(it.fileName.toString()) }
