@@ -2,7 +2,7 @@ package com.github.am4dr.image.tagger.app
 
 import com.github.am4dr.image.tagger.core.ImageData
 import com.github.am4dr.image.tagger.core.ImageMetaData
-import com.github.am4dr.image.tagger.core.ImageDataStore
+import com.github.am4dr.image.tagger.core.ImageLoader
 import com.github.am4dr.image.tagger.core.loadImageMataData
 import com.github.am4dr.image.tagger.util.createEmptyListProperty
 import javafx.beans.binding.When
@@ -36,7 +36,7 @@ class MainFrame(private val commandline: CommandLine) {
     internal val mainPane = BorderPane()
     private val targetDirProperty: ObjectProperty<Path?> = SimpleObjectProperty()
     private val imageMetaDataStore = mutableMapOf<Path, ImageMetaData>()
-    private val imageDataStore = ImageDataStore()
+    private val imageCache = ImageLoader()
     init {
         val imagesProperty: ListProperty<ImageData> = createEmptyListProperty()
         val filer = ImageFiler()
@@ -76,7 +76,7 @@ class MainFrame(private val commandline: CommandLine) {
         fun Path.toImageData(): ImageData =
                 ImageData(targetDirPath.resolve(this).toUri().toURL(),
                         imageMetaDataStore.getOrPut(this.normalize()) { ImageMetaData() },
-                        imageDataStore)
+                        imageCache)
         return Files.list(targetDirPath)
                 .filter { Files.isRegularFile(it) && imageFileNameMatcher.matches(it.fileName.toString()) }
                 .map { targetDirPath.relativize(it).toImageData() }

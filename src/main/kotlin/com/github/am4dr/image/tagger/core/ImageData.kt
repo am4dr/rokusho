@@ -6,12 +6,12 @@ import java.net.URL
 private const val thumbnailMaxWidth: Double = 500.0
 private const val thumbnailMaxHeight: Double = 200.0
 
-class ImageData(val url: URL, val metaData: ImageMetaData, private val dataStore: ImageDataStore) {
-    val thumnail: Image by lazy { dataStore.getImage(url, thumbnailMaxWidth, thumbnailMaxHeight, true) }
+class ImageData(val url: URL, val metaData: ImageMetaData, private val loader: ImageLoader) {
+    val thumnail: Image by lazy { loader.getImage(url, thumbnailMaxWidth, thumbnailMaxHeight, true) }
     val tempThumbnail: Image
-        get() = dataStore.getTemporaryImage(url, thumbnailMaxWidth, thumbnailMaxHeight)
-    val image: Image by lazy { dataStore.getImage(url) }
+        get() = loader.getTemporaryImage(url, thumbnailMaxWidth, thumbnailMaxHeight)
+    val image: Image by lazy { loader.getImage(url) }
     val tempImage: Image
-        get() = dataStore.getTemporaryImage(url)
+        get() = loader.getTemporaryImage(url)
     override fun toString(): String = "url: $url"
 }

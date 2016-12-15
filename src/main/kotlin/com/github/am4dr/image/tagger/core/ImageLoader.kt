@@ -3,7 +3,7 @@ package com.github.am4dr.image.tagger.core
 import javafx.scene.image.Image
 import java.net.URL
 
-class ImageDataStore {
+class ImageLoader {
     private val cache: MutableMap<Triple<URL, Double, Double>, Image> = mutableMapOf()
 
     fun getImage(url: URL, requestWidth: Double, requestHeight: Double,
