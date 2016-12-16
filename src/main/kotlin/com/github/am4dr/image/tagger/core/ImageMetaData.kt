@@ -17,6 +17,5 @@ fun toSaveFormat(data: Map<Path, ImageMetaData>): String =
             val (path, meta) = it
             "${path.normalize()}\t${meta.tags.joinToString("\t")}"
         }.joinToString("\n")
-fun saveImageMetaData(data: Map<Path, ImageMetaData>, to: File) {
-    to.writeText(toSaveFormat(data))
-}
+fun saveImageMetaData(data: Map<Path, ImageMetaData>, to: File) =
+        to.writeText(toSaveFormat(data))
