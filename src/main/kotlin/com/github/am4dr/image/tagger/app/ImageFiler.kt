@@ -2,7 +2,9 @@ package com.github.am4dr.image.tagger.app
 
 import com.github.am4dr.image.tagger.core.ImageData
 import com.github.am4dr.image.tagger.node.ThumbnailPane
+import com.github.am4dr.image.tagger.util.TransformedList
 import com.github.am4dr.image.tagger.util.createEmptyListProperty
+import javafx.beans.binding.Bindings
 import javafx.beans.property.ListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.event.EventHandler
@@ -16,12 +18,16 @@ import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.util.concurrent.Callable
 
 class ImageFiler {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
     val imagesProperty: ListProperty<ImageData> = createEmptyListProperty()
-    private val listNode = ListView<ImageData>().apply {
-        itemsProperty().bind(imagesProperty)
+    private val listNode = ListView<Label>().apply {
+        items = TransformedList(imagesProperty) {
+            val b = Bindings.createStringBinding(Callable { it.toString() }, it.metaData.tags)
+            Label().apply { textProperty().bind(b) }
+        }
     }
     private val thumbnailNode = ThumbnailPane(imagesProperty)
     private val selectedView = SimpleObjectProperty<Node>().apply { set(thumbnailNode) }

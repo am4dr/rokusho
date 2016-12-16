@@ -32,9 +32,8 @@ internal class DraftTagEditor(val image: ImageData) : Stage() {
                       , 600.0, 400.0)
     }
     fun update() {
-        image.metaData.tags.clear()
         val tags = tagsText.get().split(Regex("\\s*,\\s*")).filter(String::isNotBlank)
-        image.metaData.tags.addAll(tags)
+        image.metaData.tags.setAll(tags)
     }
     var onUpdate: (DraftTagEditor, String) -> Unit = { e, str -> }
 }
