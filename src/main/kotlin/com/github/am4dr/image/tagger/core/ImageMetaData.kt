@@ -1,15 +1,10 @@
 package com.github.am4dr.image.tagger.core
 
-import javafx.collections.FXCollections
-import javafx.collections.ObservableList
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
 
-data class ImageMetaData(val tags: ObservableList<String>) {
-    constructor(tags: MutableList<String> = mutableListOf())
-            : this(FXCollections.observableList(tags))
-}
+data class ImageMetaData(val tags: List<String> = listOf())
 
 fun parseImageMetaData(tokens: String): Pair<Path, ImageMetaData> =
         parseImageMetaData(tokens.split("\t"))
