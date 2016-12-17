@@ -1,8 +1,15 @@
 package com.github.am4dr.image.tagger.node
 
 import com.github.am4dr.image.tagger.core.ImageData
+import com.github.am4dr.image.tagger.util.TransformedList
+import javafx.beans.binding.Bindings
+import javafx.beans.binding.ListBinding
 import javafx.beans.property.BooleanProperty
+import javafx.beans.property.ListProperty
 import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleListProperty
+import javafx.collections.FXCollections
+import javafx.collections.ObservableList
 import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.scene.Node
@@ -17,9 +24,10 @@ private val transparentBlackBackground = Background(BackgroundFill(Color.rgb(0, 
 class ImageTile(val data: ImageData) : StackPane() {
     val imageVisibleProperty: BooleanProperty = SimpleBooleanProperty(true)
     var onAddTagsButtonClicked: (ImageTile) -> Unit = {}
+    val tags: ListProperty<String>
+    private val tagLabelNodes: ObservableList<Node>
     init {
         val image = ImageView(data.thumbnail)
-        val overlay = FlowPane(7.5, 5.0)
         val addTagsButton = Button(" + ").apply {
             textFill = Color.rgb(200, 200, 200)
             padding = Insets(-1.0, 2.0, 0.0, 2.0)
@@ -27,11 +35,17 @@ class ImageTile(val data: ImageData) : StackPane() {
             background = Background(BackgroundFill(Color.BLACK, CornerRadii(2.0), null))
             onAction = EventHandler { onAddTagsButtonClicked(this@ImageTile) }
         }
-        overlay.apply {
+        tags = SimpleListProperty(FXCollections.observableList(data.metaData.tags.toMutableList()))
+        tagLabelNodes = object : ListBinding<Node>() {
+            init { super.bind(tags) }
+            val labels = TransformedList(tags, ::createTagLabel)
+            override fun computeValue(): ObservableList<Node> =
+                    FXCollections.observableList(labels + addTagsButton)
+        }
+        val overlay = FlowPane(7.5, 5.0).apply {
             padding = Insets(10.0)
             background = transparentBlackBackground
-            children.addAll(data.metaData.tags.map(::createTagLabel))
-            children.add(addTagsButton)
+            Bindings.bindContent(children, tagLabelNodes)
             visibleProperty().bind(this@ImageTile.hoverProperty())
             prefWidthProperty().bind(image.image.widthProperty())
             prefHeightProperty().bind(image.image.heightProperty())
