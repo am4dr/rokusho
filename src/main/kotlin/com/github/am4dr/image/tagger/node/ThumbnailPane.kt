@@ -1,5 +1,6 @@
 package com.github.am4dr.image.tagger.node
 
+import com.github.am4dr.image.tagger.app.DraftTagEditor
 import com.github.am4dr.image.tagger.core.ImageData
 import com.github.am4dr.image.tagger.util.TransformedList
 import javafx.beans.property.ListProperty
@@ -15,6 +16,7 @@ import javafx.scene.paint.Color
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+// TODO モデルを変更する限りnodeではない
 class ThumbnailPane(imageDataList: ListProperty<ImageData>) : StackPane() {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
     init {
@@ -29,8 +31,19 @@ class ThumbnailPane(imageDataList: ListProperty<ImageData>) : StackPane() {
             log.info("tile clicked: $tile")
             overlay.show(tile.data.tempImage)
         }
-        val tiles = TransformedList(imagesProperty) {
-            ImageTile(it).apply { onMouseClicked = tileClickHandler }
+        val tiles = TransformedList(imagesProperty) { data ->
+            ImageTile(data).apply {
+                onMouseClicked = tileClickHandler
+                onAddTagsButtonClicked = {
+                    println("onAddTagsButtonClicked !")
+                    DraftTagEditor(data).apply {
+                        onUpdate = { e, new ->
+                            imagesProperty[imagesProperty.indexOf(data)] = new
+                            close()
+                        }
+                    }.show()
+                }
+            }
         }
         tiles.addListener(ListChangeListener {
             log.debug("tiles changed")
