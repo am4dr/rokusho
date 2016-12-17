@@ -1,9 +1,6 @@
 package com.github.am4dr.image.tagger.app
 
-import com.github.am4dr.image.tagger.core.ImageData
-import com.github.am4dr.image.tagger.core.ImageMetaData
-import com.github.am4dr.image.tagger.core.ImageLoader
-import com.github.am4dr.image.tagger.core.loadImageMataData
+import com.github.am4dr.image.tagger.core.*
 import com.github.am4dr.image.tagger.util.createEmptyListProperty
 import javafx.beans.binding.When
 import javafx.beans.property.ListProperty
@@ -71,6 +68,15 @@ class MainFrame(private val commandline: CommandLine) {
         else {
             log.info("info file not found: $metaDataFile")
         }
+    }
+    private fun saveMetaData(metaDataFilePath: Path) {
+        val metaDataFile = metaDataFilePath.resolve(defaultMetaDataFileName).toFile()
+        log.info("save image mata data to: $metaDataFile")
+        if (metaDataFile.exists()) {
+            log.info("$metaDataFile already exists, overwrite with new data")
+        }
+        saveImageMetaData(imageMetaDataStore, metaDataFile)
+        log.info("saved ${imageMetaDataStore.size} image mata data to: $metaDataFile")
     }
     private fun loadImageData(targetDirPath: Path): List<ImageData> {
         fun Path.toImageData(): ImageData =
