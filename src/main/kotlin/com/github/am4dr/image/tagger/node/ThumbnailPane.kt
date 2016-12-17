@@ -37,7 +37,8 @@ class ThumbnailPane(imageDataList: ListProperty<ImageData>) : StackPane() {
                 onAddTagsButtonClicked = {
                     DraftTagEditor(data).apply {
                         onUpdate = { e, new ->
-                            imagesProperty[imagesProperty.indexOf(data)] = new
+                            imagesProperty.indexOf(data)
+                                    .let { if (it >= 0) imagesProperty[it] = new }
                             close()
                         }
                     }.show()
