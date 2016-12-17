@@ -35,7 +35,6 @@ class ThumbnailPane(imageDataList: ListProperty<ImageData>) : StackPane() {
             ImageTile(data).apply {
                 onMouseClicked = tileClickHandler
                 onAddTagsButtonClicked = {
-                    println("onAddTagsButtonClicked !")
                     DraftTagEditor(data).apply {
                         onUpdate = { e, new ->
                             imagesProperty[imagesProperty.indexOf(data)] = new
