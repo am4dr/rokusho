@@ -1,5 +1,6 @@
 package com.github.am4dr.image.tagger.node
 
+import com.github.am4dr.image.tagger.app.DraftMetaDataEditor
 import com.github.am4dr.image.tagger.core.ImageData
 import com.github.am4dr.image.tagger.util.TransformedList
 import javafx.beans.binding.Bindings
@@ -21,10 +22,10 @@ import javafx.scene.paint.Color
 import javafx.scene.text.Font
 
 private val transparentBlackBackground = Background(BackgroundFill(Color.rgb(0, 0, 0, 0.5), null, null))
-class ImageTile(val data: ImageData) : StackPane() {
+class ImageTile(data: ImageData) : StackPane() {
     val imageVisibleProperty: BooleanProperty = SimpleBooleanProperty(true)
-    var onAddTagsButtonClicked: (ImageTile) -> Unit = {}
-    val tags: ListProperty<String>
+    val tags: ListProperty<String> =
+            SimpleListProperty(FXCollections.observableList(data.metaData.tags.toMutableList()))
     private val tagLabelNodes: ObservableList<Node>
     init {
         val image = ImageView(data.thumbnail)
@@ -33,9 +34,15 @@ class ImageTile(val data: ImageData) : StackPane() {
             padding = Insets(-1.0, 2.0, 0.0, 2.0)
             font = Font(14.0)
             background = Background(BackgroundFill(Color.BLACK, CornerRadii(2.0), null))
-            onAction = EventHandler { onAddTagsButtonClicked(this@ImageTile) }
+            onAction = EventHandler {
+                DraftMetaDataEditor(data).apply {
+                    onUpdate = { new ->
+                        tags.setAll(new.tags)
+                        close()
+                    }
+                }.show()
+            }
         }
-        tags = SimpleListProperty(FXCollections.observableList(data.metaData.tags.toMutableList()))
         tagLabelNodes = object : ListBinding<Node>() {
             init { super.bind(tags) }
             val labels = TransformedList(tags, ::createTagLabel)

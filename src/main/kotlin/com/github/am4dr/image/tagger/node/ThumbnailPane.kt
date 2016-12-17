@@ -1,7 +1,7 @@
 package com.github.am4dr.image.tagger.node
 
-import com.github.am4dr.image.tagger.app.DraftTagEditor
 import com.github.am4dr.image.tagger.core.ImageData
+import com.github.am4dr.image.tagger.core.ImageMetaData
 import com.github.am4dr.image.tagger.util.TransformedList
 import javafx.beans.property.ListProperty
 import javafx.beans.property.ReadOnlyObjectWrapper
@@ -26,22 +26,17 @@ class ThumbnailPane(imageDataList: ListProperty<ImageData>) : StackPane() {
             onMouseClicked = EventHandler<MouseEvent> { visibleProperty().set(false) }
             background = Background(BackgroundFill(Color.rgb(30, 30, 30, 0.75), null, null))
         }
-        val tileClickHandler = EventHandler<MouseEvent> { e ->
-            val tile = e.source as? ImageTile ?: return@EventHandler
-            log.info("tile clicked: $tile")
-            overlay.show(tile.data.tempImage)
-        }
         val tiles = TransformedList(imagesProperty) { data ->
             ImageTile(data).apply {
-                onMouseClicked = tileClickHandler
-                onAddTagsButtonClicked = {
-                    DraftTagEditor(data).apply {
-                        onUpdate = { e, new ->
-                            imagesProperty.indexOf(data)
-                                    .let { if (it >= 0) imagesProperty[it] = new }
-                            close()
-                        }
-                    }.show()
+                onMouseClicked = EventHandler<MouseEvent> { e ->
+                    val tile = e.source as? ImageTile ?: return@EventHandler
+                    log.info("tile clicked: $tile")
+                    overlay.show(data.tempImage)
+                }
+                tags.addListener { tags, old, new ->
+                    imagesProperty.indexOf(data).let {
+                        if (it >= 0) { imagesProperty[it] = data.copy(ImageMetaData(new)) }
+                    }
                 }
             }
         }
