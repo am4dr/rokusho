@@ -2,13 +2,14 @@ package com.github.am4dr.image.tagger.node
 
 import com.github.am4dr.image.tagger.app.DraftMetaDataEditor
 import com.github.am4dr.image.tagger.core.ImageData
+import com.github.am4dr.image.tagger.core.ImageMetaData
 import com.github.am4dr.image.tagger.util.TransformedList
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.ListBinding
 import javafx.beans.property.BooleanProperty
-import javafx.beans.property.ListProperty
+import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.SimpleListProperty
+import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.event.EventHandler
@@ -16,49 +17,49 @@ import javafx.geometry.Insets
 import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.Label
+import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.scene.text.Font
 
-private val transparentBlackBackground = Background(BackgroundFill(Color.rgb(0, 0, 0, 0.5), null, null))
-class ImageTile(data: ImageData) : StackPane() {
+class ImageTile(image: Image, metaData: ImageMetaData = ImageMetaData()) : StackPane() {
+    constructor(data: ImageData) : this(data.thumbnail, data.metaData)
     val imageVisibleProperty: BooleanProperty = SimpleBooleanProperty(true)
-    val tags: ListProperty<String> =
-            SimpleListProperty(FXCollections.observableList(data.metaData.tags.toMutableList()))
-    private val tagLabelNodes: ObservableList<Node>
+    val image: ObjectProperty<Image> = SimpleObjectProperty(image)
+    val metaData: ObjectProperty<ImageMetaData> = SimpleObjectProperty(metaData)
     init {
-        val image = ImageView(data.thumbnail)
+        val imageView = ImageView().apply {
+            imageProperty().bind(this@ImageTile.image)
+            visibleProperty().bind(imageVisibleProperty)
+        }
+        val metaDataEditor = DraftMetaDataEditor(this.metaData.get(), this.image.get()).apply {
+            onUpdate = { this@ImageTile.metaData.set(it); close() }
+        }
         val addTagsButton = Button(" + ").apply {
             textFill = Color.rgb(200, 200, 200)
             padding = Insets(-1.0, 2.0, 0.0, 2.0)
             font = Font(14.0)
             background = Background(BackgroundFill(Color.BLACK, CornerRadii(2.0), null))
-            onAction = EventHandler {
-                DraftMetaDataEditor(data).apply {
-                    onUpdate = { new ->
-                        tags.setAll(new.tags)
-                        close()
-                    }
-                }.show()
-            }
+            onAction = EventHandler { metaDataEditor.show() }
         }
-        tagLabelNodes = object : ListBinding<Node>() {
-            init { super.bind(tags) }
-            val labels = TransformedList(tags, ::createTagLabel)
+        val tagLabelNodes = object : ListBinding<Node>() {
+            init { super.bind(this@ImageTile.metaData) }
+            val labels = TransformedList(
+                    FXCollections.observableList(this@ImageTile.metaData.get().tags),
+                    ::createTagLabel)
             override fun computeValue(): ObservableList<Node> =
                     FXCollections.observableList(labels + addTagsButton)
         }
         val overlay = FlowPane(7.5, 5.0).apply {
             padding = Insets(10.0)
-            background = transparentBlackBackground
+            background = Background(BackgroundFill(Color.rgb(0, 0, 0, 0.5), null, null))
             Bindings.bindContent(children, tagLabelNodes)
             visibleProperty().bind(this@ImageTile.hoverProperty())
-            prefWidthProperty().bind(image.image.widthProperty())
-            prefHeightProperty().bind(image.image.heightProperty())
+            prefWidthProperty().bind(Bindings.selectDouble(image, "width"))
+            prefHeightProperty().bind(Bindings.selectDouble(image, "height"))
         }
-        children.setAll(image, overlay)
-        image.visibleProperty().bind(imageVisibleProperty)
+        children.setAll(imageView, overlay)
     }
 }
 private fun createTagLabel(name: String): Node =

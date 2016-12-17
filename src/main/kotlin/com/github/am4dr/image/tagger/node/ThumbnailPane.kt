@@ -1,7 +1,6 @@
 package com.github.am4dr.image.tagger.node
 
 import com.github.am4dr.image.tagger.core.ImageData
-import com.github.am4dr.image.tagger.core.ImageMetaData
 import com.github.am4dr.image.tagger.util.TransformedList
 import javafx.beans.property.ListProperty
 import javafx.beans.property.ReadOnlyObjectWrapper
@@ -33,9 +32,9 @@ class ThumbnailPane(imageDataList: ListProperty<ImageData>) : StackPane() {
                     log.info("tile clicked: $tile")
                     overlay.show(data.tempImage)
                 }
-                tags.addListener { tags, old, new ->
+                metaData.addListener { tags, old, new ->
                     imagesProperty.indexOf(data).let {
-                        if (it >= 0) { imagesProperty[it] = data.copy(ImageMetaData(new)) }
+                        if (it >= 0) { imagesProperty[it] = data.copy(new) }
                     }
                 }
             }
