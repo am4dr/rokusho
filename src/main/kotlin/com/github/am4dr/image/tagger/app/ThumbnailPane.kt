@@ -1,6 +1,9 @@
-package com.github.am4dr.image.tagger.node
+package com.github.am4dr.image.tagger.app
 
 import com.github.am4dr.image.tagger.core.ImageData
+import com.github.am4dr.image.tagger.node.ImageOverlay
+import com.github.am4dr.image.tagger.node.ImageTile
+import com.github.am4dr.image.tagger.node.ImageTileScrollPane
 import com.github.am4dr.image.tagger.util.TransformedList
 import javafx.beans.property.ListProperty
 import javafx.beans.property.ReadOnlyObjectWrapper
@@ -15,7 +18,6 @@ import javafx.scene.paint.Color
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-// TODO モデルを変更する限りnodeではない
 class ThumbnailPane(imageDataList: ListProperty<ImageData>) : StackPane() {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
     init {

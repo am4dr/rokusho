@@ -1,7 +1,6 @@
 package com.github.am4dr.image.tagger.app
 
 import com.github.am4dr.image.tagger.core.ImageData
-import com.github.am4dr.image.tagger.node.ThumbnailPane
 import com.github.am4dr.image.tagger.util.createEmptyListProperty
 import javafx.beans.property.ListProperty
 import javafx.beans.property.SimpleObjectProperty

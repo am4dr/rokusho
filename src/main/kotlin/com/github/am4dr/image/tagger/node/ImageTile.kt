@@ -6,7 +6,10 @@ import com.github.am4dr.image.tagger.core.ImageMetaData
 import com.github.am4dr.image.tagger.util.TransformedList
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.ListBinding
-import javafx.beans.property.*
+import javafx.beans.property.BooleanProperty
+import javafx.beans.property.ObjectProperty
+import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.event.EventHandler
