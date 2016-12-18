@@ -26,15 +26,15 @@ import javafx.scene.text.Font
 class ImageTile(image: Image, metaData: ImageMetaData = ImageMetaData()) : StackPane() {
     constructor(data: ImageData) : this(data.thumbnail, data.metaData)
     val imageVisibleProperty: BooleanProperty = SimpleBooleanProperty(true)
-    val image: ObjectProperty<Image> = SimpleObjectProperty(image)
-    val metaData: ObjectProperty<ImageMetaData> = SimpleObjectProperty(metaData)
+    val imageProperty: ObjectProperty<Image> = SimpleObjectProperty(image)
+    val metaDataProperty: ObjectProperty<ImageMetaData> = SimpleObjectProperty(metaData)
     init {
         val imageView = ImageView().apply {
-            imageProperty().bind(this@ImageTile.image)
+            imageProperty().bind(imageProperty)
             visibleProperty().bind(imageVisibleProperty)
         }
-        val metaDataEditor = DraftMetaDataEditor(this.metaData.get(), this.image.get()).apply {
-            onUpdate = { this@ImageTile.metaData.set(it); close() }
+        val metaDataEditor = DraftMetaDataEditor(metaDataProperty.get(), imageProperty.get()).apply {
+            onUpdate = { metaDataProperty.set(it); close() }
         }
         val addTagsButton = Button(" + ").apply {
             textFill = Color.rgb(200, 200, 200)
@@ -44,9 +44,9 @@ class ImageTile(image: Image, metaData: ImageMetaData = ImageMetaData()) : Stack
             onAction = EventHandler { metaDataEditor.show() }
         }
         val tagLabelNodes = object : ListBinding<Node>() {
-            init { super.bind(this@ImageTile.metaData) }
+            init { super.bind(metaDataProperty) }
             val labels = TransformedList(
-                    FXCollections.observableList(this@ImageTile.metaData.get().tags),
+                    FXCollections.observableList(metaDataProperty.get().tags),
                     ::createTagLabel)
             override fun computeValue(): ObservableList<Node> =
                     FXCollections.observableList(labels + addTagsButton)

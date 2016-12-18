@@ -32,7 +32,7 @@ class ThumbnailPane(imageDataList: ListProperty<ImageData>) : StackPane() {
                     log.info("tile clicked: $tile")
                     overlay.show(data.tempImage)
                 }
-                metaData.addListener { tags, old, new ->
+                metaDataProperty.addListener { tags, old, new ->
                     imagesProperty.indexOf(data).let {
                         if (it >= 0) { imagesProperty[it] = data.copy(new) }
                     }
