@@ -61,9 +61,9 @@ class MainFrame(private val commandline: CommandLine) {
     private fun loadMetaData(metaDataFilePath: Path) {
         val metaDataFile = metaDataFilePath.resolve(defaultMetaDataFileName).toFile()
         if (metaDataFile.exists()) {
-            log.info("load image info from file: $metaDataFile")
+            log.info("load imageProperty info from file: $metaDataFile")
             imageMetaDataStore.putAll(loadImageMataData(metaDataFile))
-            log.info("loaded image info number: ${imageMetaDataStore.size}")
+            log.info("loaded imageProperty info number: ${imageMetaDataStore.size}")
         }
         else {
             log.info("info file not found: $metaDataFile")
@@ -71,12 +71,12 @@ class MainFrame(private val commandline: CommandLine) {
     }
     private fun saveMetaData(metaDataFilePath: Path) {
         val metaDataFile = metaDataFilePath.resolve(defaultMetaDataFileName).toFile()
-        log.info("save image mata data to: $metaDataFile")
+        log.info("save imageProperty mata data to: $metaDataFile")
         if (metaDataFile.exists()) {
             log.info("$metaDataFile already exists, overwrite with new data")
         }
         saveImageMetaData(imageMetaDataStore, metaDataFile)
-        log.info("saved ${imageMetaDataStore.size} image mata data to: $metaDataFile")
+        log.info("saved ${imageMetaDataStore.size} imageProperty mata data to: $metaDataFile")
     }
     private fun loadImageData(targetDirPath: Path): List<ImageData> {
         fun Path.toImageData(): ImageData =
