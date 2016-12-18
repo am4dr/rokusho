@@ -6,10 +6,7 @@ import com.github.am4dr.image.tagger.core.ImageMetaData
 import com.github.am4dr.image.tagger.util.TransformedList
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.ListBinding
-import javafx.beans.property.BooleanProperty
-import javafx.beans.property.ObjectProperty
-import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.property.*
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.event.EventHandler
@@ -26,9 +23,11 @@ import javafx.scene.text.Font
 class ImageTile(image: Image, metaData: ImageMetaData = ImageMetaData()) : StackPane() {
     constructor(data: ImageData) : this(data.thumbnail, data.metaData)
     val imageVisibleProperty: BooleanProperty = SimpleBooleanProperty(true)
-    val imageProperty: ObjectProperty<Image> = SimpleObjectProperty(image)
+    val imageProperty: ObjectProperty<Image> = SimpleObjectProperty<Image>(image)
     val metaDataProperty: ObjectProperty<ImageMetaData> = SimpleObjectProperty(metaData)
     init {
+        imageProperty.addListener { obs, old, new -> updateMaxSizeProperty() }
+        updateMaxSizeProperty()
         val imageView = ImageView().apply {
             imageProperty().bind(imageProperty)
             visibleProperty().bind(imageVisibleProperty)
@@ -56,10 +55,12 @@ class ImageTile(image: Image, metaData: ImageMetaData = ImageMetaData()) : Stack
             background = Background(BackgroundFill(Color.rgb(0, 0, 0, 0.5), null, null))
             Bindings.bindContent(children, tagLabelNodes)
             visibleProperty().bind(this@ImageTile.hoverProperty())
-            prefWidthProperty().bind(Bindings.selectDouble(image, "width"))
-            prefHeightProperty().bind(Bindings.selectDouble(image, "height"))
         }
         children.setAll(imageView, overlay)
+    }
+    private fun updateMaxSizeProperty() {
+        maxWidthProperty().bind(imageProperty.get().widthProperty())
+        maxHeightProperty().bind(imageProperty.get().heightProperty())
     }
 }
 private fun createTagLabel(name: String): Node =

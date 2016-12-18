@@ -26,7 +26,6 @@ class ImageTileScrollPane(tiles: ObservableValue<ObservableList<ImageTile>>) : S
         content = FlowPane(10.0, 10.0).apply {
             padding = Insets(25.0, 0.0, 25.0, 0.0)
             alignment = Pos.CENTER
-            rowValignment = VPos.BASELINE
             Bindings.bindContent(children, tilesProperty)
             vValueHeightProperty.bind(vvalueProperty().multiply(heightProperty()))
         }
