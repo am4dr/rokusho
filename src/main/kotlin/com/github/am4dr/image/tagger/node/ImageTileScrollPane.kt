@@ -7,7 +7,6 @@ import javafx.beans.value.ObservableValue
 import javafx.collections.ObservableList
 import javafx.geometry.Insets
 import javafx.geometry.Pos
-import javafx.geometry.VPos
 import javafx.scene.control.ScrollPane
 import javafx.scene.layout.FlowPane
 import org.slf4j.Logger
