@@ -3,7 +3,6 @@ package com.github.am4dr.image.tagger.node
 import com.github.am4dr.image.tagger.app.DraftMetaDataEditor
 import com.github.am4dr.image.tagger.core.ImageData
 import com.github.am4dr.image.tagger.core.ImageMetaData
-import com.github.am4dr.image.tagger.util.TransformedList
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.ListBinding
 import javafx.beans.property.BooleanProperty
@@ -47,11 +46,9 @@ class ImageTile(image: Image, metaData: ImageMetaData = ImageMetaData()) : Stack
         }
         val tagLabelNodes = object : ListBinding<Node>() {
             init { super.bind(metaDataProperty) }
-            val labels = TransformedList(
-                    FXCollections.observableList(metaDataProperty.get().tags),
-                    ::createTagLabel)
             override fun computeValue(): ObservableList<Node> =
-                    FXCollections.observableList(labels + addTagsButton)
+                    FXCollections.observableList(
+                            metaDataProperty.get().tags.map(::createTagLabel) + addTagsButton)
         }
         val overlay = FlowPane(7.5, 5.0).apply {
             padding = Insets(10.0)
