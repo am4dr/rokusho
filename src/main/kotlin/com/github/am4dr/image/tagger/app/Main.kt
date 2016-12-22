@@ -2,8 +2,6 @@ package com.github.am4dr.image.tagger.app
 
 import com.github.am4dr.image.tagger.core.Library
 import com.github.am4dr.image.tagger.core.Picture
-import com.github.am4dr.image.tagger.core.thumbnailMaxHeight
-import com.github.am4dr.image.tagger.core.thumbnailMaxWidth
 import com.github.am4dr.image.tagger.node.ImageTile
 import com.github.am4dr.image.tagger.node.ImageTileScrollPane
 import javafx.application.Application
@@ -12,7 +10,6 @@ import javafx.beans.property.*
 import javafx.collections.FXCollections.observableList
 import javafx.event.EventHandler
 import javafx.geometry.Pos
-import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.control.Hyperlink
 import javafx.scene.control.Label
@@ -56,16 +53,6 @@ class Main : Application() {
         }
     }
     override fun start(stage: Stage) {
-//        val mainNode: Parent = MainFrame(parseArgs(parameters.raw.toTypedArray())).mainPane
-//        stage.run {
-//            title = "Image Tagger"
-//            scene = Scene(mainNode, 800.0, 500.0)
-//            show()
-//        }
-        newStage()
-    }
-    fun newStage() {
-        val stage = Stage()
         stage.apply {
             title = "Image Tagger"
             scene = Scene(createMainFrame(stage), 800.0, 500.0)
@@ -75,12 +62,12 @@ class Main : Application() {
     private fun makeOptions(): Options = with(Options()) {
         addOption(null, "saveto", true, "specify the directory path to save the tag file")
     }
-    private fun createMainFrame(stage: Stage): Parent =
-        MainFrame2(
-                ImageFiler2(
+    private fun createMainFrame(stage: Stage): MainFrame =
+        MainFrame(
+                ImageFiler(
                         mainModel.picturesProperty,
                         ListView(),
-                        ThumbnailPane2(ImageTileScrollPane(::ImageTile))),
+                        ThumbnailPane(ImageTileScrollPane(::ImageTile))),
                 makeDirectorySelectorPane(stage)).apply {
             librariesNotSelectedProperty.bind(mainModel.picturesProperty.emptyProperty())
         }

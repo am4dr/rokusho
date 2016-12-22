@@ -22,7 +22,6 @@ import javafx.scene.paint.Color
 import javafx.scene.text.Font
 
 class ImageTile(image: Image, metaData: ImageMetaData = ImageMetaData()) : StackPane() {
-    constructor(data: ImageData) : this(data.thumbnail, data.metaData)
     constructor(picture: Picture) : this(picture.loader.getImage(thumbnailMaxWidth, thumbnailMaxHeight, true), picture.mataData)
     val imageVisibleProperty: BooleanProperty = SimpleBooleanProperty(true)
     val imageProperty: ObjectProperty<Image> = SimpleObjectProperty<Image>(image)
