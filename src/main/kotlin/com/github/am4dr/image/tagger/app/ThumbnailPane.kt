@@ -1,15 +1,18 @@
 package com.github.am4dr.image.tagger.app
 
 import com.github.am4dr.image.tagger.core.ImageData
+import com.github.am4dr.image.tagger.core.Picture
 import com.github.am4dr.image.tagger.node.ImageOverlay
 import com.github.am4dr.image.tagger.node.ImageTile
 import com.github.am4dr.image.tagger.node.ImageTileScrollPane
 import com.github.am4dr.image.tagger.util.TransformedList
+import com.github.am4dr.image.tagger.util.createEmptyListProperty
 import javafx.beans.property.ListProperty
 import javafx.beans.property.ReadOnlyObjectWrapper
 import javafx.beans.property.SimpleListProperty
 import javafx.collections.ListChangeListener
 import javafx.event.EventHandler
+import javafx.scene.Node
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Background
 import javafx.scene.layout.BackgroundFill
@@ -48,4 +51,7 @@ class ThumbnailPane(imageDataList: ListProperty<ImageData>) : StackPane() {
                 ImageTileScrollPane(ReadOnlyObjectWrapper(tiles)),
                 overlay)
     }
+}
+class ThumbnailPane2() : StackPane() {
+    val  picturesProperty: ListProperty<Picture> = createEmptyListProperty()
 }

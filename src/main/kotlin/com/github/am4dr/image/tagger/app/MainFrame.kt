@@ -100,13 +100,13 @@ class MainFrame(private val commandline: CommandLine) {
         }
     }
 }
-class MainFrame2(val filer: ImageFiler, val directorySelectorPane: Node) : BorderPane() {
+class MainFrame2(val filer: ImageFiler2, val directorySelectorPane: Node) : BorderPane() {
     val librariesNotSelectedProperty: BooleanProperty
     init {
         librariesNotSelectedProperty = SimpleBooleanProperty(true)
         centerProperty().bind(
                 When(librariesNotSelectedProperty)
                         .then<Node>(directorySelectorPane)
-                        .otherwise(filer.node))
+                        .otherwise(filer))
     }
 }

@@ -71,7 +71,9 @@ class Main : Application() {
         addOption(null, "saveto", true, "specify the directory path to save the tag file")
     }
     private fun createMainFrame(stage: Stage): Parent =
-        MainFrame2(ImageFiler(), makeDirectorySelectorPane(stage)).apply {
+        MainFrame2(
+                ImageFiler2().apply { picturesProperty.bind(mainModel.picturesProperty) },
+                makeDirectorySelectorPane(stage)).apply {
             librariesNotSelectedProperty.bind(mainModel.picturesProperty.emptyProperty())
         }
     private fun selectLibraryDirectory(window: Window) {
