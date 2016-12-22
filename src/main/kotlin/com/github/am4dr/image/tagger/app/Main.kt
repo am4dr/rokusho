@@ -3,6 +3,7 @@ package com.github.am4dr.image.tagger.app
 import com.github.am4dr.image.tagger.core.ImageMetaData
 import com.github.am4dr.image.tagger.core.Library
 import com.github.am4dr.image.tagger.core.Picture
+import com.github.am4dr.image.tagger.core.saveImageMetaData
 import com.github.am4dr.image.tagger.node.ImageTile
 import com.github.am4dr.image.tagger.node.ImageTileScrollPane
 import javafx.application.Application
@@ -106,9 +107,21 @@ class MainModel {
                 Callable { libraryProperty.get()?.pictures ?: observableList(mutableListOf()) },
                 libraryProperty))
     }
-    fun setLibrary(path: Path) = _libraryProperty.set(Library(path))
+    fun setLibrary(path: Path) {
+        log.info("select library: $path")
+        _libraryProperty.set(Library(path))
+    }
     fun updateMetaData(picture: Picture, metaData: ImageMetaData) {
         log.info("update metadata: $picture, $metaData")
         libraryProperty.get().updateMetaData(picture, metaData)
+    }
+    fun save() {
+        val metaDataFile = libraryProperty.get().metaDataFilePath.toFile()
+        log.info("save imageProperty mata data to: $metaDataFile")
+        if (metaDataFile.exists()) {
+            log.info("$metaDataFile already exists, overwrite with new data")
+        }
+        saveImageMetaData(libraryProperty.get().metaDataStore, metaDataFile)
+        log.info("saved ${libraryProperty.get().metaDataStore.size} imageProperty mata data to: $metaDataFile")
     }
 }
