@@ -3,11 +3,10 @@ package com.github.am4dr.image.tagger.app
 import com.github.am4dr.image.tagger.core.*
 import com.github.am4dr.image.tagger.util.createEmptyListProperty
 import javafx.beans.binding.When
-import javafx.beans.property.ListProperty
-import javafx.beans.property.ObjectProperty
-import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.property.*
 import javafx.event.EventHandler
 import javafx.geometry.Pos
+import javafx.scene.Node
 import javafx.scene.control.Hyperlink
 import javafx.scene.control.Label
 import javafx.scene.layout.BorderPane
@@ -25,9 +24,6 @@ import java.util.stream.Collectors
 private const val defaultMetaDataFileName = "image_tag_info.tsv"
 private val imageFileNameMatcher = Regex(".*\\.(bmp|gif|jpe?g|png)$", RegexOption.IGNORE_CASE)
 
-/*
-シーングラフのルート。全体で共有したいデータを保持し、子ノードにプロパティとして提供する。
- */
 class MainFrame(private val commandline: CommandLine) {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
     internal val mainPane = BorderPane()
@@ -102,5 +98,15 @@ class MainFrame(private val commandline: CommandLine) {
         return HBox(Label("対象とする画像があるディレクトリを選択してください: "), link).apply {
             alignment = Pos.CENTER
         }
+    }
+}
+class MainFrame2(val filer: ImageFiler, val directorySelectorPane: Node) : BorderPane() {
+    val librariesNotSelectedProperty: BooleanProperty
+    init {
+        librariesNotSelectedProperty = SimpleBooleanProperty(true)
+        centerProperty().bind(
+                When(librariesNotSelectedProperty)
+                        .then<Node>(directorySelectorPane)
+                        .otherwise(filer.node))
     }
 }
