@@ -26,7 +26,7 @@ const val thumbnailMaxWidth: Double = 500.0
 const val thumbnailMaxHeight: Double = 200.0
 
 class ImageTile(image: Image, metaData: ImageMetaData = ImageMetaData()) : StackPane() {
-    constructor(picture: Picture) : this(picture.loader.getImage(thumbnailMaxWidth, thumbnailMaxHeight, true), picture.mataData)
+    constructor(picture: Picture) : this(picture.loader.getImage(thumbnailMaxWidth, thumbnailMaxHeight, true), picture.metaData)
     val imageVisibleProperty: BooleanProperty = SimpleBooleanProperty(true)
     val imageProperty: ObjectProperty<Image> = SimpleObjectProperty<Image>(image)
     val metaDataProperty: ObjectProperty<ImageMetaData> = SimpleObjectProperty(metaData)

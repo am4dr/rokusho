@@ -1,5 +1,7 @@
 package com.github.am4dr.image.tagger.core
 
+import javafx.collections.FXCollections.observableList
+import javafx.collections.ObservableList
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.stream.Collectors
@@ -10,13 +12,13 @@ private fun isSupportedImageFile(path: Path) =
         Files.exists(path)
                 && Files.isRegularFile(path)
                 && imageFileNameMatcher.matches(path.fileName.toString())
-// TODO add test
+// TODO add test 特にupdateMetaData
 class Library(root: Path) {
     val root: Path
     val images: List<Path>
     val metaDataFilePath: Path
     val metaDataStore: MutableMap<Path, ImageMetaData>
-    val pictures: List<Picture>
+    val pictures: ObservableList<Picture>
 
     init {
         this.root = root.toAbsolutePath()
@@ -28,11 +30,18 @@ class Library(root: Path) {
         metaDataStore =
                 if (Files.exists(metaDataFilePath)) loadImageMataData(metaDataFilePath.toFile())
                 else mutableMapOf()
-        pictures =
-                images.map { path ->
-                    val url = path.toUri().toURL()
-                    val metaIndex = root.relativize(path)
-                    Picture(URLImageLoader(url), metaDataStore.getOrElse(metaIndex) { ImageMetaData() })
-                }
+        val pics = images.map { path ->
+            val url = path.toUri().toURL()
+            val metaIndex = root.relativize(path)
+            Picture(URLImageLoader(url), metaDataStore.getOrElse(metaIndex) { ImageMetaData() })
+        }.toMutableList()
+        pictures = observableList(pics)
+    }
+    fun updateMetaData(picture: Picture, newMetaData: ImageMetaData) {
+        val i = pictures.indexOf(picture)
+        if (i >= 0) {
+            pictures[i] = picture.copy(metaData = newMetaData)
+            metaDataStore[root.relativize(images[i])] = newMetaData
+        }
     }
 }

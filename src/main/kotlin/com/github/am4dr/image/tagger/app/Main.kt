@@ -1,5 +1,6 @@
 package com.github.am4dr.image.tagger.app
 
+import com.github.am4dr.image.tagger.core.ImageMetaData
 import com.github.am4dr.image.tagger.core.Library
 import com.github.am4dr.image.tagger.core.Picture
 import com.github.am4dr.image.tagger.node.ImageTile
@@ -67,7 +68,9 @@ class Main : Application() {
                 ImageFiler(
                         mainModel.picturesProperty,
                         ListView(),
-                        ThumbnailPane(ImageTileScrollPane(::ImageTile))),
+                        ThumbnailPane(ImageTileScrollPane(::ImageTile).apply {
+                            onMetaDataChanged = { tile, pic, meta -> mainModel.updateMetaData(pic, meta) }
+                        })),
                 makeDirectorySelectorPane(stage)).apply {
             librariesNotSelectedProperty.bind(mainModel.picturesProperty.emptyProperty())
         }
@@ -90,6 +93,7 @@ class Main : Application() {
 
 // TODO 複数Libraryへの対応
 class MainModel {
+    private val log = LoggerFactory.getLogger(this.javaClass)
     private val _libraryProperty: ObjectProperty<Library>
     val libraryProperty: ReadOnlyObjectProperty<Library>
     val picturesProperty: ReadOnlyListProperty<Picture>
@@ -99,8 +103,12 @@ class MainModel {
         libraryProperty.bind(_libraryProperty)
         picturesProperty = SimpleListProperty()
         picturesProperty.bind(createObjectBinding(
-                Callable { observableList(libraryProperty.get()?.pictures ?: mutableListOf()) },
+                Callable { libraryProperty.get()?.pictures ?: observableList(mutableListOf()) },
                 libraryProperty))
     }
     fun setLibrary(path: Path) = _libraryProperty.set(Library(path))
+    fun updateMetaData(picture: Picture, metaData: ImageMetaData) {
+        log.info("update metadata: $picture, $metaData")
+        libraryProperty.get().updateMetaData(picture, metaData)
+    }
 }
