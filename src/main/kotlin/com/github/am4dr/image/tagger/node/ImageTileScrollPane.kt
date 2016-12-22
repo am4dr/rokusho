@@ -4,6 +4,7 @@ import com.github.am4dr.image.tagger.util.createEmptyListProperty
 import javafx.beans.binding.Bindings
 import javafx.beans.property.*
 import javafx.beans.value.ObservableValue
+import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.geometry.Insets
 import javafx.geometry.Pos
@@ -13,6 +14,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class ImageTileScrollPane(tiles: ObservableValue<ObservableList<ImageTile>>) : ScrollPane() {
+    constructor() : this(ReadOnlyObjectWrapper(FXCollections.emptyObservableList<ImageTile>()))
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
     val tilesProperty: ListProperty<ImageTile> = createEmptyListProperty()
     private val vValueHeightProperty = SimpleDoubleProperty()

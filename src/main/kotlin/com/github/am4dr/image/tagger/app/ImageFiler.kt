@@ -2,8 +2,10 @@ package com.github.am4dr.image.tagger.app
 
 import com.github.am4dr.image.tagger.core.ImageData
 import com.github.am4dr.image.tagger.core.Picture
+import com.github.am4dr.image.tagger.node.ImageTileScrollPane
 import com.github.am4dr.image.tagger.util.createEmptyListProperty
 import javafx.beans.property.ListProperty
+import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.event.EventHandler
 import javafx.scene.Node
@@ -36,16 +38,16 @@ class ImageFiler {
                 Button("サムネイル").apply { onAction = EventHandler { selectedView.set(thumbnailNode) } }),
             currentView)
 }
-class ImageFiler2(val listNode: ListView<Picture>, val thumbnailNode: ThumbnailPane2) : VBox() {
-    constructor() : this(ListView<Picture>(), ThumbnailPane2())
-    val picturesProperty: ListProperty<Picture>
+class ImageFiler2(
+        val picturesProperty: ReadOnlyListProperty<Picture>,
+        val listNode: ListView<Picture>,
+        val thumbnailNode: ThumbnailPane2) : VBox() {
     private val selectedView = SimpleObjectProperty<Node>().apply { set(thumbnailNode) }
     private val currentView: Node = BorderPane().apply {
         VBox.setVgrow(this, Priority.ALWAYS)
         centerProperty().bind(selectedView)
     }
     init {
-        picturesProperty = createEmptyListProperty()
         listNode.itemsProperty().bind(picturesProperty)
         thumbnailNode.picturesProperty.bind(picturesProperty)
         children.addAll(

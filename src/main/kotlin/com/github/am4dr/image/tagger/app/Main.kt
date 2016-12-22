@@ -2,6 +2,7 @@ package com.github.am4dr.image.tagger.app
 
 import com.github.am4dr.image.tagger.core.Library
 import com.github.am4dr.image.tagger.core.Picture
+import com.github.am4dr.image.tagger.node.ImageTileScrollPane
 import javafx.application.Application
 import javafx.beans.binding.Bindings.createObjectBinding
 import javafx.beans.property.*
@@ -12,6 +13,7 @@ import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.control.Hyperlink
 import javafx.scene.control.Label
+import javafx.scene.control.ListView
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Pane
 import javafx.stage.DirectoryChooser
@@ -72,7 +74,10 @@ class Main : Application() {
     }
     private fun createMainFrame(stage: Stage): Parent =
         MainFrame2(
-                ImageFiler2().apply { picturesProperty.bind(mainModel.picturesProperty) },
+                ImageFiler2(
+                        mainModel.picturesProperty,
+                        ListView(),
+                        ThumbnailPane2(ImageTileScrollPane())),
                 makeDirectorySelectorPane(stage)).apply {
             librariesNotSelectedProperty.bind(mainModel.picturesProperty.emptyProperty())
         }
