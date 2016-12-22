@@ -47,7 +47,7 @@ class ThumbnailPane(imageDataList: ListProperty<ImageData>) : StackPane() {
             log.debug("tiles changed")
         })
         children.addAll(
-                ImageTileScrollPane(ReadOnlyObjectWrapper(tiles)),
+//                ImageTileScrollPane(ReadOnlyObjectWrapper(tiles)),
                 overlay)
     }
 }
@@ -69,6 +69,7 @@ class ThumbnailPane2(scrollPane: ImageTileScrollPane) : StackPane() {
             onMouseClicked = EventHandler<MouseEvent> { onOverlayClicked() }
             background = Background(BackgroundFill(Color.rgb(30, 30, 30, 0.75), null, null))
         }
+        scrollPane.picturesProperty.bind(picturesProperty)
         children.addAll(scrollPane, overlay)
     }
 }

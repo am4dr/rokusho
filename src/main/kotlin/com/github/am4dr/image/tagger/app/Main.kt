@@ -2,6 +2,9 @@ package com.github.am4dr.image.tagger.app
 
 import com.github.am4dr.image.tagger.core.Library
 import com.github.am4dr.image.tagger.core.Picture
+import com.github.am4dr.image.tagger.core.thumbnailMaxHeight
+import com.github.am4dr.image.tagger.core.thumbnailMaxWidth
+import com.github.am4dr.image.tagger.node.ImageTile
 import com.github.am4dr.image.tagger.node.ImageTileScrollPane
 import javafx.application.Application
 import javafx.beans.binding.Bindings.createObjectBinding
@@ -77,7 +80,7 @@ class Main : Application() {
                 ImageFiler2(
                         mainModel.picturesProperty,
                         ListView(),
-                        ThumbnailPane2(ImageTileScrollPane())),
+                        ThumbnailPane2(ImageTileScrollPane(::ImageTile))),
                 makeDirectorySelectorPane(stage)).apply {
             librariesNotSelectedProperty.bind(mainModel.picturesProperty.emptyProperty())
         }

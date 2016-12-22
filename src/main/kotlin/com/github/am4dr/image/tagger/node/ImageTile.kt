@@ -1,8 +1,7 @@
 package com.github.am4dr.image.tagger.node
 
 import com.github.am4dr.image.tagger.app.DraftMetaDataEditor
-import com.github.am4dr.image.tagger.core.ImageData
-import com.github.am4dr.image.tagger.core.ImageMetaData
+import com.github.am4dr.image.tagger.core.*
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.ListBinding
 import javafx.beans.property.BooleanProperty
@@ -24,6 +23,7 @@ import javafx.scene.text.Font
 
 class ImageTile(image: Image, metaData: ImageMetaData = ImageMetaData()) : StackPane() {
     constructor(data: ImageData) : this(data.thumbnail, data.metaData)
+    constructor(picture: Picture) : this(picture.loader.getImage(thumbnailMaxWidth, thumbnailMaxHeight, true), picture.mataData)
     val imageVisibleProperty: BooleanProperty = SimpleBooleanProperty(true)
     val imageProperty: ObjectProperty<Image> = SimpleObjectProperty<Image>(image)
     val metaDataProperty: ObjectProperty<ImageMetaData> = SimpleObjectProperty(metaData)
