@@ -1,25 +1,40 @@
 package com.github.am4dr.image.tagger.node
 
+import com.github.am4dr.image.tagger.core.ImageMetaData
+import com.github.am4dr.image.tagger.core.Picture
+import com.github.am4dr.image.tagger.util.TransformedList
 import com.github.am4dr.image.tagger.util.createEmptyListProperty
 import javafx.beans.binding.Bindings
 import javafx.beans.property.*
-import javafx.beans.value.ObservableValue
-import javafx.collections.ObservableList
+import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.control.ScrollPane
+import javafx.scene.input.MouseEvent
 import javafx.scene.layout.FlowPane
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class ImageTileScrollPane(tiles: ObservableValue<ObservableList<ImageTile>>) : ScrollPane() {
+class ImageTileScrollPane(val tileFacotry: (Picture) -> ImageTile) : ScrollPane() {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
-    val tilesProperty: ListProperty<ImageTile> = createEmptyListProperty()
+    val picturesProperty: ListProperty<Picture>
+    val tilesProperty: ListProperty<ImageTile>
+    var onTileClicked: (ImageTile, Picture) -> Unit = { tile, pic -> }
+    var onMetaDataChanged: (ImageTile, Picture, ImageMetaData) -> Unit = { tile, pic, meta -> }
+
     private val vValueHeightProperty = SimpleDoubleProperty()
     private var ranges = mutableListOf<TileRange>()
     private val maxRangeSize: Int = 200
     init {
-        tilesProperty.bind(tiles)
+        picturesProperty = createEmptyListProperty()
+        tilesProperty = SimpleListProperty(TransformedList(picturesProperty) { pic ->
+            tileFacotry(pic).apply {
+                onMouseClicked = EventHandler<MouseEvent> { onTileClicked(this, pic) }
+                metaDataProperty.addListener { property, old, new ->
+                    onMetaDataChanged(this, pic, new)
+                }
+            }
+        })
         fitToWidthProperty().set(true)
         hbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
         content = FlowPane(10.0, 10.0).apply {
