@@ -15,4 +15,5 @@ class URLImageLoader(val url: URL) : ImageLoader {
             cache.getOrPut(Triple(url, width.toDouble(), height.toDouble())) {
                 Image(url.toString(), width.toDouble(), height.toDouble(), true, true, async)
             }
+    override fun toString(): String = "URLImageLoader(url=$url)"
 }
