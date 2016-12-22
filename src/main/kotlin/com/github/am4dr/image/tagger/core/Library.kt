@@ -28,11 +28,11 @@ class Library(root: Path) {
         metaDataStore =
                 if (Files.exists(metaDataFilePath)) loadImageMataData(metaDataFilePath.toFile())
                 else mutableMapOf()
-        pictures = mutableListOf()
-        images.mapTo(pictures) { path ->
-            val url = path.toUri().toURL()
-            val metaIndex = root.relativize(path)
-            Picture(URLImageLoader(url), metaDataStore.getOrPut(metaIndex) { ImageMetaData() })
-        }
+        pictures =
+                images.map { path ->
+                    val url = path.toUri().toURL()
+                    val metaIndex = root.relativize(path)
+                    Picture(URLImageLoader(url), metaDataStore.getOrElse(metaIndex) { ImageMetaData() })
+                }
     }
 }
