@@ -7,11 +7,10 @@ import com.github.am4dr.image.tagger.node.ImageTile
 import com.github.am4dr.image.tagger.node.ImageTileScrollPane
 import com.github.am4dr.image.tagger.util.TransformedList
 import com.github.am4dr.image.tagger.util.createEmptyListProperty
-import com.sun.org.apache.xpath.internal.operations.Bool
 import javafx.beans.property.*
 import javafx.collections.ListChangeListener
 import javafx.event.EventHandler
-import javafx.scene.Node
+import javafx.scene.image.Image
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Background
 import javafx.scene.layout.BackgroundFill
@@ -34,7 +33,7 @@ class ThumbnailPane(imageDataList: ListProperty<ImageData>) : StackPane() {
                 onMouseClicked = EventHandler<MouseEvent> { e ->
                     val tile = e.source as? ImageTile ?: return@EventHandler
                     log.info("tile clicked: $tile")
-                    overlay.show(data.tempImage)
+                    //overlay.show(data.tempImage)
                 }
                 metaDataProperty.addListener { tags, old, new ->
                     imagesProperty.indexOf(data).let {
@@ -53,23 +52,33 @@ class ThumbnailPane(imageDataList: ListProperty<ImageData>) : StackPane() {
 }
 class ThumbnailPane2(scrollPane: ImageTileScrollPane) : StackPane() {
     val picturesProperty: ListProperty<Picture> = createEmptyListProperty()
-    val overlay: Node
+    val overlay: ImageOverlay
     val overlayVisibleProperty: BooleanProperty
+    val overlayImageProperty: ObjectProperty<Image>
     private var onOverlayClickedHandler: ObjectProperty<EventHandler<MouseEvent>>
     var onOverlayClicked: () -> Unit = {}
         set(value) { onOverlayClickedHandler.set(EventHandler { value() }) }
 
     init {
         overlayVisibleProperty = SimpleBooleanProperty(false)
+        overlayImageProperty = SimpleObjectProperty()
         onOverlayClickedHandler = SimpleObjectProperty()
         onOverlayClicked = { overlayVisibleProperty.set(false) }
 
         overlay = ImageOverlay().apply {
             visibleProperty().bind(overlayVisibleProperty)
-            onMouseClicked = EventHandler<MouseEvent> { onOverlayClicked() }
+            imageProperty.bind(overlayImageProperty)
+            onMouseClickedProperty().bind(onOverlayClickedHandler)
             background = Background(BackgroundFill(Color.rgb(30, 30, 30, 0.75), null, null))
         }
         scrollPane.picturesProperty.bind(picturesProperty)
+        scrollPane.onTileClicked = { tile, pic ->
+            showOverlay(pic.loader.image)
+        }
         children.addAll(scrollPane, overlay)
+    }
+    fun showOverlay(image: Image) {
+        overlayImageProperty.set(image)
+        overlayVisibleProperty.set(true)
     }
 }

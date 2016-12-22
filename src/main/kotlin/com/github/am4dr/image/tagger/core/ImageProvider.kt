@@ -5,8 +5,8 @@ import java.net.URL
 
 // TODO のちのImageLoaderである
 interface ImageProvider {
-    val image: Image get () = getImage(0.0, 0.0)
-    fun getImage(width: Number, height: Number, async: Boolean = false): Image
+    val image: Image get () = getImage(0.0, 0.0, false)
+    fun getImage(width: Number, height: Number, async: Boolean): Image
 }
 
 class URLImageLoader(val url: URL) : ImageProvider {
