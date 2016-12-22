@@ -1,7 +1,8 @@
 package com.github.am4dr.image.tagger.node
 
 import com.github.am4dr.image.tagger.app.DraftMetaDataEditor
-import com.github.am4dr.image.tagger.core.*
+import com.github.am4dr.image.tagger.core.ImageMetaData
+import com.github.am4dr.image.tagger.core.Picture
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.ListBinding
 import javafx.beans.property.BooleanProperty
@@ -20,6 +21,9 @@ import javafx.scene.image.ImageView
 import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.scene.text.Font
+
+const val thumbnailMaxWidth: Double = 500.0
+const val thumbnailMaxHeight: Double = 200.0
 
 class ImageTile(image: Image, metaData: ImageMetaData = ImageMetaData()) : StackPane() {
     constructor(picture: Picture) : this(picture.loader.getImage(thumbnailMaxWidth, thumbnailMaxHeight, true), picture.mataData)
