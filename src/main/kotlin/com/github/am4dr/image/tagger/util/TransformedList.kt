@@ -11,8 +11,8 @@ class TransformedList<E, F>(source: ObservableList<out F>, private val transform
     override val size: Int get() = transformed.size
     override fun get(index: Int): E = transformed[index]
     override fun getSourceIndex(index: Int) = index
-    override fun sourceChanged(c: ListChangeListener.Change<out F>?) {
-        c ?: return
+    override fun sourceChanged(change: ListChangeListener.Change<out F>?) {
+        val c = change ?: return
         beginChange()
         while (c.next()) {
             if (c.wasPermutated()) { permutate(c) }
