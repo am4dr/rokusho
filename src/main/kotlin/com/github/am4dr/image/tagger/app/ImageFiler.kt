@@ -1,6 +1,7 @@
 package com.github.am4dr.image.tagger.app
 
 import com.github.am4dr.image.tagger.core.Picture
+import com.github.am4dr.image.tagger.node.ThumbnailPane
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.event.EventHandler

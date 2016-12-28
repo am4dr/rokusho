@@ -4,8 +4,8 @@ import com.github.am4dr.image.tagger.core.ImageMetaData
 import com.github.am4dr.image.tagger.core.Library
 import com.github.am4dr.image.tagger.core.Picture
 import com.github.am4dr.image.tagger.core.saveImageMetaData
-import com.github.am4dr.image.tagger.node.ImageTile
 import com.github.am4dr.image.tagger.node.ImageTileScrollPane
+import com.github.am4dr.image.tagger.node.ThumbnailPane
 import javafx.application.Application
 import javafx.beans.binding.Bindings.createObjectBinding
 import javafx.beans.property.*
@@ -69,12 +69,13 @@ class Main : Application() {
                 ImageFiler(
                         mainModel.picturesProperty,
                         ListView(),
-                        ThumbnailPane(ImageTileScrollPane(::ImageTile).apply {
+                        ThumbnailPane(ImageTileScrollPane().apply {
                             onMetaDataChanged = { tile, pic, meta -> mainModel.updateMetaData(pic, meta) }
                         })),
-                makeDirectorySelectorPane(stage)).apply {
-            librariesNotSelectedProperty.bind(mainModel.picturesProperty.emptyProperty())
-        }
+                makeDirectorySelectorPane(stage))
+                .apply {
+                    librariesNotSelectedProperty.bind(mainModel.picturesProperty.emptyProperty())
+                }
     private fun selectLibraryDirectory(window: Window) {
         DirectoryChooser().run {
             title = "画像があるディレクトリを選択してください"

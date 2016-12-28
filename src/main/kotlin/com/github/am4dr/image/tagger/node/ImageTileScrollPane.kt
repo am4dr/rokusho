@@ -15,7 +15,7 @@ import javafx.scene.layout.FlowPane
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class ImageTileScrollPane(val tileFacotry: (Picture) -> ImageTile) : ScrollPane() {
+class ImageTileScrollPane(val tileFacotry: (Picture) -> ImageTile = ::ImageTile) : ScrollPane() {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
     val picturesProperty: ListProperty<Picture>
     val tilesProperty: ListProperty<ImageTile>

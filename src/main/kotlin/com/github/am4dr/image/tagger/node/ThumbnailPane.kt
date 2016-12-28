@@ -1,8 +1,6 @@
-package com.github.am4dr.image.tagger.app
+package com.github.am4dr.image.tagger.node
 
 import com.github.am4dr.image.tagger.core.Picture
-import com.github.am4dr.image.tagger.node.ImageOverlay
-import com.github.am4dr.image.tagger.node.ImageTileScrollPane
 import com.github.am4dr.image.tagger.util.createEmptyListProperty
 import javafx.beans.property.*
 import javafx.event.EventHandler
@@ -13,7 +11,7 @@ import javafx.scene.layout.BackgroundFill
 import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
 
-class ThumbnailPane(scrollPane: ImageTileScrollPane) : StackPane() {
+class ThumbnailPane(scrollPane: ImageTileScrollPane = ImageTileScrollPane()) : StackPane() {
     val picturesProperty: ListProperty<Picture> = createEmptyListProperty()
     val overlay: ImageOverlay
     val overlayVisibleProperty: BooleanProperty
