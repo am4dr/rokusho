@@ -1,6 +1,8 @@
 package com.github.am4dr.image.tagger.app
 
 import com.github.am4dr.image.tagger.core.ImageMetaData
+import com.github.am4dr.image.tagger.core.Tag
+import com.github.am4dr.image.tagger.core.TagParser
 import javafx.beans.property.SimpleStringProperty
 import javafx.event.EventHandler
 import javafx.scene.Scene
@@ -17,7 +19,7 @@ import javafx.stage.Stage
  * tag editor for development
  */
 internal class DraftMetaDataEditor(val metaData: ImageMetaData, val image: Image? = null) : Stage() {
-    private val tagsText = SimpleStringProperty(metaData.tags.joinToString(","))
+    private val tagsText = SimpleStringProperty(metaData.tags.map(Tag::text).joinToString(","))
     var onUpdate: (ImageMetaData) -> Unit = {}
     init {
         title = "tags editor"
@@ -39,5 +41,9 @@ internal class DraftMetaDataEditor(val metaData: ImageMetaData, val image: Image
         scene = Scene(root, 600.0, 400.0)
     }
     private fun createImageMetaData(): ImageMetaData =
-            tagsText.get().split(Regex("\\s*,\\s*")).filter(String::isNotBlank).let(::ImageMetaData)
+            tagsText.get()
+                    .split(Regex("\\s*,\\s*"))
+                    .filter(String::isNotBlank)
+                    .map { TagParser.parse(it) }
+                    .let(::ImageMetaData)
 }
