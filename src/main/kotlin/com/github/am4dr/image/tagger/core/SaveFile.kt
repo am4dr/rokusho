@@ -56,6 +56,9 @@ data class SaveFile(
             }
         }
     }
+    fun toTextFormat(): String {
+        TODO()
+    }
 }
 open class IllegalSaveFormatException(message: String = "") : RuntimeException(message)
 class VersionNotSpecifiedException(message: String = ""): IllegalSaveFormatException(message)
