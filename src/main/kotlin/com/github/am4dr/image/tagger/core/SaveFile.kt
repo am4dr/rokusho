@@ -27,14 +27,15 @@ data class SaveFile(
             data ?: return mapOf()
             val map = data as? Map<*, *> ?: throw IllegalSaveFormatException("tags must be a Map<String, Map<String, String>>")
             map.forEach {
-                val name = it.key as? String ?: throw IllegalSaveFormatException("key of tags must be a String")
+                it.key as? String ?: throw IllegalSaveFormatException("key of tags must be a String")
                 val opts = it.value as? Map<*, *> ?: throw IllegalSaveFormatException("value of tags must be a Map<String, String>")
                 opts.forEach {
                     it.key as? String ?: throw IllegalSaveFormatException("name of tag option must be a String")
                     it.value as? String ?: throw IllegalSaveFormatException("value of tag option must be a String")
                 }
             }
-            return data as Map<String, Map<String, String>>
+            @Suppress("UNCHECKED_CAST")
+            return map as Map<String, Map<String, String>>
         }
         private fun parseMetaData(data: Any?): Map<Path, ImageMetaData> {
             data ?: return mapOf()
