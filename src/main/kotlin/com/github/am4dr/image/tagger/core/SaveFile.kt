@@ -11,11 +11,15 @@ data class SaveFile(
         val log = LoggerFactory.getLogger(SaveFile::class.java)
         fun parse(string: String): SaveFile {
             val yaml = Yaml().load(string)
-            if (yaml == null || yaml !is Map<*,*>) { throw IllegalSaveFormatException() }
-            val version = yaml["version"]?.let { it as? String } ?: throw VersionNotSpecifiedException()
+            if (yaml == null || yaml !is Map<*,*>) { throw IllegalSaveFormatException("top level of save file must be a Map") }
+            val version = parseVersion(yaml["version"])
             val tags = parseMetaTagData(yaml["tags"])
             val metaData = parseMetaData(yaml["metaData"])
             return SaveFile(version, tags, metaData)
+        }
+        private fun parseVersion(data: Any?): String {
+            data ?: throw VersionNotSpecifiedException()
+            return data as? String ?: throw IllegalSaveFormatException("version must be a String")
         }
         private fun parseMetaTagData(data: Any?): Map<String, Map<String, String>> {
             data ?: return mapOf()
@@ -24,8 +28,8 @@ data class SaveFile(
                 val name = it.key as? String ?: throw IllegalSaveFormatException("key of tags must be a String")
                 val opts = it.value as? Map<*, *> ?: throw IllegalSaveFormatException("value of tags must be a Map<String, String>")
                 opts.forEach {
-                    it.key as? String ?: IllegalSaveFormatException("name of tag option must be a String")
-                    it.value as? String ?: IllegalSaveFormatException("value of tag option must be a String")
+                    it.key as? String ?: throw IllegalSaveFormatException("name of tag option must be a String")
+                    it.value as? String ?: throw IllegalSaveFormatException("value of tag option must be a String")
                 }
             }
             return data as Map<String, Map<String, String>>
