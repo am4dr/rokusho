@@ -3,7 +3,6 @@ package com.github.am4dr.image.tagger.app
 import com.github.am4dr.image.tagger.core.ImageMetaData
 import com.github.am4dr.image.tagger.core.Library
 import com.github.am4dr.image.tagger.core.Picture
-import com.github.am4dr.image.tagger.core.saveImageMetaData
 import com.github.am4dr.image.tagger.node.ImageTileScrollPane
 import com.github.am4dr.image.tagger.node.ThumbnailPane
 import javafx.application.Application
@@ -122,7 +121,7 @@ class MainModel {
         if (metaDataFile.exists()) {
             log.info("$metaDataFile already exists, overwrite with new data")
         }
-        saveImageMetaData(libraryProperty.get().metaDataStore, metaDataFile)
+        metaDataFile.writeText(libraryProperty.get().toSaveFormat())
         log.info("saved ${libraryProperty.get().metaDataStore.size} imageProperty mata data to: $metaDataFile")
     }
 }

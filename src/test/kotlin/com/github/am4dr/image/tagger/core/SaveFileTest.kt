@@ -2,6 +2,7 @@ package com.github.am4dr.image.tagger.core;
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import java.nio.file.Paths
 
 class SaveFileTest {
     @Test
@@ -130,7 +131,7 @@ class SaveFileTest {
             |version: "1"
             |metaData: { path/to/image: {} }
             |""".trimMargin())
-        assert(save.metaData.containsKey("path/to/image"))
+        assert(save.metaData.containsKey(Paths.get("path/to/image")))
     }
     @Test
     fun tagsInMetaDataMustBeMap() {
@@ -148,7 +149,7 @@ class SaveFileTest {
             |metaData: { path/to/image: { tags: [tagA] } }
             |""".trimMargin())
         assertEquals(1, save.metaData.size)
-        assert(save.metaData.containsKey("path/to/image"))
-        assert(save.metaData["path/to/image"]!!.let { it.tags.first().text == "tagA" })
+        assert(save.metaData.containsKey(Paths.get("path/to/image")))
+        assert(save.metaData[Paths.get("path/to/image")]!!.let { it.tags.first().text == "tagA" })
     }
 }

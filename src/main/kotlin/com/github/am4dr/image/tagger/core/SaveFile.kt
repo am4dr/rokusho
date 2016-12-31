@@ -2,11 +2,13 @@ package com.github.am4dr.image.tagger.core
 
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
+import java.nio.file.Path
+import java.nio.file.Paths
 
 data class SaveFile(
         val version: String,
         val tags: Map<String, Map<String, String>>,
-        val metaData: Map<String, ImageMetaData>) {
+        val metaData: Map<Path, ImageMetaData>) {
     companion object {
         val log = LoggerFactory.getLogger(SaveFile::class.java)
         fun parse(string: String): SaveFile {
@@ -34,14 +36,14 @@ data class SaveFile(
             }
             return data as Map<String, Map<String, String>>
         }
-        private fun parseMetaData(data: Any?): Map<String, ImageMetaData> {
+        private fun parseMetaData(data: Any?): Map<Path, ImageMetaData> {
             data ?: return mapOf()
             data as? Map<*, *> ?: throw IllegalSaveFormatException("metaData must be a Map")
             return data.map {
                 val path = it.key as? String ?: throw IllegalSaveFormatException("key of metaData must be a String")
                 val metaData = it.value as? Map<*, *> ?: throw IllegalSaveFormatException("value of metaData must be a Map")
                 val tags = parseTagData(metaData["tags"])
-                Pair(path, ImageMetaData(tags))
+                Pair(Paths.get(path), ImageMetaData(tags))
             }.toMap()
         }
         private fun parseTagData(data: Any?): List<Tag> {
