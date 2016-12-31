@@ -16,6 +16,7 @@ import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.scene.Node
 import javafx.scene.control.Button
+import javafx.scene.control.Label
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.layout.*
@@ -28,7 +29,7 @@ const val thumbnailMaxHeight: Double = 200.0
 class ImageTile(
         image: Image,
         metaData: ImageMetaData = ImageMetaData(),
-        tagNodeFactory : (Tag) -> Node = Tag::createNode) : StackPane() {
+        tagNodeFactory : (Tag) -> Node = ::createTagNode) : StackPane() {
     constructor(picture: Picture) : this(picture.loader.getImage(thumbnailMaxWidth, thumbnailMaxHeight, true), picture.metaData)
     val imageVisibleProperty: BooleanProperty = SimpleBooleanProperty(true)
     val imageProperty: ObjectProperty<Image> = SimpleObjectProperty<Image>(image)
@@ -70,3 +71,10 @@ class ImageTile(
         maxHeightProperty().bind(imageProperty.get().heightProperty())
     }
 }
+fun createTagNode(tag: Tag): Node =
+        Label(tag.text).apply {
+            textFill = Color.rgb(200, 200, 200)
+            padding = Insets(-1.0, 2.0, 0.0, 2.0)
+            font = Font(14.0)
+            background = Background(BackgroundFill(Color.BLACK, CornerRadii(2.0), null))
+        }
