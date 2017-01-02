@@ -68,6 +68,12 @@ class SaveFileTest {
         assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
             SaveFile.parse("""
             |version: "1"
+            |tags: { tagA: { key: null } }
+            |""".trimMargin())
+        }
+        assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
+            SaveFile.parse("""
+            |version: "1"
             |tags: { tagA: { type: 1 } }
             |""".trimMargin())
         }
@@ -150,7 +156,14 @@ class SaveFileTest {
             |""".trimMargin())
         assertEquals(1, save.metaData.size)
         assert(save.metaData.containsKey(Paths.get("path/to/image")))
-        assert(save.metaData[Paths.get("path/to/image")]!!.let { it.tags.first().name == "tagA" })
+        assert(save.metaData[Paths.get("path/to/image")]!!.tags.first().name == "tagA")
+
+        assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
+            SaveFile.parse("""
+            |version: "1"
+            |metaData: { path/to/image: { tags: { tagA: { opt: null } } } }
+            |""".trimMargin())
+        }
     }
     @Test
     fun dumpAndParseTest() {

@@ -31,6 +31,7 @@ data class SaveFile(
                 val opts = it.value as? Map<*, *> ?: throw IllegalSaveFormatException("value of tags must be a Map<String, String>")
                 opts.forEach {
                     it.key as? String ?: throw IllegalSaveFormatException("name of tag option must be a String")
+                    if (it.value == null) throw IllegalSaveFormatException("value of tag option must not be null")
                 }
                 if (opts.containsKey("type") && opts["type"] !is String) throw IllegalSaveFormatException("type of tag must be a String")
                 val type = opts["type"] as? String ?: "text"
@@ -55,7 +56,7 @@ data class SaveFile(
             return map.map {
                 val name = it.key as? String ?: throw IllegalSaveFormatException("tag name in metaData must be a String")
                 val ops = it.value as? Map<*, *> ?: mutableMapOf<String, Any>() // do not use mapOf() to avoid Yaml reference
-                if (!ops.all { it.key == String }) throw IllegalSaveFormatException("metaData.tags.data must be a Map<String, Any>")
+                if (!ops.all { it.key == String && it.value != null }) throw IllegalSaveFormatException("metaData.tags must be a Map<String, Any>")
                 @Suppress("UNCHECKED_CAST")
                 ops as Map<String, Any>
                 TextTag(name, ops)
