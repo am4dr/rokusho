@@ -5,6 +5,8 @@ import org.yaml.snakeyaml.Yaml
 import java.nio.file.Path
 import java.nio.file.Paths
 
+// TODO タグが度の種類であるかという情報とある画像についているのがどのタグで値は何かという情報の扱い
+// TODO つまり、SaveFileではImageMetaDataやTagを扱うのは抽象すぎて違うのかもしれないということ
 data class SaveFile(
         val version: String,
         val tags: Map<String, Map<String, String>>,
@@ -15,7 +17,7 @@ data class SaveFile(
             val yaml = Yaml().load(string)
             if (yaml == null || yaml !is Map<*,*>) { throw IllegalSaveFormatException("top level of save file must be a Map") }
             val version = parseVersion(yaml["version"])
-            val tags = parseMetaTagData(yaml["tags"])
+            val tags = parseTagMetaData(yaml["tags"])
             val metaData = parseMetaData(yaml["metaData"])
             return SaveFile(version, tags, metaData)
         }
@@ -23,8 +25,8 @@ data class SaveFile(
             data ?: throw VersionNotSpecifiedException()
             return data as? String ?: throw IllegalSaveFormatException("version must be a String")
         }
-        private fun parseMetaTagData(data: Any?): Map<String, Map<String, String>> {
-            data ?: return mapOf()
+        private fun parseTagMetaData(data: Any?): Map<String, Map<String, String>> {
+            data ?: return mutableMapOf() // do not use mapOf() to avoid Yaml reference
             val map = data as? Map<*, *> ?: throw IllegalSaveFormatException("tags must be a Map<String, Map<String, String>>")
             map.forEach {
                 it.key as? String ?: throw IllegalSaveFormatException("key of tags must be a String")
@@ -49,13 +51,19 @@ data class SaveFile(
         }
         private fun parseTagData(data: Any?): List<Tag> {
             data ?: return listOf()
-            val list = data as? List<*> ?: throw IllegalSaveFormatException("tags in metaData must be a List<String>")
-            return list.map {
-                if (it !is String) throw IllegalSaveFormatException("tag in metaData must be a List<String>")
-                DefaultTag(it)
+            val map = data as? Map<*, *> ?: throw IllegalSaveFormatException("tags in metaData must be a Map<String, Any>")
+            return map.map {
+                val name = it.key as? String ?: throw IllegalSaveFormatException("tag name in metaData must be a String")
+                val ops = it.value as? Map<*, *> ?: mutableMapOf<String, Any>() // do not use mapOf() to avoid Yaml reference
+                if (!ops.all { it.key == String }) throw IllegalSaveFormatException("metaData.tags.data must be a Map<String, Any>")
+                @Suppress("UNCHECKED_CAST")
+                ops as Map<String, Any>
+                TextTag(name, "text", ops)
             }
         }
         const val pathSeparator: String = "/"
+        fun ImageMetaData.toDumpStructure(): Map<String, Any> =
+                mapOf("tags" to tags.map { it.name to it.data }.toMap())
     }
     fun toTextFormat(): String =
         Yaml().dump(toDumpStructure())
@@ -66,10 +74,8 @@ data class SaveFile(
                 "metaData" to metaData.map {
                     val path = it.key.joinToString(pathSeparator)
                     val data = it.value
-                    Pair(path, toDumpStructure(data))
+                    Pair(path, data.toDumpStructure())
                 }.toMap())
-    fun toDumpStructure(metaData: ImageMetaData): Map<String, Any> =
-            mapOf("tags" to metaData.tags.map(Tag::text))
 }
 open class IllegalSaveFormatException(message: String = "") : RuntimeException(message)
 class VersionNotSpecifiedException(message: String = ""): IllegalSaveFormatException(message)

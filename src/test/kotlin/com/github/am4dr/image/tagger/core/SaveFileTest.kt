@@ -146,7 +146,7 @@ class SaveFileTest {
     fun singleTagInMetaDataTest() {
         val save = SaveFile.parse("""
             |version: "1"
-            |metaData: { path/to/image: { tags: [tagA] } }
+            |metaData: { path/to/image: { tags: { tagA: {}} } }
             |""".trimMargin())
         assertEquals(1, save.metaData.size)
         assert(save.metaData.containsKey(Paths.get("path/to/image")))
@@ -157,7 +157,7 @@ class SaveFileTest {
         val original = SaveFile.parse("""
             |version: "1"
             |tags: { tagA: {}, tagB: {}, tagC: {} }
-            |metaData: { path/to/image: { tags: [tagA] } }
+            |metaData: { path/to/image: { tags: { tagA: {}, tagB: null } } }
             |""".trimMargin())
         val dumped = SaveFile.parse(original.toTextFormat())
         assertEquals(original, dumped)
