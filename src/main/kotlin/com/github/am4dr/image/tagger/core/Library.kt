@@ -7,7 +7,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.util.stream.Collectors
 
-private const val defaultMetaDataFileName = "image_tag_info.tsv"
+private const val defaultMetaDataFileName = "image_tag_info.yaml"
 private val imageFileNameMatcher = Regex(".*\\.(bmp|gif|jpe?g|png)$", RegexOption.IGNORE_CASE)
 private fun isSupportedImageFile(path: Path) =
         Files.exists(path)
@@ -32,9 +32,9 @@ class Library(root: Path) {
         log.info("load imageProperty info from file: $metaDataFilePath")
         metaDataStore =
                 if (Files.exists(metaDataFilePath)) {
-                    loadImageMataData(metaDataFilePath.toFile()).apply {
-                        log.info("loaded imageProperty info number: $size")
-                    }
+                    val save = SaveFile.parse(metaDataFilePath.toFile().readText())
+                    log.info("loaded imageProperty info number: ${save.metaData.size}")
+                    save.metaData as MutableMap<Path, ImageMetaData>
                 }
                 else {
                     log.info("info file not found: $metaDataFilePath")
@@ -55,4 +55,6 @@ class Library(root: Path) {
             metaDataStore[root.relativize(images[i])] = newMetaData
         }
     }
+    fun toSaveFormat(): String =
+        SaveFile("1", mapOf(), metaDataStore).toTextFormat()
 }

@@ -38,6 +38,8 @@ dependencies {
     compile 'org.slf4j:slf4j-api:1.7.21'
     runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.7'
 
+    compile group: 'org.yaml', name: 'snakeyaml', version: '1.17'
+
     testCompile 'org.junit.jupiter:junit-jupiter-api:5.0.0'+junit_milestone
     testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.0.0'+junit_milestone
 }
