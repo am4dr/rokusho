@@ -55,10 +55,21 @@ data class SaveFile(
                 DefaultTag(it)
             }
         }
+        const val pathSeparator: String = "/"
     }
-    fun toTextFormat(): String {
-        TODO()
-    }
+    fun toTextFormat(): String =
+        Yaml().dump(toDumpStructure())
+    fun toDumpStructure(): Map<String, Any> =
+        mapOf(
+                "version" to version,
+                "tags" to tags,
+                "metaData" to metaData.map {
+                    val path = it.key.joinToString(pathSeparator)
+                    val data = it.value
+                    Pair(path, toDumpStructure(data))
+                }.toMap())
+    fun toDumpStructure(metaData: ImageMetaData): Map<String, Any> =
+            mapOf("tags" to metaData.tags.map(Tag::text))
 }
 open class IllegalSaveFormatException(message: String = "") : RuntimeException(message)
 class VersionNotSpecifiedException(message: String = ""): IllegalSaveFormatException(message)
