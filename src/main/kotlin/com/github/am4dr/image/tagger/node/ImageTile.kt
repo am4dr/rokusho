@@ -72,7 +72,7 @@ class ImageTile(
     }
 }
 fun createTagNode(tag: Tag): Node =
-        Label(tag.text).apply {
+        Label(tag.name).apply {
             textFill = Color.rgb(200, 200, 200)
             padding = Insets(-1.0, 2.0, 0.0, 2.0)
             font = Font(14.0)

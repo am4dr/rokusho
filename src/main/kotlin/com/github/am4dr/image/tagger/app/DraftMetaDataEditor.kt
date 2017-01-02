@@ -19,7 +19,7 @@ import javafx.stage.Stage
  * tag editor for development
  */
 internal class DraftMetaDataEditor(val metaData: ImageMetaData, val image: Image? = null) : Stage() {
-    private val tagsText = SimpleStringProperty(metaData.tags.map(Tag::text).joinToString(","))
+    private val tagsText = SimpleStringProperty(metaData.tags.map(Tag::name).joinToString(","))
     var onUpdate: (ImageMetaData) -> Unit = {}
     init {
         title = "tags editor"

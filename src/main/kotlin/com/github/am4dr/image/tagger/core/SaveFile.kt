@@ -5,8 +5,6 @@ import org.yaml.snakeyaml.Yaml
 import java.nio.file.Path
 import java.nio.file.Paths
 
-// TODO タグが度の種類であるかという情報とある画像についているのがどのタグで値は何かという情報の扱い
-// TODO つまり、SaveFileではImageMetaDataやTagを扱うのは抽象すぎて違うのかもしれないということ
 data class SaveFile(
         val version: String,
         val tags: Map<String, Map<String, String>>,
@@ -58,7 +56,7 @@ data class SaveFile(
                 if (!ops.all { it.key == String }) throw IllegalSaveFormatException("metaData.tags.data must be a Map<String, Any>")
                 @Suppress("UNCHECKED_CAST")
                 ops as Map<String, Any>
-                TextTag(name, "text", ops)
+                TextTag(name, ops)
             }
         }
         const val pathSeparator: String = "/"

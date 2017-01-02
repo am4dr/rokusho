@@ -150,7 +150,7 @@ class SaveFileTest {
             |""".trimMargin())
         assertEquals(1, save.metaData.size)
         assert(save.metaData.containsKey(Paths.get("path/to/image")))
-        assert(save.metaData[Paths.get("path/to/image")]!!.let { it.tags.first().text == "tagA" })
+        assert(save.metaData[Paths.get("path/to/image")]!!.let { it.tags.first().name == "tagA" })
     }
     @Test
     fun dumpAndParseTest() {
