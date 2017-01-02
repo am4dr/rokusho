@@ -7,7 +7,7 @@ import java.nio.file.Paths
 
 data class SaveFile(
         val version: String,
-        val tags: Map<String, Map<String, String>>,
+        val tags: Map<String, TagInfo>,
         val metaData: Map<Path, ImageMetaData>) {
     companion object {
         val log = LoggerFactory.getLogger(SaveFile::class.java)
@@ -15,7 +15,7 @@ data class SaveFile(
             val yaml = Yaml().load(string)
             if (yaml == null || yaml !is Map<*,*>) { throw IllegalSaveFormatException("top level of save file must be a Map") }
             val version = parseVersion(yaml["version"])
-            val tags = parseTagMetaData(yaml["tags"])
+            val tags = parseTagInfo(yaml["tags"])
             val metaData = parseMetaData(yaml["metaData"])
             return SaveFile(version, tags, metaData)
         }
@@ -23,19 +23,21 @@ data class SaveFile(
             data ?: throw VersionNotSpecifiedException()
             return data as? String ?: throw IllegalSaveFormatException("version must be a String")
         }
-        private fun parseTagMetaData(data: Any?): Map<String, Map<String, String>> {
+        private fun parseTagInfo(data: Any?): Map<String, TagInfo> {
             data ?: return mutableMapOf() // do not use mapOf() to avoid Yaml reference
             val map = data as? Map<*, *> ?: throw IllegalSaveFormatException("tags must be a Map<String, Map<String, String>>")
-            map.forEach {
-                it.key as? String ?: throw IllegalSaveFormatException("key of tags must be a String")
+            return map.map {
+                val name = it.key as? String ?: throw IllegalSaveFormatException("name of tag in tags must be a String")
                 val opts = it.value as? Map<*, *> ?: throw IllegalSaveFormatException("value of tags must be a Map<String, String>")
                 opts.forEach {
                     it.key as? String ?: throw IllegalSaveFormatException("name of tag option must be a String")
-                    it.value as? String ?: throw IllegalSaveFormatException("value of tag option must be a String")
                 }
-            }
-            @Suppress("UNCHECKED_CAST")
-            return map as Map<String, Map<String, String>>
+                if (opts.containsKey("type") && opts["type"] !is String) throw IllegalSaveFormatException("type of tag must be a String")
+                val type = opts["type"] as? String ?: "text"
+                @Suppress("UNCHECKED_CAST")
+                opts as Map<String, Any>
+                Pair(name, TagInfo(type, opts))
+            }.toMap()
         }
         private fun parseMetaData(data: Any?): Map<Path, ImageMetaData> {
             data ?: return mapOf()
@@ -68,7 +70,11 @@ data class SaveFile(
     fun toDumpStructure(): Map<String, Any> =
         mapOf(
                 "version" to version,
-                "tags" to tags,
+                "tags" to tags.map {
+                    val name = it.key
+                    val info = it.value
+                    Pair(name, info.data)
+                }.toMap(),
                 "metaData" to metaData.map {
                     val path = it.key.joinToString(pathSeparator)
                     val data = it.value

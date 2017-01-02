@@ -17,3 +17,4 @@ class TagParser {
         fun parse(string: String): Tag = TextTag(string)
     }
 }
+data class TagInfo(val type: String, val data: Map<String, Any>)

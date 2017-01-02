@@ -20,6 +20,7 @@ class Library(root: Path) {
     val images: List<Path>
     val metaDataFilePath: Path
     val metaDataStore: MutableMap<Path, ImageMetaData>
+    val tags: MutableMap<String, TagInfo>
     val pictures: ObservableList<Picture>
 
     init {
@@ -30,16 +31,17 @@ class Library(root: Path) {
                         .collect(Collectors.toList<Path>())
         metaDataFilePath = root.resolve(defaultMetaDataFileName)
         log.info("load imageProperty info from file: $metaDataFilePath")
-        metaDataStore =
+        val savefile =
                 if (Files.exists(metaDataFilePath)) {
-                    val save = SaveFile.parse(metaDataFilePath.toFile().readText())
-                    log.info("loaded imageProperty info number: ${save.metaData.size}")
-                    save.metaData as MutableMap<Path, ImageMetaData>
+                    SaveFile.parse(metaDataFilePath.toFile().readText())
                 }
                 else {
-                    log.info("info file not found: $metaDataFilePath")
-                    mutableMapOf()
+                    null
                 }
+        if (savefile == null) log.info("info file not found: $metaDataFilePath")
+        metaDataStore = savefile?.let { it.metaData as MutableMap<Path, ImageMetaData> } ?: mutableMapOf()
+        log.info("loaded imageProperty info number: ${metaDataStore.size}")
+        tags = savefile?.let { it.tags as MutableMap<String, TagInfo> } ?: mutableMapOf()
 
         val pics = images.map { path ->
             val url = path.toUri().toURL()
@@ -56,5 +58,5 @@ class Library(root: Path) {
         }
     }
     fun toSaveFormat(): String =
-        SaveFile("1", mapOf(), metaDataStore).toTextFormat()
+        SaveFile("1", tags, metaDataStore).toTextFormat()
 }

@@ -156,7 +156,7 @@ class SaveFileTest {
     fun dumpAndParseTest() {
         val original = SaveFile.parse("""
             |version: "1"
-            |tags: { tagA: {}, tagB: {}, tagC: {} }
+            |tags: { tagA: { type: "selection" }, tagB: { type: "text" }, tagC: {} }
             |metaData: { path/to/image: { tags: { tagA: {}, tagB: null } } }
             |""".trimMargin())
         val dumped = SaveFile.parse(original.toTextFormat())
