@@ -15,7 +15,7 @@ import javafx.scene.layout.FlowPane
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class ImageTileScrollPane(val tileFacotry: (Picture) -> ImageTile = ::ImageTile) : ScrollPane() {
+class ImageTileScrollPane(val tileFactory: (Picture) -> ImageTile = ::ImageTile) : ScrollPane() {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
     val picturesProperty: ListProperty<Picture>
     val tilesProperty: ListProperty<ImageTile>
@@ -28,7 +28,7 @@ class ImageTileScrollPane(val tileFacotry: (Picture) -> ImageTile = ::ImageTile)
     init {
         picturesProperty = createEmptyListProperty()
         tilesProperty = SimpleListProperty(TransformedList(picturesProperty) { pic ->
-            tileFacotry(pic).apply {
+            tileFactory(pic).apply {
                 onMouseClicked = EventHandler<MouseEvent> { onTileClicked(this, pic) }
                 metaDataProperty.addListener { property, old, new ->
                     onMetaDataChanged(this, pic, new)
