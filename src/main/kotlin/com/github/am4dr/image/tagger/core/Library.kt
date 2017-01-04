@@ -34,6 +34,7 @@ class Library(root: Path) {
         val savefile =
                 if (Files.exists(metaDataFilePath)) {
                     SaveFile.parse(metaDataFilePath.toFile().readText())
+                    // TODO ファイルフォーマットに問題があって読み込めなかったときに複製をスタックとレースと共に保存する
                 }
                 else {
                     null

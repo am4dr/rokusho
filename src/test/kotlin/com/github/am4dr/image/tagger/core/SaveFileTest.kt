@@ -158,6 +158,14 @@ class SaveFileTest {
         assert(save.metaData.containsKey(Paths.get("path/to/image")))
         assert(save.metaData[Paths.get("path/to/image")]!!.tags.first().name == "tagA")
 
+        val withOption = SaveFile.parse("""
+            |version: "1"
+            |metaData: { path/to/image: { tags: { tagA: { option: value }} } }
+            |""".trimMargin())
+        assertEquals(1, withOption.metaData.size)
+        assert(withOption.metaData.containsKey(Paths.get("path/to/image")))
+        assert(withOption.metaData[Paths.get("path/to/image")]!!.tags.first().name == "tagA")
+
         assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
             SaveFile.parse("""
             |version: "1"

@@ -53,10 +53,13 @@ data class SaveFile(
         private fun parseTagData(data: Any?): List<Tag> {
             data ?: return listOf()
             val map = data as? Map<*, *> ?: throw IllegalSaveFormatException("tags in metaData must be a Map<String, Any>")
-            return map.map {
-                val name = it.key as? String ?: throw IllegalSaveFormatException("tag name in metaData must be a String")
-                val ops = it.value as? Map<*, *> ?: mutableMapOf<String, Any>() // do not use mapOf() to avoid Yaml reference
-                if (!ops.all { it.key == String && it.value != null }) throw IllegalSaveFormatException("metaData.tags must be a Map<String, Any>")
+            return map.map { tag ->
+                val name = tag.key as? String ?: throw IllegalSaveFormatException("tag name in metaData must be a String: ${tag.key}")
+                val ops = tag.value as? Map<*, *> ?: mutableMapOf<String, Any>() // do not use mapOf() to avoid Yaml reference
+                ops.forEach {
+                    if (it.key !is String) throw IllegalSaveFormatException("key of metaData.tags must be a String: ${it.key}")
+                    if (it.value == null) throw IllegalSaveFormatException("value of metaData.tags.<option name> must not be null: ${it.value}")
+                }
                 @Suppress("UNCHECKED_CAST")
                 ops as Map<String, Any>
                 TextTag(name, ops)
