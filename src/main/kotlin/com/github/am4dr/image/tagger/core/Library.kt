@@ -10,8 +10,7 @@ import java.util.stream.Collectors
 private const val defaultMetaDataFileName = "image_tag_info.yaml"
 private val imageFileNameMatcher = Regex(".*\\.(bmp|gif|jpe?g|png)$", RegexOption.IGNORE_CASE)
 private fun isSupportedImageFile(path: Path) =
-        Files.exists(path)
-                && Files.isRegularFile(path)
+        Files.isRegularFile(path)
                 && imageFileNameMatcher.matches(path.fileName.toString())
 // TODO add test 特にupdateMetaData
 class Library(root: Path) {
@@ -25,10 +24,6 @@ class Library(root: Path) {
 
     init {
         this.root = root.toAbsolutePath()
-        images =
-                Files.list(root)
-                        .filter(::isSupportedImageFile)
-                        .collect(Collectors.toList<Path>())
         metaDataFilePath = root.resolve(defaultMetaDataFileName)
         log.info("load imageProperty info from file: $metaDataFilePath")
         val savefile =
@@ -43,12 +38,15 @@ class Library(root: Path) {
         metaDataStore = savefile?.let { it.metaData as MutableMap<Path, ImageMetaData> } ?: mutableMapOf()
         log.info("loaded imageProperty info number: ${metaDataStore.size}")
         tags = savefile?.let { it.tags as MutableMap<String, TagInfo> } ?: mutableMapOf()
-
+        images =
+                Files.list(root)
+                        .filter(::isSupportedImageFile)
+                        .collect(Collectors.toList<Path>())
         val pics = images.map { path ->
             val url = path.toUri().toURL()
             val metaIndex = root.relativize(path)
             Picture(URLImageLoader(url), metaDataStore.getOrElse(metaIndex) { ImageMetaData() })
-        }.toMutableList()
+        }
         pictures = observableList(pics)
     }
     fun updateMetaData(picture: Picture, newMetaData: ImageMetaData) {
