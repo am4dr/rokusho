@@ -42,6 +42,10 @@ class ImageTileScrollPane(val tileFactory: (Picture) -> ImageTile = ::ImageTile)
             alignment = Pos.CENTER
             Bindings.bindContent(children, tilesProperty)
             vValueHeightProperty.bind(vvalueProperty().multiply(heightProperty()))
+            setOnScroll {
+                vvalue -= it.deltaY * 3 / height
+                it.consume()
+            }
         }
         val margin = SimpleDoubleProperty(2000.0)
         val screenTop = margin.multiply(-1).add(vValueHeightProperty)
