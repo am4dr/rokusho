@@ -3,6 +3,7 @@ package com.github.am4dr.image.tagger.node
 import com.github.am4dr.image.tagger.app.DraftMetaDataEditor
 import com.github.am4dr.image.tagger.core.ImageMetaData
 import com.github.am4dr.image.tagger.core.Picture
+import com.github.am4dr.image.tagger.core.Tag
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.ListBinding
 import javafx.beans.property.BooleanProperty
@@ -25,7 +26,10 @@ import javafx.scene.text.Font
 const val thumbnailMaxWidth: Double = 500.0
 const val thumbnailMaxHeight: Double = 200.0
 
-class ImageTile(image: Image, metaData: ImageMetaData = ImageMetaData()) : StackPane() {
+class ImageTile(
+        image: Image,
+        metaData: ImageMetaData = ImageMetaData(),
+        tagNodeFactory : (Tag) -> Node = ::createTagNode) : StackPane() {
     constructor(picture: Picture) : this(picture.loader.getImage(thumbnailMaxWidth, thumbnailMaxHeight, true), picture.metaData)
     val imageVisibleProperty: BooleanProperty = SimpleBooleanProperty(true)
     val imageProperty: ObjectProperty<Image> = SimpleObjectProperty<Image>(image)
@@ -51,7 +55,8 @@ class ImageTile(image: Image, metaData: ImageMetaData = ImageMetaData()) : Stack
             init { super.bind(metaDataProperty) }
             override fun computeValue(): ObservableList<Node> =
                     FXCollections.observableList(
-                            metaDataProperty.get().tags.map(::createTagLabel) + addTagsButton)
+                            metaDataProperty.get().tags.map(tagNodeFactory)
+                                    + addTagsButton)
         }
         val overlay = FlowPane(7.5, 5.0).apply {
             padding = Insets(10.0)
@@ -66,8 +71,8 @@ class ImageTile(image: Image, metaData: ImageMetaData = ImageMetaData()) : Stack
         maxHeightProperty().bind(imageProperty.get().heightProperty())
     }
 }
-private fun createTagLabel(name: String): Node =
-        Label(name).apply {
+fun createTagNode(tag: Tag): Node =
+        Label(tag.name).apply {
             textFill = Color.rgb(200, 200, 200)
             padding = Insets(-1.0, 2.0, 0.0, 2.0)
             font = Font(14.0)
