@@ -58,6 +58,9 @@ class Library(root: Path) {
             metaDataStore[root.relativize(images[i])] = newMetaData
         }
     }
+    fun updateTagInfo(name: String, info: TagInfo) {
+        tags[name] = info
+    }
     fun toSaveFormat(): String =
         SaveFile("1", tags, metaDataStore).toTextFormat()
 }

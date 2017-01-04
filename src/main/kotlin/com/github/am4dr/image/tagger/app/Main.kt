@@ -1,16 +1,15 @@
 package com.github.am4dr.image.tagger.app
 
-import com.github.am4dr.image.tagger.core.ImageMetaData
-import com.github.am4dr.image.tagger.core.Library
-import com.github.am4dr.image.tagger.core.Picture
-import com.github.am4dr.image.tagger.node.ImageTileScrollPane
-import com.github.am4dr.image.tagger.node.ThumbnailPane
+import com.github.am4dr.image.tagger.core.*
+import com.github.am4dr.image.tagger.node.*
 import javafx.application.Application
 import javafx.beans.binding.Bindings.createObjectBinding
 import javafx.beans.property.*
 import javafx.collections.FXCollections.observableList
+import javafx.collections.FXCollections.observableMap
 import javafx.event.EventHandler
 import javafx.geometry.Pos
+import javafx.scene.Node
 import javafx.scene.Scene
 import javafx.scene.control.Hyperlink
 import javafx.scene.control.Label
@@ -63,18 +62,23 @@ class Main : Application() {
     private fun makeOptions(): Options = with(Options()) {
         addOption(null, "saveto", true, "specify the directory path to save the tag file")
     }
-    private fun createMainFrame(stage: Stage): MainFrame =
-        MainFrame(
+    private fun createMainFrame(stage: Stage): MainFrame {
+        val tagNodeFactory: (Tag) -> Node = { mainModel.tagNodeFactory.createTagNode(it) }
+        val tileFactory: (Picture) -> ImageTile = { pic ->
+            ImageTile(pic.loader.getImage(thumbnailMaxWidth, thumbnailMaxHeight, true), pic.metaData, tagNodeFactory)
+        }
+        return MainFrame(
                 ImageFiler(
                         mainModel.picturesProperty,
                         ListView(),
-                        ThumbnailPane(ImageTileScrollPane().apply {
+                        ThumbnailPane(ImageTileScrollPane(tileFactory).apply {
                             onMetaDataChanged = { tile, pic, meta -> mainModel.updateMetaData(pic, meta) }
                         })),
                 makeDirectorySelectorPane(stage))
                 .apply {
                     librariesNotSelectedProperty.bind(mainModel.picturesProperty.emptyProperty())
                 }
+    }
     private fun selectLibraryDirectory(window: Window) {
         DirectoryChooser().run {
             title = "画像があるディレクトリを選択してください"
@@ -98,6 +102,8 @@ class MainModel {
     private val _libraryProperty: ObjectProperty<Library>
     val libraryProperty: ReadOnlyObjectProperty<Library>
     val picturesProperty: ReadOnlyListProperty<Picture>
+    val tagsProperty: ReadOnlyMapProperty<String, TagInfo>
+    val tagNodeFactory: TagNodeFactory
     init {
         _libraryProperty = SimpleObjectProperty()
         libraryProperty = SimpleObjectProperty<Library>()
@@ -106,6 +112,11 @@ class MainModel {
         picturesProperty.bind(createObjectBinding(
                 Callable { libraryProperty.get()?.pictures ?: observableList(mutableListOf()) },
                 libraryProperty))
+        tagsProperty = SimpleMapProperty()
+        tagsProperty.bind(createObjectBinding(
+                Callable { observableMap(libraryProperty.get()?.tags ?: mutableMapOf()) },
+                libraryProperty))
+        tagNodeFactory = TagNodeFactory(tagsProperty)
     }
     fun setLibrary(path: Path) {
         log.info("select library: $path")
@@ -114,6 +125,10 @@ class MainModel {
     fun updateMetaData(picture: Picture, metaData: ImageMetaData) {
         log.info("update metadata: $picture, $metaData")
         libraryProperty.get().updateMetaData(picture, metaData)
+    }
+    fun updateTagInfo(name: String, info: TagInfo) {
+        log.info("update tag info: name=$name, info=$info")
+        libraryProperty.get().updateTagInfo(name, info)
     }
     fun save() {
         val metaDataFile = libraryProperty.get().metaDataFilePath.toFile()

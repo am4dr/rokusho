@@ -37,7 +37,7 @@ data class SaveFile(
                 val type = opts["type"] as? String ?: "text"
                 @Suppress("UNCHECKED_CAST")
                 opts as Map<String, Any>
-                Pair(name, TagInfo(type, opts))
+                Pair(name, TagInfo(TagType.from(type), opts))
             }.toMap()
         }
         private fun parseMetaData(data: Any?): Map<Path, ImageMetaData> {
