@@ -1,6 +1,5 @@
 package com.github.am4dr.image.tagger.node
 
-import com.github.am4dr.image.tagger.core.ImageMetaData
 import com.github.am4dr.image.tagger.core.Picture
 import com.github.am4dr.image.tagger.util.TransformedList
 import com.github.am4dr.image.tagger.util.createEmptyListProperty
@@ -20,7 +19,6 @@ class ImageTileScrollPane(val tileFactory: (Picture) -> ImageTile = ::ImageTile)
     val picturesProperty: ListProperty<Picture>
     val tilesProperty: ListProperty<ImageTile>
     var onTileClicked: (ImageTile, Picture) -> Unit = { tile, pic -> }
-    var onMetaDataChanged: (ImageTile, Picture, ImageMetaData) -> Unit = { tile, pic, meta -> }
 
     private val vValueHeightProperty = SimpleDoubleProperty()
     private var ranges = mutableListOf<TileRange>()
@@ -30,9 +28,6 @@ class ImageTileScrollPane(val tileFactory: (Picture) -> ImageTile = ::ImageTile)
         tilesProperty = SimpleListProperty(TransformedList(picturesProperty) { pic ->
             tileFactory(pic).apply {
                 onMouseClicked = EventHandler<MouseEvent> { onTileClicked(this, pic) }
-                metaDataProperty.addListener { property, old, new ->
-                    onMetaDataChanged(this, pic, new)
-                }
             }
         })
         fitToWidthProperty().set(true)

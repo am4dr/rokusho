@@ -65,15 +65,15 @@ class Main : Application() {
     private fun createMainFrame(stage: Stage): MainFrame {
         val tagNodeFactory: (Tag) -> Node = { mainModel.tagNodeFactory.createTagNode(it) }
         val tileFactory: (Picture) -> ImageTile = { pic ->
-            ImageTile(pic.loader.getImage(thumbnailMaxWidth, thumbnailMaxHeight, true), pic.metaData, tagNodeFactory)
+            ImageTile(pic.loader.getImage(thumbnailMaxWidth, thumbnailMaxHeight, true), pic.metaData, tagNodeFactory).apply {
+                metaDataProperty.addListener { it -> mainModel.updateMetaData(pic, metaDataProperty.get()) }
+            }
         }
         return MainFrame(
                 ImageFiler(
                         mainModel.picturesProperty,
                         ListView(),
-                        ThumbnailPane(ImageTileScrollPane(tileFactory).apply {
-                            onMetaDataChanged = { tile, pic, meta -> mainModel.updateMetaData(pic, meta) }
-                        })),
+                        ThumbnailPane(ImageTileScrollPane(tileFactory))),
                 makeDirectorySelectorPane(stage))
                 .apply {
                     librariesNotSelectedProperty.bind(mainModel.picturesProperty.emptyProperty())
