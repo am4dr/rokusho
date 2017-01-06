@@ -4,9 +4,8 @@ import com.github.am4dr.image.tagger.core.Picture
 import com.github.am4dr.image.tagger.util.TransformedList
 import com.github.am4dr.image.tagger.util.createEmptyListProperty
 import javafx.beans.binding.Bindings
-import javafx.beans.property.ListProperty
-import javafx.beans.property.SimpleDoubleProperty
-import javafx.beans.property.SimpleListProperty
+import javafx.beans.binding.BooleanBinding
+import javafx.beans.property.*
 import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.geometry.Pos
@@ -21,6 +20,7 @@ class ImageTileScrollPane(val tileFactory: (Picture) -> ImageTile = ::ImageTile)
     val picturesProperty: ListProperty<Picture>
     val tilesProperty: ListProperty<ImageTile>
     var onTileClicked: (ImageTile, Picture) -> Unit = { tile, pic -> }
+    var filterProperty: ObjectProperty<(Picture) -> Boolean> = SimpleObjectProperty({ it -> true })
 
     private val vValueHeightProperty = SimpleDoubleProperty()
     init {
@@ -31,9 +31,15 @@ class ImageTileScrollPane(val tileFactory: (Picture) -> ImageTile = ::ImageTile)
         tilesProperty = SimpleListProperty(TransformedList(picturesProperty) { pic ->
             tileFactory(pic).apply {
                 onMouseClicked = EventHandler<MouseEvent> { onTileClicked(this, pic) }
+                val filterPassedProperty = object : BooleanBinding() {
+                    init { super.bind(filterProperty, metaDataProperty) }
+                    override fun computeValue(): Boolean = filterProperty.get().invoke(pic)
+                }
                 visibleProperty().bind(
-                        layoutYProperty().greaterThanOrEqualTo(screenTop)
+                        filterPassedProperty
+                                .and(layoutYProperty().greaterThanOrEqualTo(screenTop))
                                 .and(layoutYProperty().lessThanOrEqualTo(screenBottom)))
+                managedProperty().bind(filterPassedProperty)
             }
         })
         fitToWidthProperty().set(true)

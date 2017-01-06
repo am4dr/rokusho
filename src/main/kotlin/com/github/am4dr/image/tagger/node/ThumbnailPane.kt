@@ -19,6 +19,7 @@ class ThumbnailPane(scrollPane: ImageTileScrollPane = ImageTileScrollPane()) : S
     private var onOverlayClickedHandler: ObjectProperty<EventHandler<MouseEvent>>
     var onOverlayClicked: () -> Unit = {}
         set(value) { onOverlayClickedHandler.set(EventHandler { value() }) }
+    var filterProperty: ObjectProperty<(Picture) -> Boolean> = SimpleObjectProperty({ it -> true })
 
     init {
         overlayVisibleProperty = SimpleBooleanProperty(false)
@@ -33,6 +34,7 @@ class ThumbnailPane(scrollPane: ImageTileScrollPane = ImageTileScrollPane()) : S
             background = Background(BackgroundFill(Color.rgb(30, 30, 30, 0.75), null, null))
         }
         scrollPane.picturesProperty.bind(picturesProperty)
+        scrollPane.filterProperty.bind(filterProperty)
         scrollPane.onTileClicked = { tile, pic ->
             showOverlay(pic.loader.image)
         }
