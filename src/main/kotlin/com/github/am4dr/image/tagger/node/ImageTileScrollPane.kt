@@ -37,9 +37,12 @@ class ImageTileScrollPane(val tileFactory: (Picture) -> ImageTile = ::ImageTile)
                 }
                 visibleProperty().bind(
                         filterPassedProperty
+                                .and(imageProperty.get().widthProperty().isNotEqualTo(0))
                                 .and(layoutYProperty().greaterThanOrEqualTo(screenTop))
                                 .and(layoutYProperty().lessThanOrEqualTo(screenBottom)))
-                managedProperty().bind(filterPassedProperty)
+                managedProperty().bind(
+                        filterPassedProperty
+                                .and(imageProperty.get().widthProperty().isNotEqualTo(0)))
             }
         })
         fitToWidthProperty().set(true)
