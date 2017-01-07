@@ -16,7 +16,9 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class ImageTileScrollPane(val tileFactory: (Picture) -> ImageTile = ::ImageTile) : ScrollPane() {
-    private val log: Logger = LoggerFactory.getLogger(this.javaClass)
+    companion object {
+        private val log: Logger = LoggerFactory.getLogger(ImageTileScrollPane::class.java)
+    }
     val picturesProperty: ListProperty<Picture>
     val tilesProperty: ListProperty<ImageTile>
     var onTileClicked: (ImageTile, Picture) -> Unit = { tile, pic -> }

@@ -14,7 +14,9 @@ private fun isSupportedImageFile(path: Path) =
                 && imageFileNameMatcher.matches(path.fileName.toString())
 // TODO add test 特にupdateMetaData
 class Library(root: Path) {
-    private val log = LoggerFactory.getLogger(this.javaClass)
+    companion object  {
+        private val log = LoggerFactory.getLogger(Library::class.java)
+    }
     val root: Path
     val images: List<Path>
     val metaDataFilePath: Path

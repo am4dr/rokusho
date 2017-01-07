@@ -10,7 +10,7 @@ data class SaveFile(
         val tags: Map<String, TagInfo>,
         val metaData: Map<Path, ImageMetaData>) {
     companion object {
-        val log = LoggerFactory.getLogger(SaveFile::class.java)
+        private val log = LoggerFactory.getLogger(SaveFile::class.java)
         fun parse(string: String): SaveFile {
             val yaml = Yaml().load(string)
             if (yaml == null || yaml !is Map<*,*>) { throw IllegalSaveFormatException("top level of save file must be a Map") }

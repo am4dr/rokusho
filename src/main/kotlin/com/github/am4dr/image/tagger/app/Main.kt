@@ -37,9 +37,11 @@ fun main(args: Array<String>) = Application.launch(Main::class.java, *args)
     - 構成要素の生成と相互接続
  */
 class Main : Application() {
-    private val log = LoggerFactory.getLogger(this.javaClass)
     private val options = makeOptions()
     private val mainModel = MainModel()
+    companion object {
+        private val log = LoggerFactory.getLogger(Main::class.java)
+    }
 
     override fun init() {
         log.info("launched with the params: ${parameters.raw}")
@@ -98,7 +100,9 @@ class Main : Application() {
 
 // TODO 複数Libraryへの対応
 class MainModel {
-    private val log = LoggerFactory.getLogger(this.javaClass)
+    companion object {
+        private val log = LoggerFactory.getLogger(MainModel::class.java)
+    }
     private val _libraryProperty: ObjectProperty<Library>
     val libraryProperty: ReadOnlyObjectProperty<Library>
     val picturesProperty: ReadOnlyListProperty<Picture>
