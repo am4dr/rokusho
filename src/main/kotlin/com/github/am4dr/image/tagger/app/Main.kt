@@ -67,7 +67,7 @@ class Main : Application() {
     private fun createMainFrame(stage: Stage): MainFrame {
         val tagNodeFactory: (Tag) -> Node = { mainModel.tagNodeFactory.createTagNode(it) }
         val tileFactory: (Picture) -> ImageTile = { pic ->
-            ImageTile(pic.loader.getImage(thumbnailMaxWidth, thumbnailMaxHeight, true), pic.metaData, tagNodeFactory).apply {
+            ImageTile(pic, tagNodeFactory).apply {
                 metaDataProperty.addListener { it -> mainModel.updateMetaData(pic, metaDataProperty.get()) }
             }
         }

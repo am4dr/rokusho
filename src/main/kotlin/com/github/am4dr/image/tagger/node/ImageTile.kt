@@ -6,9 +6,9 @@ import com.github.am4dr.image.tagger.core.Picture
 import com.github.am4dr.image.tagger.core.Tag
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.ListBinding
-import javafx.beans.property.BooleanProperty
 import javafx.beans.property.ObjectProperty
-import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.ReadOnlyObjectProperty
+import javafx.beans.property.ReadOnlyObjectWrapper
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
@@ -26,30 +26,26 @@ import javafx.scene.text.Font
 const val thumbnailMaxWidth: Double = 500.0
 const val thumbnailMaxHeight: Double = 200.0
 
-class ImageTile(
-        image: Image,
-        metaData: ImageMetaData = ImageMetaData(),
-        tagNodeFactory : (Tag) -> Node = ::createTagNode) : StackPane() {
-    constructor(picture: Picture) : this(picture.loader.getImage(thumbnailMaxWidth, thumbnailMaxHeight, true), picture.metaData)
-    val imageVisibleProperty: BooleanProperty = SimpleBooleanProperty(true)
-    val imageProperty: ObjectProperty<Image> = SimpleObjectProperty<Image>(image)
-    val metaDataProperty: ObjectProperty<ImageMetaData> = SimpleObjectProperty(metaData)
+class ImageTile(picture: Picture, tagNodeFactory : (Tag) -> Node) : StackPane() {
+    constructor(picture: Picture) : this(picture,  ::createTagNode)
+    val pictureProperty: ReadOnlyObjectProperty<Picture> = ReadOnlyObjectWrapper(picture)
+    val imageProperty: ReadOnlyObjectProperty<Image> = ReadOnlyObjectWrapper(picture.loader.getImage(thumbnailMaxWidth, thumbnailMaxHeight, true))
+    private val _metaDataProperty: ObjectProperty<ImageMetaData> = SimpleObjectProperty(picture.metaData)
+    val metaDataProperty: ReadOnlyObjectProperty<ImageMetaData> = SimpleObjectProperty<ImageMetaData>().apply { bind(_metaDataProperty) }
     init {
-        imageProperty.addListener { obs, old, new -> updateMaxSizeProperty() }
-        updateMaxSizeProperty()
-        val imageView = ImageView().apply {
-            imageProperty().bind(imageProperty)
-            visibleProperty().bind(imageVisibleProperty)
-        }
-        val metaDataEditor = DraftMetaDataEditor(metaDataProperty.get(), imageProperty.get()).apply {
-            onUpdate = { metaDataProperty.set(it); close() }
-        }
+        maxWidthProperty().bind(imageProperty.get().widthProperty())
+        maxHeightProperty().bind(imageProperty.get().heightProperty())
+        val imageView = ImageView().apply { imageProperty().bind(imageProperty) }
         val addTagsButton = Button(" + ").apply {
             textFill = Color.rgb(200, 200, 200)
             padding = Insets(-1.0, 2.0, 0.0, 2.0)
             font = Font(14.0)
             background = Background(BackgroundFill(Color.BLACK, CornerRadii(2.0), null))
-            onAction = EventHandler { metaDataEditor.show() }
+            onAction = EventHandler {
+                DraftMetaDataEditor(metaDataProperty.get(), imageProperty.get()).apply {
+                    onUpdate = { _metaDataProperty.set(it); close() }
+                }.show()
+            }
         }
         val tagLabelNodes = object : ListBinding<Node>() {
             init { super.bind(metaDataProperty) }
@@ -65,10 +61,6 @@ class ImageTile(
             visibleProperty().bind(this@ImageTile.hoverProperty())
         }
         children.setAll(imageView, overlay)
-    }
-    private fun updateMaxSizeProperty() {
-        maxWidthProperty().bind(imageProperty.get().widthProperty())
-        maxHeightProperty().bind(imageProperty.get().heightProperty())
     }
 }
 fun createTagNode(tag: Tag): Node =
