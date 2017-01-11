@@ -74,6 +74,7 @@ class Main : Application() {
         return MainFrame(
                 ImageFiler(
                         mainModel.picturesProperty,
+                        StringPictureFilter(),
                         ListView(),
                         ThumbnailPane(ImageTileScrollPane(tileFactory))),
                 makeDirectorySelectorPane(stage))
