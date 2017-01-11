@@ -35,7 +35,7 @@ class ImageTileScrollPane(val tileFactory: (Picture) -> ImageTile = ::ImageTile)
                 onMouseClicked = EventHandler<MouseEvent> { onTileClicked(this) }
                 val filterPassedProperty = object : BooleanBinding() {
                     init { super.bind(filterProperty, metaDataProperty) }
-                    override fun computeValue(): Boolean = filterProperty.get().invoke(pic)
+                    override fun computeValue(): Boolean = filterProperty.get().invoke(pictureProperty.get())
                 }
                 visibleProperty().bind(
                         filterPassedProperty
