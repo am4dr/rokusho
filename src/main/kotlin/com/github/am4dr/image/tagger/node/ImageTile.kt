@@ -31,7 +31,7 @@ class ImageTile(picture: Picture, tagNodeFactory : (Tag) -> Node) : StackPane() 
     val pictureProperty: ReadOnlyObjectProperty<Picture> = ReadOnlyObjectWrapper(picture)
     val imageProperty: ReadOnlyObjectProperty<Image> = ReadOnlyObjectWrapper(picture.loader.getImage(thumbnailMaxWidth, thumbnailMaxHeight, true))
     private val _metaDataProperty: ObjectProperty<ImageMetaData> = SimpleObjectProperty(picture.metaData)
-    val metaDataProperty: ReadOnlyObjectProperty<ImageMetaData> = SimpleObjectProperty<ImageMetaData>().apply { bind(_metaDataProperty) }
+    val metaDataProperty: ReadOnlyObjectProperty<ImageMetaData> = _metaDataProperty
     init {
         maxWidthProperty().bind(imageProperty.get().widthProperty())
         maxHeightProperty().bind(imageProperty.get().heightProperty())
