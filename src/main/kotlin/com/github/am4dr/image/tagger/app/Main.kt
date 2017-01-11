@@ -1,7 +1,9 @@
 package com.github.am4dr.image.tagger.app
 
 import com.github.am4dr.image.tagger.core.*
-import com.github.am4dr.image.tagger.node.*
+import com.github.am4dr.image.tagger.node.ImageTile
+import com.github.am4dr.image.tagger.node.ImageTileScrollPane
+import com.github.am4dr.image.tagger.node.ThumbnailPane
 import javafx.application.Application
 import javafx.beans.binding.Bindings.createObjectBinding
 import javafx.beans.property.*

@@ -2,7 +2,9 @@ package com.github.am4dr.image.tagger.app
 
 import com.github.am4dr.image.tagger.core.Picture
 import javafx.beans.binding.ObjectBinding
-import javafx.beans.property.*
+import javafx.beans.property.ObjectProperty
+import javafx.beans.property.ReadOnlyObjectProperty
+import javafx.beans.property.SimpleObjectProperty
 
 interface PictureFilter<T> {
     val filterProperty: ReadOnlyObjectProperty<(Picture) -> Boolean>
