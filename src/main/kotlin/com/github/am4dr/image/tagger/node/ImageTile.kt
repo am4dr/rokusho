@@ -6,7 +6,10 @@ import com.github.am4dr.image.tagger.core.Picture
 import com.github.am4dr.image.tagger.core.Tag
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.ListBinding
-import javafx.beans.property.*
+import javafx.beans.property.ObjectProperty
+import javafx.beans.property.ReadOnlyObjectProperty
+import javafx.beans.property.ReadOnlyObjectWrapper
+import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.event.EventHandler
@@ -33,15 +36,16 @@ class ImageTile(picture: Picture, tagNodeFactory : (Tag) -> Node) : StackPane() 
         maxWidthProperty().bind(imageProperty.get().widthProperty())
         maxHeightProperty().bind(imageProperty.get().heightProperty())
         val imageView = ImageView().apply { imageProperty().bind(imageProperty) }
-        val metaDataEditor = DraftMetaDataEditor(metaDataProperty.get(), imageProperty.get()).apply {
-            onUpdate = { _metaDataProperty.set(it); close() }
-        }
         val addTagsButton = Button(" + ").apply {
             textFill = Color.rgb(200, 200, 200)
             padding = Insets(-1.0, 2.0, 0.0, 2.0)
             font = Font(14.0)
             background = Background(BackgroundFill(Color.BLACK, CornerRadii(2.0), null))
-            onAction = EventHandler { metaDataEditor.show() }
+            onAction = EventHandler {
+                DraftMetaDataEditor(metaDataProperty.get(), imageProperty.get()).apply {
+                    onUpdate = { _metaDataProperty.set(it); close() }
+                }.show()
+            }
         }
         val tagLabelNodes = object : ListBinding<Node>() {
             init { super.bind(metaDataProperty) }
