@@ -21,7 +21,7 @@ class ImageTileScrollPane(val tileFactory: (Picture) -> ImageTile = ::ImageTile)
     }
     val picturesProperty: ListProperty<Picture>
     val tilesProperty: ListProperty<ImageTile>
-    var onTileClicked: (ImageTile, Picture) -> Unit = { tile, pic -> }
+    var onTileClicked: (ImageTile) -> Unit = { tile -> }
     var filterProperty: ObjectProperty<(Picture) -> Boolean> = SimpleObjectProperty({ it -> true })
 
     private val vValueHeightProperty = SimpleDoubleProperty()
@@ -32,7 +32,7 @@ class ImageTileScrollPane(val tileFactory: (Picture) -> ImageTile = ::ImageTile)
         val screenBottom = margin.add(vValueHeightProperty)
         tilesProperty = SimpleListProperty(TransformedList(picturesProperty) { pic ->
             tileFactory(pic).apply {
-                onMouseClicked = EventHandler<MouseEvent> { onTileClicked(this, pic) }
+                onMouseClicked = EventHandler<MouseEvent> { onTileClicked(this) }
                 val filterPassedProperty = object : BooleanBinding() {
                     init { super.bind(filterProperty, metaDataProperty) }
                     override fun computeValue(): Boolean = filterProperty.get().invoke(pic)

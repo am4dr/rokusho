@@ -35,8 +35,8 @@ class ThumbnailPane(scrollPane: ImageTileScrollPane = ImageTileScrollPane()) : S
         }
         scrollPane.picturesProperty.bind(picturesProperty)
         scrollPane.filterProperty.bind(filterProperty)
-        scrollPane.onTileClicked = { tile, pic ->
-            showOverlay(pic.loader.image)
+        scrollPane.onTileClicked = { tile ->
+            showOverlay(tile.pictureProperty.get().loader.image)
         }
         children.addAll(scrollPane, overlay)
     }
