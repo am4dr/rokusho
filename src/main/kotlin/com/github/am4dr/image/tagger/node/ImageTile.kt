@@ -4,9 +4,12 @@ import com.github.am4dr.image.tagger.core.ImageMetaData
 import com.github.am4dr.image.tagger.core.Picture
 import com.github.am4dr.image.tagger.core.Tag
 import com.github.am4dr.image.tagger.core.TextTag
+import com.github.am4dr.image.tagger.util.TransformedList
 import javafx.beans.binding.Bindings
+import javafx.beans.binding.ListBinding
 import javafx.beans.property.*
 import javafx.collections.FXCollections.observableList
+import javafx.collections.ObservableList
 import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.scene.Node
@@ -26,67 +29,67 @@ class ImageTile(picture: Picture, tagNodeFactory : (Tag) -> TagNode) : StackPane
     val imageProperty: ReadOnlyObjectProperty<Image> = ReadOnlyObjectWrapper(picture.loader.getImage(thumbnailMaxWidth, thumbnailMaxHeight, true))
     private val _metaDataProperty: ObjectProperty<ImageMetaData> = SimpleObjectProperty(picture.metaData)
     val metaDataProperty: ReadOnlyObjectProperty<ImageMetaData> = SimpleObjectProperty(picture.metaData)
-    private fun updateMetaData() {
-        metaDataProperty as SimpleObjectProperty
-        metaDataProperty.set(_metaDataProperty.get())
-    }
+    private fun updateMetaData() =
+            (metaDataProperty as SimpleObjectProperty).set(_metaDataProperty.get())
+
     init {
         maxWidthProperty().bind(imageProperty.get().widthProperty())
         maxHeightProperty().bind(imageProperty.get().heightProperty())
         val imageView = ImageView().apply { imageProperty().bind(imageProperty) }
-        val tagInput = FittingTextField().apply {
-            font = Font(14.0)
-            background = Background(BackgroundFill(Color.WHITE, CornerRadii(2.0), null))
-            padding = Insets(-1.0, 2.0, 0.0, 2.0)
-            visibleProperty().set(false)
-            managedProperty().bind(visibleProperty())
-            focusedProperty().addListener { observableValue, old, new ->
-                if (new == false) { visibleProperty().set(false); updateMetaData() }
+        val overlay = ImageTileOverlay(_metaDataProperty.get(), tagNodeFactory).apply {
+            tagsProperty.addListener { obs, old, new ->
+                _metaDataProperty.set(_metaDataProperty.get().copy(tags = new))
+                updateMetaData()
             }
-            onAction = EventHandler {
-                when (text) { null, "" -> return@EventHandler }
-                with(_metaDataProperty) {
-                    val newTags = get().tags + TextTag(text)
-                    set(get().copy(tags = newTags))
-                }
-                text = ""
-            }
-        }
-        val addTagsButton = Button(" + ").apply {
-            textFill = Color.rgb(200, 200, 200)
-            padding = Insets(-1.0, 2.0, 0.0, 2.0)
-            font = Font(14.0)
-            background = Background(BackgroundFill(Color.BLACK, CornerRadii(2.0), null))
-            onAction = EventHandler {
-                tagInput.visibleProperty().set(true)
-                tagInput.requestFocus()
-            }
-        }
-        val tagLabelNodes = SimpleListProperty<Node>(observableList(
-                _metaDataProperty.get().tags.map { tag ->
-                    tagNodeFactory(tag).apply { onCloseClickedProperty.set({ removeTag(tag) }) }
-                } + tagInput + addTagsButton))
-        _metaDataProperty.addListener { observableValue, old, new ->
-            tagLabelNodes.setAll(observableList(
-                    _metaDataProperty.get().tags.map { tag ->
-                        tagNodeFactory(tag).apply { onCloseClickedProperty.set({ removeTag(tag) }) }
-                    } + tagInput + addTagsButton))
-        }
-        val overlay = FlowPane(7.5, 5.0).apply {
-            padding = Insets(10.0)
-            background = Background(BackgroundFill(Color.rgb(0, 0, 0, 0.5), null, null))
-            Bindings.bindContent(children, tagLabelNodes)
-            visibleProperty().bind(this@ImageTile.hoverProperty().or(tagInput.focusedProperty()))
+            visibleProperty().bind(this@ImageTile.hoverProperty().or(tagInputFocusedProperty))
         }
         children.setAll(imageView, overlay)
     }
-    private fun removeTag(tag: Tag) {
-        val metaData = _metaDataProperty.get()
-        val tags = metaData.tags.toMutableList()
-        if (tags.remove(tag)) {
-            _metaDataProperty.set(metaData.copy(tags = tags))
-            updateMetaData()
-        }
-    }
 }
 private fun createTagNode(tag: Tag): TagNode = TextTagNode(tag.name)
+
+private class ImageTileOverlay(data: ImageMetaData, tagNodeFactory : (Tag) -> TagNode) : FlowPane(7.5, 5.0) {
+    private val tags = observableList(data.tags.toMutableList())
+    val tagsProperty: ReadOnlyListProperty<Tag> = SimpleListProperty(observableList(data.tags))
+    private fun updateTags() = (tagsProperty as SimpleListProperty).set(tags)
+
+    private val tagNodes = TransformedList(tags) { tag ->
+        tagNodeFactory(tag).apply { onCloseClickedProperty.set({ tags.remove(tag) }) }
+    }
+    private val tagInput = FittingTextField().apply {
+        font = Font(14.0)
+        background = Background(BackgroundFill(Color.WHITE, CornerRadii(2.0), null))
+        padding = Insets(-1.0, 2.0, 0.0, 2.0)
+        visibleProperty().set(false)
+        managedProperty().bind(visibleProperty())
+        focusedProperty().addListener { observableValue, old, new ->
+            if (new == false) { visibleProperty().set(false); updateTags() }
+        }
+        onAction = EventHandler {
+            when (text) { null, "" -> return@EventHandler }
+            tags.add(TextTag(text))
+            text = ""
+        }
+    }
+    val tagInputFocusedProperty: ReadOnlyBooleanProperty = tagInput.focusedProperty()
+    private val addTagButton = Button(" + ").apply {
+        textFill = Color.rgb(200, 200, 200)
+        padding = Insets(-1.0, 2.0, 0.0, 2.0)
+        font = Font(14.0)
+        background = Background(BackgroundFill(Color.BLACK, CornerRadii(2.0), null))
+        onAction = EventHandler {
+            tagInput.visibleProperty().set(true)
+            tagInput.requestFocus()
+        }
+    }
+    private val fpContents = object : ListBinding<Node>() {
+        init { super.bind(tagNodes) }
+        override fun computeValue(): ObservableList<Node> =
+                observableList(tagNodes + tagInput + addTagButton)
+    }
+    init {
+        padding = Insets(10.0)
+        background = Background(BackgroundFill(Color.rgb(0, 0, 0, 0.5), null, null))
+        Bindings.bindContent(children, fpContents)
+    }
+}
