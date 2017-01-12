@@ -3,6 +3,7 @@ package com.github.am4dr.image.tagger.app
 import com.github.am4dr.image.tagger.core.*
 import com.github.am4dr.image.tagger.node.ImageTile
 import com.github.am4dr.image.tagger.node.ImageTileScrollPane
+import com.github.am4dr.image.tagger.node.TagNode
 import com.github.am4dr.image.tagger.node.ThumbnailPane
 import javafx.application.Application
 import javafx.beans.binding.Bindings.createObjectBinding
@@ -11,7 +12,6 @@ import javafx.collections.FXCollections.observableList
 import javafx.collections.FXCollections.observableMap
 import javafx.event.EventHandler
 import javafx.geometry.Pos
-import javafx.scene.Node
 import javafx.scene.Scene
 import javafx.scene.control.Hyperlink
 import javafx.scene.control.Label
@@ -67,7 +67,7 @@ class Main : Application() {
         addOption(null, "saveto", true, "specify the directory path to save the tag file")
     }
     private fun createMainFrame(stage: Stage): MainFrame {
-        val tagNodeFactory: (Tag) -> Node = { mainModel.tagNodeFactory.createTagNode(it) }
+        val tagNodeFactory: (Tag) -> TagNode = { mainModel.tagNodeFactory.createTagNode(it) }
         val tileFactory: (Picture) -> ImageTile = { pic ->
             ImageTile(pic, tagNodeFactory).apply {
                 metaDataProperty.addListener { it -> mainModel.updateMetaData(pic, metaDataProperty.get()) }
