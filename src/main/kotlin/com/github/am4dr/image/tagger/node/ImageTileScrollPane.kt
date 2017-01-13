@@ -27,6 +27,8 @@ class ImageTileScrollPane(val tileFactory: (Picture) -> ImageTile = ::ImageTile)
     private val vValueHeightProperty = SimpleDoubleProperty()
     init {
         picturesProperty = createEmptyListProperty()
+        val contentPadding = 25.0
+        assert(contentPadding / 2 > 0.0) { "(contentPadding / 2) must be bigger than 0.0 to check if the layout of a tile is finished" }
         val margin = SimpleDoubleProperty(2000.0)
         val screenTop = margin.multiply(-1).add(vValueHeightProperty)
         val screenBottom = margin.add(vValueHeightProperty)
@@ -37,20 +39,20 @@ class ImageTileScrollPane(val tileFactory: (Picture) -> ImageTile = ::ImageTile)
                     init { super.bind(filterProperty, metaDataProperty) }
                     override fun computeValue(): Boolean = filterProperty.get().invoke(pictureProperty.get())
                 }
+                val layoutFinishedProperty = layoutYProperty().greaterThan(contentPadding/2)
                 visibleProperty().bind(
-                        filterPassedProperty
-                                .and(imageProperty.get().widthProperty().isNotEqualTo(0))
+                        layoutFinishedProperty
                                 .and(layoutYProperty().greaterThanOrEqualTo(screenTop))
                                 .and(layoutYProperty().lessThanOrEqualTo(screenBottom)))
                 managedProperty().bind(
-                        filterPassedProperty
-                                .and(imageProperty.get().widthProperty().isNotEqualTo(0)))
+                        imageProperty.get().widthProperty().isNotEqualTo(0)     // image is loaded
+                                .and(filterPassedProperty))
             }
         })
         fitToWidthProperty().set(true)
         hbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
         content = FlowPane(10.0, 10.0).apply {
-            padding = Insets(25.0, 0.0, 25.0, 0.0)
+            padding = Insets(contentPadding, 0.0, contentPadding, 0.0)
             alignment = Pos.CENTER
             Bindings.bindContent(children, tilesProperty)
             vValueHeightProperty.bind(vvalueProperty().multiply(heightProperty()))
