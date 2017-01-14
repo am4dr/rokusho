@@ -40,7 +40,8 @@ class ImageTileScrollPane(val tileFactory: (Picture) -> ImageTile = ::ImageTile)
                 }
                 val layoutFinishedProperty = layoutYProperty().greaterThan(contentPadding/2)
                 visibleProperty().bind(
-                        layoutFinishedProperty
+                        managedProperty()
+                                .and(layoutFinishedProperty)
                                 .and(layoutYProperty().greaterThanOrEqualTo(screenTop))
                                 .and(layoutYProperty().lessThanOrEqualTo(screenBottom)))
                 managedProperty().bind(
