@@ -51,10 +51,10 @@ private fun createTagNode(tag: Tag): TagNode = TextTagNode(tag.name)
 private class ImageTileOverlay(data: ImageMetaData, tagNodeFactory : (Tag) -> TagNode) : FlowPane(7.5, 5.0) {
     private val tags = observableList(data.tags.toMutableList())
     val tagsProperty: ReadOnlyListProperty<Tag> = SimpleListProperty(observableList(data.tags))
-    private fun updateTags() = (tagsProperty as SimpleListProperty).set(tags)
+    private fun updateTags() = (tagsProperty as SimpleListProperty).setAll(tags)
 
     private val tagNodes = TransformedList(tags) { tag ->
-        tagNodeFactory(tag).apply { onCloseClickedProperty.set({ tags.remove(tag) }) }
+        tagNodeFactory(tag).apply { onRemovedProperty.set({ tags.remove(tag); updateTags() }) }
     }
     private val tagInput = FittingTextField().apply {
         font = Font(14.0)

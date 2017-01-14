@@ -18,7 +18,7 @@ import javafx.scene.paint.Color
 import javafx.scene.text.Font
 
 abstract class TagNode : Pane() {
-    open val onCloseClickedProperty: ObjectProperty<(TagNode) -> Unit> = SimpleObjectProperty({ it -> })
+    open val onRemovedProperty: ObjectProperty<(TagNode) -> Unit> = SimpleObjectProperty({ it -> })
 }
 class TextTagNode(text: ObservableObjectValue<String>? = null) : TagNode() {
     constructor(text: String) : this(ReadOnlyObjectWrapper(text))
@@ -33,9 +33,9 @@ class TextTagNode(text: ObservableObjectValue<String>? = null) : TagNode() {
         background = Background(BackgroundFill(Color.BLACK, CornerRadii(2.0), null))
     }
     val textProperty: StringProperty = label.textProperty()
-    override val onCloseClickedProperty: ObjectProperty<(TagNode) -> Unit> = SimpleObjectProperty({ it -> })
+    override val onRemovedProperty: ObjectProperty<(TagNode) -> Unit> = SimpleObjectProperty({ it -> })
 
-    private val closeButton = Button(" × ").apply {
+    private val removeButton = Button(" × ").apply {
         padding = Insets(-1.0, 2.0, 0.0, 2.0)
         font = Font(14.0)
         textFillProperty().bind(
@@ -46,15 +46,15 @@ class TextTagNode(text: ObservableObjectValue<String>? = null) : TagNode() {
                 When(hoverProperty())
                         .then(buttonBackgroundHovered)
                         .otherwise(buttonBackground))
-        onAction = EventHandler { onCloseClickedProperty.get().invoke(this@TextTagNode) }
+        onAction = EventHandler { onRemovedProperty.get().invoke(this@TextTagNode) }
     }
     init {
         if (text != null) { textProperty.bind(text) }
         children.addAll(
-                Pane(closeButton).apply {
+                Pane(removeButton).apply {
                     managedProperty().set(false)
                     visibleProperty().bind(this@TextTagNode.hoverProperty())
-                    layoutXProperty().bind(label.layoutXProperty().subtract(closeButton.widthProperty().subtract(2)))
+                    layoutXProperty().bind(label.layoutXProperty().subtract(removeButton.widthProperty().subtract(2)))
                 },
                 label
         )
