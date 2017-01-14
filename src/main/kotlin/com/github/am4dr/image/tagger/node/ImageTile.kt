@@ -54,7 +54,7 @@ private class ImageTileOverlay(data: ImageMetaData, tagNodeFactory : (Tag) -> Ta
     private fun updateTags() = (tagsProperty as SimpleListProperty).setAll(tags)
 
     private val tagNodes = TransformedList(tags) { tag ->
-        tagNodeFactory(tag).apply { onCloseClickedProperty.set({ tags.remove(tag); updateTags() }) }
+        tagNodeFactory(tag).apply { onRemovedProperty.set({ tags.remove(tag); updateTags() }) }
     }
     private val tagInput = FittingTextField().apply {
         font = Font(14.0)
