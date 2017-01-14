@@ -19,14 +19,13 @@ class ImageTileScrollPane(val tileFactory: (Picture) -> ImageTile = ::ImageTile)
     companion object {
         private val log: Logger = LoggerFactory.getLogger(ImageTileScrollPane::class.java)
     }
-    val picturesProperty: ListProperty<Picture>
-    val tilesProperty: ListProperty<ImageTile>
+    val picturesProperty: ListProperty<Picture> = createEmptyListProperty()
+    private val tilesProperty: ListProperty<ImageTile>
     var onTileClicked: (ImageTile) -> Unit = { tile -> }
-    var filterProperty: ObjectProperty<(Picture) -> Boolean> = SimpleObjectProperty({ it -> true })
+    val filterProperty: ObjectProperty<(Picture) -> Boolean> = SimpleObjectProperty({ it -> true })
 
     private val vValueHeightProperty = SimpleDoubleProperty()
     init {
-        picturesProperty = createEmptyListProperty()
         val contentPadding = 25.0
         assert(contentPadding / 2 > 0.0) { "(contentPadding / 2) must be bigger than 0.0 to check if the layout of a tile is finished" }
         val margin = SimpleDoubleProperty(2000.0)
