@@ -5,6 +5,7 @@ import com.github.am4dr.image.tagger.node.ImageTile
 import com.github.am4dr.image.tagger.node.ImageTileScrollPane
 import com.github.am4dr.image.tagger.node.TagNode
 import com.github.am4dr.image.tagger.node.ThumbnailPane
+import com.github.am4dr.rokusho.gui.AdaptedDefaultMainModel
 import javafx.application.Application
 import javafx.beans.binding.Bindings.createObjectBinding
 import javafx.beans.property.*
@@ -29,6 +30,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.concurrent.Callable
+import com.github.am4dr.rokusho.gui.DefaultMainModel as NewDefaultMainModel
 
 fun main(args: Array<String>) = Application.launch(Main::class.java, *args)
 
@@ -40,7 +42,7 @@ fun main(args: Array<String>) = Application.launch(Main::class.java, *args)
  */
 class Main : Application() {
     private val options = makeOptions()
-    private val mainModel = MainModel()
+    private val mainModel: MainModel = AdaptedDefaultMainModel()
     companion object {
         private val log = LoggerFactory.getLogger(Main::class.java)
     }
@@ -87,7 +89,7 @@ class Main : Application() {
     private fun selectLibraryDirectory(window: Window) {
         DirectoryChooser().run {
             title = "画像があるディレクトリを選択してください"
-            initialDirectory = mainModel.libraryProperty.get()?.let { it.root.toFile() }
+            //initialDirectory = mainModel.libraryProperty.get()?.let { it.root.toFile() }
             val selected = showDialog(window)?.toPath()
             if (selected != null) { mainModel.setLibrary(selected) }
         }
@@ -100,17 +102,27 @@ class Main : Application() {
         }
     }
 }
-
-// TODO 複数Libraryへの対応
-class MainModel {
-    companion object {
-        private val log = LoggerFactory.getLogger(MainModel::class.java)
-    }
-    private val _libraryProperty: ObjectProperty<Library>
-    val libraryProperty: ReadOnlyObjectProperty<Library>
+interface MainModel {
+//    val libraryProperty: ReadOnlyObjectProperty<Library>
     val picturesProperty: ReadOnlyListProperty<Picture>
     val tagsProperty: ReadOnlyMapProperty<String, TagInfo>
     val tagNodeFactory: TagNodeFactory
+    fun setLibrary(path: Path)
+    fun updateMetaData(picture: Picture, metaData: ImageMetaData)
+    fun updateTagInfo(name: String, info: TagInfo)
+    fun save()
+}
+
+// TODO 複数Libraryへの対応
+class DefaultMainModel : MainModel {
+    companion object {
+        private val log = LoggerFactory.getLogger(DefaultMainModel::class.java)
+    }
+    private val _libraryProperty: ObjectProperty<Library>
+    val libraryProperty: ReadOnlyObjectProperty<Library>
+    override val picturesProperty: ReadOnlyListProperty<Picture>
+    override val tagsProperty: ReadOnlyMapProperty<String, TagInfo>
+    override val tagNodeFactory: TagNodeFactory
     init {
         _libraryProperty = SimpleObjectProperty()
         libraryProperty = SimpleObjectProperty<Library>()
@@ -125,19 +137,19 @@ class MainModel {
                 libraryProperty))
         tagNodeFactory = TagNodeFactory(tagsProperty)
     }
-    fun setLibrary(path: Path) {
+    override fun setLibrary(path: Path) {
         log.info("select library: $path")
         _libraryProperty.set(Library(path))
     }
-    fun updateMetaData(picture: Picture, metaData: ImageMetaData) {
+    override fun updateMetaData(picture: Picture, metaData: ImageMetaData) {
         log.info("update metadata: $picture, $metaData")
         libraryProperty.get().updateMetaData(picture, metaData)
     }
-    fun updateTagInfo(name: String, info: TagInfo) {
+    override fun updateTagInfo(name: String, info: TagInfo) {
         log.info("update tag info: name=$name, info=$info")
         libraryProperty.get().updateTagInfo(name, info)
     }
-    fun save() {
+    override fun save() {
         val metaDataFile = libraryProperty.get().metaDataFilePath.toFile()
         log.info("save imageProperty mata data to: $metaDataFile")
         if (metaDataFile.exists()) {
