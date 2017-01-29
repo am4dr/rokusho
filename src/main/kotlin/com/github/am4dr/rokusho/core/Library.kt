@@ -70,6 +70,6 @@ class SimplePathLibrary(override val root: Path, private val library: Library)
 interface FilteredPathLibrary : PathLibrary {
     val filter: (Path?, BasicFileAttributes?) -> Boolean
     override fun getPaths(): List<Path> =
-            Files.find(root, Int.MAX_VALUE, filter, arrayOf())
+            Files.find(root, Int.MAX_VALUE, filter, arrayOf(FileVisitOption.FOLLOW_LINKS))
                     .collect(Collectors.toList<Path>())
 }
