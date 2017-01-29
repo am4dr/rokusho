@@ -50,7 +50,7 @@ class SimpleLibrary(tags: List<Tag> = listOf(), itemMetaData: List<LibraryItemMe
 
 interface PathLibrary : Library {
     val root: Path
-    fun getPaths(): List<Path>
+    fun getPaths(): List<Path> = Files.walk(root, FileVisitOption.FOLLOW_LINKS).collect(Collectors.toList<Path>())
     fun getItems(): List<Pair<Path, LibraryItemMetaData>> {
         val m = getItemMetaData()
         return getPaths().map {
@@ -64,7 +64,6 @@ class SimplePathLibrary(override val root: Path, private val library: Library)
     : PathLibrary, Library by library {
     constructor(root: Path, tags: List<Tag> = listOf(), itemMetaData: List<LibraryItemMetaData> = listOf()) :
             this(root, SimpleLibrary(tags, itemMetaData))
-    override fun getPaths(): List<Path> = Files.walk(root, FileVisitOption.FOLLOW_LINKS).collect(Collectors.toList<Path>())
 }
 
 interface FilteredPathLibrary : PathLibrary {
