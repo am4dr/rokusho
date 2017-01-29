@@ -13,7 +13,7 @@ private fun isSupportedImageFile(path: Path) =
 
 class ImagePathLibrary(private val library: PathLibrary) : PathLibrary by library, FilteredPathLibrary {
     constructor(path: Path) : this(DefaultLibraryFileLocator().locate(path))
-    override val filter: (Path?, BasicFileAttributes?) -> Boolean =
+    override val matcher: (Path?, BasicFileAttributes?) -> Boolean =
             { path, attr -> path?.let(::isSupportedImageFile) ?: false }
     val images: List<ImageItem>
     init {
