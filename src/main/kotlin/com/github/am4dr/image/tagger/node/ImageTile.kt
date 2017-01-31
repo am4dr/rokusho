@@ -2,9 +2,9 @@ package com.github.am4dr.image.tagger.node
 
 import com.github.am4dr.image.tagger.core.ImageMetaData
 import com.github.am4dr.image.tagger.core.Picture
-import com.github.am4dr.image.tagger.core.Tag
 import com.github.am4dr.image.tagger.core.TextTag
 import com.github.am4dr.image.tagger.util.TransformedList
+import com.github.am4dr.rokusho.core.Tag
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.ListBinding
 import javafx.beans.property.*
@@ -46,7 +46,7 @@ class ImageTile(picture: Picture, tagNodeFactory : (Tag) -> TagNode) : StackPane
         children.setAll(imageView, overlay)
     }
 }
-private fun createTagNode(tag: Tag): TagNode = TextTagNode(tag.name)
+private fun createTagNode(tag: Tag): TagNode = TextTagNode(tag.id)
 
 private class ImageTileOverlay(data: ImageMetaData, tagNodeFactory : (Tag) -> TagNode) : FlowPane(7.5, 5.0) {
     private val tags = observableList(data.tags.toMutableList())

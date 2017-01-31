@@ -1,10 +1,14 @@
 package com.github.am4dr.image.tagger.app
 
-import com.github.am4dr.image.tagger.core.*
+import com.github.am4dr.image.tagger.core.ImageMetaData
+import com.github.am4dr.image.tagger.core.Library
+import com.github.am4dr.image.tagger.core.Picture
+import com.github.am4dr.image.tagger.core.TagInfo
 import com.github.am4dr.image.tagger.node.ImageTile
 import com.github.am4dr.image.tagger.node.ImageTileScrollPane
 import com.github.am4dr.image.tagger.node.TagNode
 import com.github.am4dr.image.tagger.node.ThumbnailPane
+import com.github.am4dr.rokusho.core.Tag
 import com.github.am4dr.rokusho.gui.AdaptedDefaultMainModel
 import javafx.application.Application
 import javafx.beans.binding.Bindings.createObjectBinding
@@ -146,7 +150,7 @@ class DefaultMainModel : MainModel {
         libraryProperty.get().updateMetaData(picture, metaData)
     }
     override fun updateTagInfo(name: String, info: TagInfo) {
-        log.info("update tag info: name=$name, info=$info")
+        log.info("update tag info: id=$name, info=$info")
         libraryProperty.get().updateTagInfo(name, info)
     }
     override fun save() {

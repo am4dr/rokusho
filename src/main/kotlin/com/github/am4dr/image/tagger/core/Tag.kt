@@ -1,14 +1,19 @@
 package com.github.am4dr.image.tagger.core
 
+import com.github.am4dr.rokusho.core.Tag
+
 // TODO 他の種類のタグも追加する
+/*
 interface Tag {
-    val name: String
+    val id: String
     val data: Map<String, Any>
 }
+*/
 data class TextTag(
-        override val name: String,
-        override val data: Map<String, Any> = mapOf()
-        ) : Tag
+        override val id: String,
+        override val data: Map<String, Any> = mapOf()) : Tag {
+    override val type: TagType = TagType.TEXT
+}
 
 enum class TagType {
     TEXT, VALUE, SELECTION, OTHERS;

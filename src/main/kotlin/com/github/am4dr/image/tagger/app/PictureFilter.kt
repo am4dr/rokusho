@@ -21,7 +21,7 @@ class StringPictureFilter : PictureFilter<String?> {
             override fun computeValue(): (Picture) -> Boolean = { pic ->
                 val text = inputProperty.get()
                 if (text == null || text == "") { true }
-                else { pic.metaData.tags.find { it.name.contains(text) } != null }
+                else { pic.metaData.tags.find { it.id.contains(text) } != null }
             }
         })
     }

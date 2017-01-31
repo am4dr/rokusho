@@ -6,7 +6,10 @@ import com.github.am4dr.image.tagger.core.Picture
 import com.github.am4dr.image.tagger.core.TagInfo
 import com.github.am4dr.image.tagger.core.URLImageLoader
 import com.github.am4dr.image.tagger.util.createEmptyListProperty
-import com.github.am4dr.rokusho.core.*
+import com.github.am4dr.rokusho.core.ImageItem
+import com.github.am4dr.rokusho.core.ImagePathLibrary
+import com.github.am4dr.rokusho.core.SimpleImage
+import com.github.am4dr.rokusho.core.SimpleLibraryItemMetaData
 import javafx.application.Application
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyMapProperty
@@ -57,8 +60,8 @@ class AdaptedDefaultMainModel : OldMainModel {
     override fun updateMetaData(picture: Picture, metaData: ImageMetaData) {
         val item = picToItemMap[picture] ?: throw IllegalStateException()
         val lib = picToLibMap[picture] ?: throw IllegalStateException()
-        val newItem = SimpleImage(item.id, item.url, metaData.tags.map(::TagAdaptor))
-        val newPic = picture.copy(metaData = newItem.tags.map(::TagAdaptor).let(::ImageMetaData))
+        val newItem = SimpleImage(item.id, item.url, metaData.tags)
+        val newPic = picture.copy(metaData = newItem.tags.let(::ImageMetaData))
         lib.updateItemMetaData(SimpleLibraryItemMetaData(newItem.id, newItem.tags))
         picToItemMap[newPic] = newItem
         picToLibMap[newPic] = lib
@@ -67,7 +70,7 @@ class AdaptedDefaultMainModel : OldMainModel {
         }
     }
     private fun ImageItem.toPicture(): Picture =
-            Picture(URLImageLoader(url), tags.map(::TagAdaptor).let(::ImageMetaData))
+            Picture(URLImageLoader(url), tags.let(::ImageMetaData))
     override fun updateTagInfo(name: String, info: TagInfo) {
         throw UnsupportedOperationException("not implemented")
     }
