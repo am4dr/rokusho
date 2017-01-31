@@ -1,6 +1,5 @@
 package com.github.am4dr.rokusho.core
 
-import com.github.am4dr.image.tagger.core.TagType
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 

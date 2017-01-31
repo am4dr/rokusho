@@ -1,6 +1,9 @@
 package com.github.am4dr.image.tagger.core
 
+import com.github.am4dr.rokusho.core.SimpleTag
 import com.github.am4dr.rokusho.core.Tag
+import com.github.am4dr.rokusho.core.TagType
+import com.github.am4dr.rokusho.core.TextTag
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.nio.file.Path
@@ -8,7 +11,7 @@ import java.nio.file.Paths
 
 data class SaveFile(
         val version: String,
-        val tags: Map<String, TagInfo>,
+        val tags: Map<String, Tag>,
         val metaData: Map<Path, ImageMetaData>) {
     companion object {
         private val log = LoggerFactory.getLogger(SaveFile::class.java)
@@ -24,7 +27,7 @@ data class SaveFile(
             data ?: throw VersionNotSpecifiedException()
             return data as? String ?: throw IllegalSaveFormatException("version must be a String")
         }
-        private fun parseTagInfo(data: Any?): Map<String, TagInfo> {
+        private fun parseTagInfo(data: Any?): Map<String, Tag> {
             data ?: return mutableMapOf() // do not use mapOf() to avoid Yaml reference
             val map = data as? Map<*, *> ?: throw IllegalSaveFormatException("tags must be a Map<String, Map<String, String>>")
             return map.map {
@@ -38,7 +41,7 @@ data class SaveFile(
                 val type = opts["type"] as? String ?: "text"
                 @Suppress("UNCHECKED_CAST")
                 opts as Map<String, Any>
-                Pair(name, TagInfo(TagType.from(type), opts))
+                Pair(name, SimpleTag(name , TagType.from(type), opts))
             }.toMap()
         }
         private fun parseMetaData(data: Any?): Map<Path, ImageMetaData> {

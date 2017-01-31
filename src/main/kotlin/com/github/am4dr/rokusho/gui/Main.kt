@@ -3,13 +3,9 @@ package com.github.am4dr.rokusho.gui
 import com.github.am4dr.image.tagger.app.TagNodeFactory
 import com.github.am4dr.image.tagger.core.ImageMetaData
 import com.github.am4dr.image.tagger.core.Picture
-import com.github.am4dr.image.tagger.core.TagInfo
 import com.github.am4dr.image.tagger.core.URLImageLoader
 import com.github.am4dr.image.tagger.util.createEmptyListProperty
-import com.github.am4dr.rokusho.core.ImageItem
-import com.github.am4dr.rokusho.core.ImagePathLibrary
-import com.github.am4dr.rokusho.core.SimpleImage
-import com.github.am4dr.rokusho.core.SimpleLibraryItemMetaData
+import com.github.am4dr.rokusho.core.*
 import javafx.application.Application
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyMapProperty
@@ -39,9 +35,9 @@ class DefaultMainModel : MainModel {
 
 class AdaptedDefaultMainModel : OldMainModel {
     private val _pictures = createEmptyListProperty<Picture>()
-    private val _tags = SimpleMapProperty(observableMap(mutableMapOf<String, TagInfo>()))
+    private val _tags = SimpleMapProperty(observableMap(mutableMapOf<String, Tag>()))
     override val picturesProperty: ReadOnlyListProperty<Picture> get() = _pictures
-    override val tagsProperty: ReadOnlyMapProperty<String, TagInfo> get() = _tags
+    override val tagsProperty: ReadOnlyMapProperty<String, Tag> get() = _tags
     override val tagNodeFactory: TagNodeFactory = TagNodeFactory(_tags)
 
     private val picToItemMap = mutableMapOf<Picture, ImageItem>()
@@ -49,7 +45,7 @@ class AdaptedDefaultMainModel : OldMainModel {
     override fun setLibrary(path: Path) {
         val lib = ImagePathLibrary(path)
         lib.getTags().map {
-            Pair(it.id, TagInfo(it.type, it.data))
+            Pair(it.id, SimpleTag(it.id, it.type, it.data))
         }.toMap(_tags)
         val pictures = lib.images.map { img ->
              img.toPicture() to img
@@ -71,7 +67,7 @@ class AdaptedDefaultMainModel : OldMainModel {
     }
     private fun ImageItem.toPicture(): Picture =
             Picture(URLImageLoader(url), tags.let(::ImageMetaData))
-    override fun updateTagInfo(name: String, info: TagInfo) {
+    override fun updateTagInfo(name: String, info: Tag) {
         throw UnsupportedOperationException("not implemented")
     }
     override fun save() {

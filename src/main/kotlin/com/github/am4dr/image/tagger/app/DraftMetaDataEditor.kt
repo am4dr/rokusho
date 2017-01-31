@@ -1,8 +1,8 @@
 package com.github.am4dr.image.tagger.app
 
 import com.github.am4dr.image.tagger.core.ImageMetaData
-import com.github.am4dr.image.tagger.core.TagParser
 import com.github.am4dr.rokusho.core.Tag
+import com.github.am4dr.rokusho.core.TagParser
 import javafx.beans.property.SimpleStringProperty
 import javafx.event.EventHandler
 import javafx.scene.Scene

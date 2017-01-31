@@ -1,5 +1,6 @@
 package com.github.am4dr.image.tagger.core
 
+import com.github.am4dr.rokusho.core.Tag
 import javafx.collections.FXCollections.observableList
 import javafx.collections.ObservableList
 import org.slf4j.LoggerFactory
@@ -21,7 +22,7 @@ class Library(root: Path) {
     val images: List<Path>
     val metaDataFilePath: Path
     val metaDataStore: MutableMap<Path, ImageMetaData>
-    val tags: MutableMap<String, TagInfo>
+    val tags: MutableMap<String, Tag>
     val pictures: ObservableList<Picture>
 
     init {
@@ -39,7 +40,7 @@ class Library(root: Path) {
         if (savefile == null) log.info("info file not found: $metaDataFilePath")
         metaDataStore = savefile?.let { it.metaData as MutableMap<Path, ImageMetaData> } ?: mutableMapOf()
         log.info("loaded imageProperty info number: ${metaDataStore.size}")
-        tags = savefile?.let { it.tags as MutableMap<String, TagInfo> } ?: mutableMapOf()
+        tags = savefile?.let { it.tags as MutableMap<String, Tag> } ?: mutableMapOf()
         images =
                 Files.list(root)
                         .filter(::isSupportedImageFile)
@@ -58,7 +59,7 @@ class Library(root: Path) {
             metaDataStore[root.relativize(images[i])] = newMetaData
         }
     }
-    fun updateTagInfo(name: String, info: TagInfo) {
+    fun updateTagInfo(name: String, info: Tag) {
         tags[name] = info
     }
     fun toSaveFormat(): String =

@@ -2,9 +2,9 @@ package com.github.am4dr.image.tagger.node
 
 import com.github.am4dr.image.tagger.core.ImageMetaData
 import com.github.am4dr.image.tagger.core.Picture
-import com.github.am4dr.image.tagger.core.TextTag
 import com.github.am4dr.image.tagger.util.TransformedList
 import com.github.am4dr.rokusho.core.Tag
+import com.github.am4dr.rokusho.core.TextTag
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.ListBinding
 import javafx.beans.property.*
