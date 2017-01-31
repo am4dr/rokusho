@@ -9,13 +9,7 @@ interface Tag {
 data class SimpleTag(
         override val id: String,
         override val type: TagType,
-        override val data: Map<String, Any>) : Tag
-
-data class TextTag(
-        override val id: String,
-        override val data: Map<String, Any> = mapOf()) : Tag {
-    override val type: TagType = TagType.TEXT
-}
+        override val data: Map<String, Any> = mapOf()) : Tag
 
 enum class TagType {
     TEXT, VALUE, SELECTION, OTHERS;
@@ -31,6 +25,6 @@ enum class TagType {
 }
 class TagParser {
     companion object {
-        fun parse(string: String): Tag = TextTag(string)
+        fun parse(string: String): Tag = SimpleTag(string, TagType.TEXT, mapOf())
     }
 }

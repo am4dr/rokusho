@@ -3,7 +3,6 @@ package com.github.am4dr.image.tagger.core
 import com.github.am4dr.rokusho.core.SimpleTag
 import com.github.am4dr.rokusho.core.Tag
 import com.github.am4dr.rokusho.core.TagType
-import com.github.am4dr.rokusho.core.TextTag
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.nio.file.Path
@@ -66,7 +65,7 @@ data class SaveFile(
                 }
                 @Suppress("UNCHECKED_CAST")
                 ops as Map<String, Any>
-                TextTag(name, ops)
+                SimpleTag(name, TagType.TEXT, ops)
             }
         }
         const val pathSeparator: String = "/"
