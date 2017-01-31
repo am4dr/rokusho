@@ -6,8 +6,7 @@ import com.github.am4dr.image.tagger.core.Picture
 import com.github.am4dr.image.tagger.core.TagInfo
 import com.github.am4dr.image.tagger.core.URLImageLoader
 import com.github.am4dr.image.tagger.util.createEmptyListProperty
-import com.github.am4dr.rokusho.core.ImagePathLibrary
-import com.github.am4dr.rokusho.core.TagAdaptor
+import com.github.am4dr.rokusho.core.*
 import javafx.application.Application
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyMapProperty
@@ -41,23 +40,38 @@ class AdaptedDefaultMainModel : OldMainModel {
     override val picturesProperty: ReadOnlyListProperty<Picture> get() = _pictures
     override val tagsProperty: ReadOnlyMapProperty<String, TagInfo> get() = _tags
     override val tagNodeFactory: TagNodeFactory = TagNodeFactory(_tags)
+
+    private val picToItemMap = mutableMapOf<Picture, ImageItem>()
+    private val picToLibMap = mutableMapOf<Picture, ImagePathLibrary>()
     override fun setLibrary(path: Path) {
         val lib = ImagePathLibrary(path)
         lib.getTags().map {
             Pair(it.id, TagInfo(it.type, it.data))
         }.toMap(_tags)
         val pictures = lib.images.map { img ->
-            Picture(URLImageLoader(img.url), img.tags.map(::TagAdaptor).let(::ImageMetaData))
-        }
-        _pictures.setAll(pictures)
+             img.toPicture() to img
+        }.toMap(picToItemMap)
+        pictures.keys.forEach { picToLibMap[it] = lib }
+        _pictures.setAll(pictures.keys)
     }
     override fun updateMetaData(picture: Picture, metaData: ImageMetaData) {
-        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val item = picToItemMap[picture] ?: throw IllegalStateException()
+        val lib = picToLibMap[picture] ?: throw IllegalStateException()
+        val newItem = SimpleImage(item.id, item.url, metaData.tags.map(::TagAdaptor))
+        val newPic = picture.copy(metaData = newItem.tags.map(::TagAdaptor).let(::ImageMetaData))
+        lib.updateItemMetaData(SimpleLibraryItemMetaData(newItem.id, newItem.tags))
+        picToItemMap[newPic] = newItem
+        picToLibMap[newPic] = lib
+        _pictures.run {
+            set(indexOf(picture), newPic)
+        }
     }
+    private fun ImageItem.toPicture(): Picture =
+            Picture(URLImageLoader(url), tags.map(::TagAdaptor).let(::ImageMetaData))
     override fun updateTagInfo(name: String, info: TagInfo) {
-        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+        throw UnsupportedOperationException("not implemented")
     }
     override fun save() {
-        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+        throw UnsupportedOperationException("not implemented")
     }
 }
