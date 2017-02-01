@@ -5,7 +5,11 @@ import com.github.am4dr.image.tagger.core.ImageMetaData
 import com.github.am4dr.image.tagger.core.Picture
 import com.github.am4dr.image.tagger.core.URLImageLoader
 import com.github.am4dr.image.tagger.util.createEmptyListProperty
-import com.github.am4dr.rokusho.core.*
+import com.github.am4dr.rokusho.app.ImageItem
+import com.github.am4dr.rokusho.app.ImagePathLibrary
+import com.github.am4dr.rokusho.app.SimpleImage
+import com.github.am4dr.rokusho.core.SimpleLibraryItemMetaData
+import com.github.am4dr.rokusho.core.Tag
 import javafx.application.Application
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyMapProperty
@@ -34,6 +38,10 @@ class DefaultMainModel : MainModel {
 }
 
 class AdaptedDefaultMainModel : OldMainModel {
+    companion object {
+        private fun ImageItem.toPicture(): Picture =
+                Picture(URLImageLoader(url), tags.let(::ImageMetaData))
+    }
     private val _pictures = createEmptyListProperty<Picture>()
     private val _tags = SimpleMapProperty(observableMap(mutableMapOf<String, Tag>()))
     override val picturesProperty: ReadOnlyListProperty<Picture> get() = _pictures
@@ -44,10 +52,9 @@ class AdaptedDefaultMainModel : OldMainModel {
     private val picToLibMap = mutableMapOf<Picture, ImagePathLibrary>()
     override fun setLibrary(path: Path) {
         val lib = ImagePathLibrary(path)
-        lib.getTags().map {
-            Pair(it.id, SimpleTag(it.id, it.type, it.data))
-        }.toMap(_tags)
-        val pictures = lib.images.map { img ->
+        _tags.putAll(lib.baseTags)
+
+        val pictures = lib.images.values.map { img ->
              img.toPicture() to img
         }.toMap(picToItemMap)
         pictures.keys.forEach { picToLibMap[it] = lib }
@@ -65,8 +72,6 @@ class AdaptedDefaultMainModel : OldMainModel {
             set(indexOf(picture), newPic)
         }
     }
-    private fun ImageItem.toPicture(): Picture =
-            Picture(URLImageLoader(url), tags.let(::ImageMetaData))
     override fun updateTagInfo(name: String, info: Tag) {
         throw UnsupportedOperationException("not implemented")
     }

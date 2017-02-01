@@ -92,7 +92,7 @@ class Main : Application() {
     private fun selectLibraryDirectory(window: Window) {
         DirectoryChooser().run {
             title = "画像があるディレクトリを選択してください"
-            //initialDirectory = mainModel.libraryProperty.get()?.let { it.root.toFile() }
+            //initialDirectory = mainModel.libraryProperty.get()?.let { it.fileWalkRoot.toFile() }
             val selected = showDialog(window)?.toPath()
             if (selected != null) { mainModel.setLibrary(selected) }
         }

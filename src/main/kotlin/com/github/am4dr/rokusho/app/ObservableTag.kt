@@ -13,6 +13,7 @@ import javafx.collections.FXCollections.observableMap
 import javafx.collections.ObservableMap
 
 interface ObservableTag : Tag, ObservableValue<Tag> {
+    fun putAllData(data: Map<String, Any>)
     fun putData(key: String, value: Any)
     fun removeData(key: String)
 }
@@ -21,6 +22,7 @@ class SimpleObservableTag(
         id: String,
         type: TagType,
         data: Map<String, Any> = mapOf()) : ObservableTag, ObjectBinding<Tag>() {
+    constructor(tag: Tag) : this(tag.id, tag.type, tag.data)
 
     private val _id: ObservableStringValue = SimpleStringProperty(id)
     private val _type: ObservableObjectValue<TagType> = SimpleObjectProperty<TagType>(type)
@@ -32,6 +34,7 @@ class SimpleObservableTag(
     init { super.bind(_id, _type, _data) }
     override fun computeValue(): Tag = this
 
+    override fun putAllData(data: Map<String, Any>) { _data.putAll(data) }
     override fun putData(key: String, value: Any) { _data.put(key, value) }
     override fun removeData(key: String) { _data.remove(key) }
 }
@@ -56,6 +59,7 @@ class DerivedObservableTag(
     override val type: TagType get() = base.value.type
     override val data: Map<String, Any> get() = mergedData
 
+    override fun putAllData(data: Map<String, Any>) { _data.putAll(data) }
     override fun putData(key: String, value: Any) { _data.put(key, value) }
     override fun removeData(key: String) { _data.remove(key) }
 }

@@ -19,7 +19,7 @@ class DefaultLibraryFileLocator : LibraryFileLocator {
         // TODO デフォルトが選択された場合ファイルが存在しないので、その時の動作をテストしておく
         val lib =
                 if (Files.isRegularFile(location)) parser.parse(location)
-                else SimplePathLibrary(location.parent)
+                else SimplePathLibrary(path, location.parent)
         return lib
     }
     private tailrec fun recursiveLocate(path: Path?, default: Path): Path {

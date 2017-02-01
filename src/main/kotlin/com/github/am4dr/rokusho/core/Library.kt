@@ -49,8 +49,9 @@ class SimpleLibrary(tags: List<Tag> = listOf(), itemMetaData: List<LibraryItemMe
 }
 
 interface PathLibrary : Library {
-    val root: Path
-    fun getPaths(): List<Path> = Files.walk(root, FileVisitOption.FOLLOW_LINKS).collect(Collectors.toList<Path>())
+    var fileWalkRoot: Path
+    val savefileRoot: Path
+    fun getPaths(): List<Path> = Files.walk(fileWalkRoot, FileVisitOption.FOLLOW_LINKS).collect(Collectors.toList<Path>())
     fun getItems(): List<Pair<Path, LibraryItemMetaData>> {
         val m = getItemMetaData()
         return getPaths().map {
@@ -58,17 +59,20 @@ interface PathLibrary : Library {
             Pair(it, m.find { it.id == id } ?: SimpleLibraryItemMetaData(id))
         }
     }
-    fun Path.toIdFormat(): String = this@PathLibrary.root.relativize(this).joinToString("/")
+    fun Path.toIdFormat(): String = this@PathLibrary.savefileRoot.relativize(this).joinToString("/")
 }
-class SimplePathLibrary(override val root: Path, private val library: Library)
+class SimplePathLibrary(
+        override var fileWalkRoot: Path,
+        override val savefileRoot: Path,
+        private val library: Library)
     : PathLibrary, Library by library {
-    constructor(root: Path, tags: List<Tag> = listOf(), itemMetaData: List<LibraryItemMetaData> = listOf()) :
-            this(root, SimpleLibrary(tags, itemMetaData))
+    constructor(fileWalkRoot : Path, savefileRoot: Path, tags: List<Tag> = listOf(), itemMetaData: List<LibraryItemMetaData> = listOf())
+            : this(fileWalkRoot, savefileRoot, SimpleLibrary(tags, itemMetaData))
 }
 
 interface FilteredPathLibrary : PathLibrary {
     val matcher: (Path?, BasicFileAttributes?) -> Boolean
     override fun getPaths(): List<Path> =
-            Files.find(root, Int.MAX_VALUE, matcher, arrayOf(FileVisitOption.FOLLOW_LINKS))
+            Files.find(fileWalkRoot, Int.MAX_VALUE, matcher, arrayOf(FileVisitOption.FOLLOW_LINKS))
                     .collect(Collectors.toList<Path>())
 }
