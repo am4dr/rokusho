@@ -42,6 +42,12 @@ class ImagePathLibrary(path: Path) {
             get(id)?.let { set(id, SimpleImage(id, it.url, tags)) }
         }
     }
+    fun update(tag: Tag) {
+        library.updateTag(tag)
+        (baseTags as MutableMap).run {
+            get(tag.id)?.let { it.putAllData(tag.data) }
+        }
+    }
     private fun toImageItem(pair: Pair<Path, LibraryItemMetaData>): ImageItem {
         val (path, meta) = pair
         return SimpleImage(library.toIdFormat(path), path.toUri().toURL(), meta.tags) // TODO DerivedTag

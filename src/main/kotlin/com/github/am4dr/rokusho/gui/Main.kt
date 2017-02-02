@@ -48,7 +48,7 @@ class AdaptedDefaultMainModel : OldMainModel {
     override val tagNodeFactory: TagNodeFactory = TagNodeFactory(_tags)
 
     private val picToItemMap = mutableMapOf<Picture, ImageItem>()
-    private val picToLibMap = mutableMapOf<Picture, ImagePathLibrary>()
+    private var library: ImagePathLibrary? = null
     override fun setLibrary(path: Path) {
         val lib = ImagePathLibrary(path)
         _tags.putAll(lib.baseTags)
@@ -56,23 +56,22 @@ class AdaptedDefaultMainModel : OldMainModel {
         val pictures = lib.images.values.map { img ->
              img.toPicture() to img
         }.toMap(picToItemMap)
-        pictures.keys.forEach { picToLibMap[it] = lib }
         _pictures.setAll(pictures.keys)
+        library = lib
     }
     override fun updateMetaData(picture: Picture, metaData: ImageMetaData) {
+        val lib = library ?: return
         val item = picToItemMap[picture] ?: throw IllegalStateException()
-        val lib = picToLibMap[picture] ?: throw IllegalStateException()
         val newItem = SimpleImage(item.id, item.url, metaData.tags)
         val newPic = picture.copy(metaData = newItem.tags.let(::ImageMetaData))
         lib.update(newItem.id, newItem.tags)
         picToItemMap[newPic] = newItem
-        picToLibMap[newPic] = lib
         _pictures.run {
             set(indexOf(picture), newPic)
         }
     }
-    override fun updateTagInfo(name: String, info: Tag) {
-        throw UnsupportedOperationException("not implemented")
+    override fun updateTagInfo(name: String, tag: Tag) {
+        library?.update(tag)
     }
     override fun save() {
         throw UnsupportedOperationException("not implemented")

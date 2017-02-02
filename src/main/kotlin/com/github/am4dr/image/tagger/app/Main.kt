@@ -112,7 +112,7 @@ interface MainModel {
     val tagNodeFactory: TagNodeFactory
     fun setLibrary(path: Path)
     fun updateMetaData(picture: Picture, metaData: ImageMetaData)
-    fun updateTagInfo(name: String, info: Tag)
+    fun updateTagInfo(name: String, tag: Tag)
     fun save()
 }
 
@@ -148,9 +148,9 @@ class DefaultMainModel : MainModel {
         log.info("update metadata: $picture, $metaData")
         libraryProperty.get().updateMetaData(picture, metaData)
     }
-    override fun updateTagInfo(name: String, info: Tag) {
-        log.info("update tag info: id=$name, info=$info")
-        libraryProperty.get().updateTagInfo(name, info)
+    override fun updateTagInfo(name: String, tag: Tag) {
+        log.info("update tag: id=$name, tag=$tag")
+        libraryProperty.get().updateTagInfo(name, tag)
     }
     override fun save() {
         val metaDataFile = libraryProperty.get().metaDataFilePath.toFile()
