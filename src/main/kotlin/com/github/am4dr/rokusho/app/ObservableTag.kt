@@ -37,6 +37,8 @@ class SimpleObservableTag(
     override fun putAllData(data: Map<String, Any>) { _data.putAll(data) }
     override fun putData(key: String, value: Any) { _data.put(key, value) }
     override fun removeData(key: String) { _data.remove(key) }
+    override fun toString(): String =
+            "SimpleObservableTag(id: $id, type: $type, data: $data)"
 }
 class DerivedObservableTag(
         private val base: ObservableValue<Tag>,
@@ -62,4 +64,6 @@ class DerivedObservableTag(
     override fun putAllData(data: Map<String, Any>) { _data.putAll(data) }
     override fun putData(key: String, value: Any) { _data.put(key, value) }
     override fun removeData(key: String) { _data.remove(key) }
+    override fun toString(): String =
+            "DerivedObservableTag(id: $id, type: $type, data: $data, base: $base)"
 }
