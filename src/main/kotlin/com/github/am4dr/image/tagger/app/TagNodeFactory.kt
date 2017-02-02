@@ -19,9 +19,9 @@ class TagNodeFactory(val prototypes: MapProperty<String, Tag>) {
         })
     fun toTextFormat(tag: Tag): String =
         when (prototypes[tag.id]?.let(Tag::type)) {
-            TagType.TEXT, null -> tag.id
-            TagType.VALUE -> "${tag.id} | ${tag.data["value"]?.let { it } ?: "-"}"
-            TagType.SELECTION -> "${tag.id} | ${tag.data["value"]?.let {it} ?: "-"}"
+            TagType.TEXT, null -> tag.data["value"]?.toString() ?: tag.id
+            TagType.VALUE -> "${tag.id} | ${tag.data["value"] ?: "-"}"
+            TagType.SELECTION -> "${tag.id} | ${tag.data["value"] ?: "-"}"
             TagType.OTHERS -> tag.id
         }
 }
