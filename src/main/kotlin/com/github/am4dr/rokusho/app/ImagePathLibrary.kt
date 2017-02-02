@@ -50,7 +50,11 @@ class ImagePathLibrary(path: Path) {
     }
     private fun toImageItem(pair: Pair<Path, LibraryItemMetaData>): ImageItem {
         val (path, meta) = pair
-        return SimpleImage(library.toIdFormat(path), path.toUri().toURL(), meta.tags) // TODO DerivedTag
+        return SimpleImage(library.toIdFormat(path),
+                path.toUri().toURL(), meta.tags.map { toDerivedTag(it) })
+    }
+    private fun toDerivedTag(tag: Tag): Tag {
+        return baseTags[tag.id]?.let { DerivedObservableTag(it, tag.data) } ?: tag
     }
 }
 
