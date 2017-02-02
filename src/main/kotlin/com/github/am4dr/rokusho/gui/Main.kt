@@ -3,10 +3,12 @@ package com.github.am4dr.rokusho.gui
 import com.github.am4dr.image.tagger.app.TagNodeFactory
 import com.github.am4dr.image.tagger.core.ImageMetaData
 import com.github.am4dr.image.tagger.core.Picture
-import com.github.am4dr.image.tagger.core.TagInfo
 import com.github.am4dr.image.tagger.core.URLImageLoader
 import com.github.am4dr.image.tagger.util.createEmptyListProperty
-import com.github.am4dr.rokusho.core.*
+import com.github.am4dr.rokusho.app.ImageItem
+import com.github.am4dr.rokusho.app.ImagePathLibrary
+import com.github.am4dr.rokusho.app.SimpleImage
+import com.github.am4dr.rokusho.core.Tag
 import javafx.application.Application
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyMapProperty
@@ -35,41 +37,41 @@ class DefaultMainModel : MainModel {
 }
 
 class AdaptedDefaultMainModel : OldMainModel {
+    companion object {
+        private fun ImageItem.toPicture(): Picture =
+                Picture(URLImageLoader(url), tags.let(::ImageMetaData))
+    }
     private val _pictures = createEmptyListProperty<Picture>()
-    private val _tags = SimpleMapProperty(observableMap(mutableMapOf<String, TagInfo>()))
+    private val _tags = SimpleMapProperty(observableMap(mutableMapOf<String, Tag>()))
     override val picturesProperty: ReadOnlyListProperty<Picture> get() = _pictures
-    override val tagsProperty: ReadOnlyMapProperty<String, TagInfo> get() = _tags
+    override val tagsProperty: ReadOnlyMapProperty<String, Tag> get() = _tags
     override val tagNodeFactory: TagNodeFactory = TagNodeFactory(_tags)
 
     private val picToItemMap = mutableMapOf<Picture, ImageItem>()
-    private val picToLibMap = mutableMapOf<Picture, ImagePathLibrary>()
+    private var library: ImagePathLibrary? = null
     override fun setLibrary(path: Path) {
         val lib = ImagePathLibrary(path)
-        lib.getTags().map {
-            Pair(it.id, TagInfo(it.type, it.data))
-        }.toMap(_tags)
-        val pictures = lib.images.map { img ->
+        _tags.putAll(lib.baseTags)
+
+        val pictures = lib.images.values.map { img ->
              img.toPicture() to img
         }.toMap(picToItemMap)
-        pictures.keys.forEach { picToLibMap[it] = lib }
         _pictures.setAll(pictures.keys)
+        library = lib
     }
     override fun updateMetaData(picture: Picture, metaData: ImageMetaData) {
+        val lib = library ?: return
         val item = picToItemMap[picture] ?: throw IllegalStateException()
-        val lib = picToLibMap[picture] ?: throw IllegalStateException()
-        val newItem = SimpleImage(item.id, item.url, metaData.tags.map(::TagAdaptor))
-        val newPic = picture.copy(metaData = newItem.tags.map(::TagAdaptor).let(::ImageMetaData))
-        lib.updateItemMetaData(SimpleLibraryItemMetaData(newItem.id, newItem.tags))
+        val newItem = SimpleImage(item.id, item.url, metaData.tags)
+        val newPic = picture.copy(metaData = newItem.tags.let(::ImageMetaData))
+        lib.update(newItem.id, newItem.tags)
         picToItemMap[newPic] = newItem
-        picToLibMap[newPic] = lib
         _pictures.run {
             set(indexOf(picture), newPic)
         }
     }
-    private fun ImageItem.toPicture(): Picture =
-            Picture(URLImageLoader(url), tags.map(::TagAdaptor).let(::ImageMetaData))
-    override fun updateTagInfo(name: String, info: TagInfo) {
-        throw UnsupportedOperationException("not implemented")
+    override fun updateTagInfo(name: String, tag: Tag) {
+        library?.update(tag)
     }
     override fun save() {
         throw UnsupportedOperationException("not implemented")

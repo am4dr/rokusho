@@ -1,7 +1,5 @@
 package com.github.am4dr.rokusho.core
 
-import com.github.am4dr.image.tagger.core.TagType
-
 interface Tag {
     val id: String
     val type: TagType
@@ -11,4 +9,22 @@ interface Tag {
 data class SimpleTag(
         override val id: String,
         override val type: TagType,
-        override val data: Map<String, Any>) : Tag
+        override val data: Map<String, Any> = mapOf()) : Tag
+
+enum class TagType {
+    TEXT, VALUE, SELECTION, OTHERS;
+    companion object {
+        fun from(string: String): TagType =
+                when (string) {
+                    "text" -> TEXT
+                    "value" -> VALUE
+                    "selection" -> SELECTION
+                    else -> OTHERS
+                }
+    }
+}
+class TagParser {
+    companion object {
+        fun parse(string: String): Tag = SimpleTag(string, TagType.TEXT, mapOf())
+    }
+}

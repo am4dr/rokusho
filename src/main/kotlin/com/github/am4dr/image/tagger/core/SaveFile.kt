@@ -1,5 +1,8 @@
 package com.github.am4dr.image.tagger.core
 
+import com.github.am4dr.rokusho.core.SimpleTag
+import com.github.am4dr.rokusho.core.Tag
+import com.github.am4dr.rokusho.core.TagType
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.nio.file.Path
@@ -7,7 +10,7 @@ import java.nio.file.Paths
 
 data class SaveFile(
         val version: String,
-        val tags: Map<String, TagInfo>,
+        val tags: Map<String, Tag>,
         val metaData: Map<Path, ImageMetaData>) {
     companion object {
         private val log = LoggerFactory.getLogger(SaveFile::class.java)
@@ -23,21 +26,21 @@ data class SaveFile(
             data ?: throw VersionNotSpecifiedException()
             return data as? String ?: throw IllegalSaveFormatException("version must be a String")
         }
-        private fun parseTagInfo(data: Any?): Map<String, TagInfo> {
+        private fun parseTagInfo(data: Any?): Map<String, Tag> {
             data ?: return mutableMapOf() // do not use mapOf() to avoid Yaml reference
             val map = data as? Map<*, *> ?: throw IllegalSaveFormatException("tags must be a Map<String, Map<String, String>>")
             return map.map {
-                val name = it.key as? String ?: throw IllegalSaveFormatException("name of tag in tags must be a String")
+                val name = it.key as? String ?: throw IllegalSaveFormatException("id of tag in tags must be a String")
                 val opts = it.value as? Map<*, *> ?: throw IllegalSaveFormatException("value of tags must be a Map<String, String>")
                 opts.forEach {
-                    it.key as? String ?: throw IllegalSaveFormatException("name of tag option must be a String")
+                    it.key as? String ?: throw IllegalSaveFormatException("id of tag option must be a String")
                     if (it.value == null) throw IllegalSaveFormatException("value of tag option must not be null")
                 }
                 if (opts.containsKey("type") && opts["type"] !is String) throw IllegalSaveFormatException("type of tag must be a String")
                 val type = opts["type"] as? String ?: "text"
                 @Suppress("UNCHECKED_CAST")
                 opts as Map<String, Any>
-                Pair(name, TagInfo(TagType.from(type), opts))
+                Pair(name, SimpleTag(name , TagType.from(type), opts))
             }.toMap()
         }
         private fun parseMetaData(data: Any?): Map<Path, ImageMetaData> {
@@ -54,20 +57,20 @@ data class SaveFile(
             data ?: return listOf()
             val map = data as? Map<*, *> ?: throw IllegalSaveFormatException("tags in metaData must be a Map<String, Any>")
             return map.map { tag ->
-                val name = tag.key as? String ?: throw IllegalSaveFormatException("tag name in metaData must be a String: ${tag.key}")
+                val name = tag.key as? String ?: throw IllegalSaveFormatException("tag id in metaData must be a String: ${tag.key}")
                 val ops = tag.value as? Map<*, *> ?: mutableMapOf<String, Any>() // do not use mapOf() to avoid Yaml reference
                 ops.forEach {
                     if (it.key !is String) throw IllegalSaveFormatException("key of metaData.tags must be a String: ${it.key}")
-                    if (it.value == null) throw IllegalSaveFormatException("value of metaData.tags.<option name> must not be null: ${it.value}")
+                    if (it.value == null) throw IllegalSaveFormatException("value of metaData.tags.<option id> must not be null: ${it.value}")
                 }
                 @Suppress("UNCHECKED_CAST")
                 ops as Map<String, Any>
-                TextTag(name, ops)
+                SimpleTag(name, TagType.TEXT, ops)
             }
         }
         const val pathSeparator: String = "/"
         fun ImageMetaData.toDumpStructure(): Map<String, Any> =
-                mapOf("tags" to tags.map { it.name to it.data }.toMap())
+                mapOf("tags" to tags.map { it.id to it.data }.toMap())
     }
     fun toTextFormat(): String =
         Yaml().dump(toDumpStructure())

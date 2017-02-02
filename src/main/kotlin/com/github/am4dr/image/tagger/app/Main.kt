@@ -1,10 +1,13 @@
 package com.github.am4dr.image.tagger.app
 
-import com.github.am4dr.image.tagger.core.*
+import com.github.am4dr.image.tagger.core.ImageMetaData
+import com.github.am4dr.image.tagger.core.Library
+import com.github.am4dr.image.tagger.core.Picture
 import com.github.am4dr.image.tagger.node.ImageTile
 import com.github.am4dr.image.tagger.node.ImageTileScrollPane
 import com.github.am4dr.image.tagger.node.TagNode
 import com.github.am4dr.image.tagger.node.ThumbnailPane
+import com.github.am4dr.rokusho.core.Tag
 import com.github.am4dr.rokusho.gui.AdaptedDefaultMainModel
 import javafx.application.Application
 import javafx.beans.binding.Bindings.createObjectBinding
@@ -89,7 +92,7 @@ class Main : Application() {
     private fun selectLibraryDirectory(window: Window) {
         DirectoryChooser().run {
             title = "画像があるディレクトリを選択してください"
-            //initialDirectory = mainModel.libraryProperty.get()?.let { it.root.toFile() }
+            //initialDirectory = mainModel.libraryProperty.get()?.let { it.fileWalkRoot.toFile() }
             val selected = showDialog(window)?.toPath()
             if (selected != null) { mainModel.setLibrary(selected) }
         }
@@ -105,11 +108,11 @@ class Main : Application() {
 interface MainModel {
 //    val libraryProperty: ReadOnlyObjectProperty<Library>
     val picturesProperty: ReadOnlyListProperty<Picture>
-    val tagsProperty: ReadOnlyMapProperty<String, TagInfo>
+    val tagsProperty: ReadOnlyMapProperty<String, Tag>
     val tagNodeFactory: TagNodeFactory
     fun setLibrary(path: Path)
     fun updateMetaData(picture: Picture, metaData: ImageMetaData)
-    fun updateTagInfo(name: String, info: TagInfo)
+    fun updateTagInfo(name: String, tag: Tag)
     fun save()
 }
 
@@ -121,7 +124,7 @@ class DefaultMainModel : MainModel {
     private val _libraryProperty: ObjectProperty<Library>
     val libraryProperty: ReadOnlyObjectProperty<Library>
     override val picturesProperty: ReadOnlyListProperty<Picture>
-    override val tagsProperty: ReadOnlyMapProperty<String, TagInfo>
+    override val tagsProperty: ReadOnlyMapProperty<String, Tag>
     override val tagNodeFactory: TagNodeFactory
     init {
         _libraryProperty = SimpleObjectProperty()
@@ -145,9 +148,9 @@ class DefaultMainModel : MainModel {
         log.info("update metadata: $picture, $metaData")
         libraryProperty.get().updateMetaData(picture, metaData)
     }
-    override fun updateTagInfo(name: String, info: TagInfo) {
-        log.info("update tag info: name=$name, info=$info")
-        libraryProperty.get().updateTagInfo(name, info)
+    override fun updateTagInfo(name: String, tag: Tag) {
+        log.info("update tag: id=$name, tag=$tag")
+        libraryProperty.get().updateTagInfo(name, tag)
     }
     override fun save() {
         val metaDataFile = libraryProperty.get().metaDataFilePath.toFile()
