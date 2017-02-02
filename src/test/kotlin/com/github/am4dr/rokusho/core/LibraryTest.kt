@@ -24,7 +24,7 @@ class SimpleLibraryTest {
         assertNotNull(lib.getTags().find { it.id == "tagA" })
         assertNotNull(lib.getItemMetaData().find { it.id == "itemA" })
         lib.removeTag(tag.id)
-        lib.removeItem(item.id)
+        lib.removeItemMetaData(item.id)
         assertNull(lib.getTags().find { it.id == "tagA" })
         assertNull(lib.getItemMetaData().find { it.id == "itemA" })
     }

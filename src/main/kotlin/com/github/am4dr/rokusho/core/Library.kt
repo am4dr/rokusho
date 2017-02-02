@@ -6,11 +6,11 @@ interface Library {
     fun updateTag(tag: Tag): Unit
     fun removeTag(id: String): Unit
     fun updateItemMetaData(itemMetaData: LibraryItemMetaData): Unit
-    fun removeItem(id: String): Unit
+    fun removeItemMetaData(id: String): Unit
     fun updateTagAll(vararg tags: Tag): Unit = tags.forEach { updateTag(it) }
     fun removeTagAll(vararg ids: String): Unit = ids.forEach { removeTag(it) }
     fun updateItemMetaDataAll(vararg itemMetaData: LibraryItemMetaData): Unit = itemMetaData.forEach { updateItemMetaData(it) }
-    fun removeItemAll(vararg ids: String): Unit = ids.forEach { removeItem(it) }
+    fun removeItemMetaDataAll(vararg ids: String): Unit = ids.forEach { removeItemMetaData(it) }
 }
 interface LibraryItemMetaData {
     val id: String
@@ -34,10 +34,10 @@ class SimpleLibrary(tags: List<Tag> = listOf(), itemMetaData: List<LibraryItemMe
         _tags.removeAll { it.id == id }
     }
     override fun updateItemMetaData(itemMetaData: LibraryItemMetaData) {
-        removeItem(itemMetaData.id)
+        removeItemMetaData(itemMetaData.id)
         _itemMetaData.add(itemMetaData)
     }
-    override fun removeItem(id: String) {
+    override fun removeItemMetaData(id: String) {
         _itemMetaData.removeAll { it.id == id }
     }
 }
