@@ -1,18 +1,14 @@
 package com.github.am4dr.image.tagger.core
 
-import com.github.am4dr.rokusho.core.Tag
-import javafx.collections.FXCollections.observableList
-import javafx.collections.ObservableList
-import org.slf4j.LoggerFactory
 import java.nio.file.Files
 import java.nio.file.Path
-import java.util.stream.Collectors
 
 private const val defaultMetaDataFileName = "image_tag_info.yaml"
 private val imageFileNameMatcher = Regex(".*\\.(bmp|gif|jpe?g|png)$", RegexOption.IGNORE_CASE)
 private fun isSupportedImageFile(path: Path) =
         Files.isRegularFile(path)
                 && imageFileNameMatcher.matches(path.fileName.toString())
+/*
 // TODO add test 特にupdateMetaData
 class Library(root: Path) {
     companion object  {
@@ -65,3 +61,4 @@ class Library(root: Path) {
     fun toSaveFormat(): String =
         SaveFile("1", tags, metaDataStore).toTextFormat()
 }
+*/

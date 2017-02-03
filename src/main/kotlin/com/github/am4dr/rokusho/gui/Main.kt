@@ -3,7 +3,6 @@ package com.github.am4dr.rokusho.gui
 import com.github.am4dr.image.tagger.app.TagNodeFactory
 import com.github.am4dr.image.tagger.core.ImageMetaData
 import com.github.am4dr.image.tagger.core.Picture
-import com.github.am4dr.image.tagger.core.URLImageLoader
 import com.github.am4dr.image.tagger.util.createEmptyListProperty
 import com.github.am4dr.rokusho.app.ImageItem
 import com.github.am4dr.rokusho.app.ImagePathLibrary
@@ -38,8 +37,7 @@ class DefaultMainModel : MainModel {
 
 class AdaptedDefaultMainModel : OldMainModel {
     companion object {
-        private fun ImageItem.toPicture(): Picture =
-                Picture(URLImageLoader(url), tags.let(::ImageMetaData))
+        private fun ImageItem.toPicture(): Picture = Picture(this)
     }
     private val _pictures = createEmptyListProperty<Picture>()
     private val _tags = SimpleMapProperty(observableMap(mutableMapOf<String, Tag>()))

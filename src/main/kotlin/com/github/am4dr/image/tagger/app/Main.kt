@@ -1,7 +1,6 @@
 package com.github.am4dr.image.tagger.app
 
 import com.github.am4dr.image.tagger.core.ImageMetaData
-import com.github.am4dr.image.tagger.core.Library
 import com.github.am4dr.image.tagger.core.Picture
 import com.github.am4dr.image.tagger.node.ImageTile
 import com.github.am4dr.image.tagger.node.ImageTileScrollPane
@@ -10,10 +9,8 @@ import com.github.am4dr.image.tagger.node.ThumbnailPane
 import com.github.am4dr.rokusho.core.Tag
 import com.github.am4dr.rokusho.gui.AdaptedDefaultMainModel
 import javafx.application.Application
-import javafx.beans.binding.Bindings.createObjectBinding
-import javafx.beans.property.*
-import javafx.collections.FXCollections.observableList
-import javafx.collections.FXCollections.observableMap
+import javafx.beans.property.ReadOnlyListProperty
+import javafx.beans.property.ReadOnlyMapProperty
 import javafx.event.EventHandler
 import javafx.geometry.Pos
 import javafx.scene.Scene
@@ -32,7 +29,6 @@ import org.slf4j.LoggerFactory
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.util.concurrent.Callable
 import com.github.am4dr.rokusho.gui.DefaultMainModel as NewDefaultMainModel
 
 fun main(args: Array<String>) = Application.launch(Main::class.java, *args)
@@ -115,7 +111,7 @@ interface MainModel {
     fun updateTagInfo(name: String, tag: Tag)
     fun save()
 }
-
+/*
 // TODO 複数Libraryへの対応
 class DefaultMainModel : MainModel {
     companion object {
@@ -161,4 +157,4 @@ class DefaultMainModel : MainModel {
         metaDataFile.writeText(libraryProperty.get().toSaveFormat())
         log.info("saved ${libraryProperty.get().metaDataStore.size} imageProperty mata data to: $metaDataFile")
     }
-}
+}*/
