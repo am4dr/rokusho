@@ -1,21 +1,15 @@
 package com.github.am4dr.rokusho.gui
 
-import com.github.am4dr.image.tagger.core.ImageMetaData
-import com.github.am4dr.image.tagger.core.Picture
-import com.github.am4dr.image.tagger.node.thumbnailMaxHeight
-import com.github.am4dr.image.tagger.node.thumbnailMaxWidth
-import com.github.am4dr.image.tagger.util.createEmptyListProperty
 import com.github.am4dr.rokusho.app.ImageItem
 import com.github.am4dr.rokusho.app.ImagePathLibrary
-import com.github.am4dr.rokusho.app.SimpleImageItem
 import com.github.am4dr.rokusho.app.StringImageItemFilter
-import com.github.am4dr.rokusho.core.Tag
+import com.github.am4dr.rokusho.gui.ThumbnailNode.Companion.thumbnailMaxHeight
+import com.github.am4dr.rokusho.gui.ThumbnailNode.Companion.thumbnailMaxWidth
+import com.github.am4dr.rokusho.util.createEmptyListProperty
 import javafx.application.Application
 import javafx.beans.binding.ListBinding
 import javafx.beans.property.ReadOnlyListProperty
-import javafx.beans.property.ReadOnlyMapProperty
 import javafx.beans.property.ReadOnlyMapWrapper
-import javafx.beans.property.SimpleMapProperty
 import javafx.collections.FXCollections.observableMap
 import javafx.collections.ObservableList
 import javafx.collections.transformation.FilteredList
@@ -38,8 +32,6 @@ import org.slf4j.LoggerFactory
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import com.github.am4dr.image.tagger.app.Main as OldMain
-import com.github.am4dr.image.tagger.app.MainModel as OldMainModel
 
 fun main(args: Array<String>) = Application.launch(Main::class.java, *args)
 
@@ -141,46 +133,5 @@ class DefaultMainModel : MainModel {
     }
     override fun getTagNodeFactory(item: ImageItem): TagNodeFactory {
         return itemToLibrary[item]?.let { libToTagNodeFactory[it] } ?: throw IllegalStateException()
-    }
-}
-
-class AdaptedDefaultMainModel : OldMainModel {
-    companion object {
-        private fun ImageItem.toPicture(): Picture = Picture(this)
-    }
-    private val _pictures = createEmptyListProperty<Picture>()
-    private val _tags = SimpleMapProperty(observableMap(mutableMapOf<String, Tag>()))
-    override val picturesProperty: ReadOnlyListProperty<Picture> get() = _pictures
-    override val tagsProperty: ReadOnlyMapProperty<String, Tag> get() = _tags
-    override val tagNodeFactory: TagNodeFactory = TagNodeFactory(_tags)
-
-    private val picToItemMap = mutableMapOf<Picture, ImageItem>()
-    private var library: ImagePathLibrary? = null
-    override fun setLibrary(path: Path) {
-        val lib = ImagePathLibrary(path)
-        _tags.putAll(lib.baseTags)
-
-        val pictures = lib.images.values.map { img ->
-             img.toPicture() to img
-        }.toMap(picToItemMap)
-        _pictures.setAll(pictures.keys)
-        library = lib
-    }
-    override fun updateMetaData(picture: Picture, metaData: ImageMetaData) {
-        val lib = library ?: return
-        val item = picToItemMap[picture] ?: throw IllegalStateException()
-        val newItem = SimpleImageItem(item.id, item.url, metaData.tags)
-        val newPic = picture.copy(metaData = newItem.tags.let(::ImageMetaData))
-        lib.update(newItem.id, newItem.tags)
-        picToItemMap[newPic] = newItem
-        _pictures.run {
-            set(indexOf(picture), newPic)
-        }
-    }
-    override fun updateTagInfo(name: String, tag: Tag) {
-        library?.update(tag)
-    }
-    override fun save() {
-        throw UnsupportedOperationException("not implemented")
     }
 }

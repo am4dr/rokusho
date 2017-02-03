@@ -1,9 +1,9 @@
 package com.github.am4dr.rokusho.gui
 
-import com.github.am4dr.image.tagger.util.TransformedList
 import com.github.am4dr.rokusho.core.SimpleTag
 import com.github.am4dr.rokusho.core.Tag
 import com.github.am4dr.rokusho.core.TagType
+import com.github.am4dr.rokusho.util.TransformedList
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.ListBinding
 import javafx.beans.property.ObjectProperty

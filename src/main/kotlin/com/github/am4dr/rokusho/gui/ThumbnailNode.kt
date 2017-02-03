@@ -1,7 +1,7 @@
 package com.github.am4dr.rokusho.gui
 
-import com.github.am4dr.image.tagger.util.TransformedList
 import com.github.am4dr.rokusho.app.ImageItem
+import com.github.am4dr.rokusho.util.TransformedList
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.BooleanBinding
 import javafx.beans.property.SimpleDoubleProperty

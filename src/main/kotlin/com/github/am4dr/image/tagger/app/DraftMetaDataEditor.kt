@@ -47,3 +47,4 @@ internal class DraftMetaDataEditor(val metaData: ImageMetaData, val image: Image
                     .map { TagParser.parse(it) }
                     .let(::ImageMetaData)
 }
+

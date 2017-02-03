@@ -2,7 +2,6 @@ package com.github.am4dr.rokusho.app
 
 import com.github.am4dr.rokusho.core.DefaultLibraryFileLocator
 import com.github.am4dr.rokusho.core.LibraryItemMetaData
-import com.github.am4dr.rokusho.core.SimpleLibraryItemMetaData
 import com.github.am4dr.rokusho.core.Tag
 import javafx.beans.binding.ObjectBinding
 import javafx.beans.value.ObservableValue
@@ -39,18 +38,6 @@ class ImagePathLibrary(path: Path) {
         images = mutableMapOf()
         images.putAll(
                 library.toLibraryItems(paths).map { toImageItem(it) }.associateBy(ImageItem::id))
-    }
-    fun update(id: String, tags: List<Tag>) {
-        library.updateItemMetaData(SimpleLibraryItemMetaData(id, tags))
-        (images as MutableMap).run {
-            get(id)?.let { set(id, SimpleImageItem(id, it.url, tags)) }
-        }
-    }
-    fun update(tag: Tag) {
-        library.updateTag(tag)
-        (baseTags as MutableMap).run {
-            get(tag.id)?.let { it.putAllData(tag.data) }
-        }
     }
     private fun toImageItem(pair: Pair<Path, LibraryItemMetaData>): ImageItem {
         val (path, meta) = pair
