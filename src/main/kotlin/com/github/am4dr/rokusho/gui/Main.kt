@@ -7,7 +7,7 @@ import com.github.am4dr.image.tagger.core.URLImageLoader
 import com.github.am4dr.image.tagger.util.createEmptyListProperty
 import com.github.am4dr.rokusho.app.ImageItem
 import com.github.am4dr.rokusho.app.ImagePathLibrary
-import com.github.am4dr.rokusho.app.SimpleImage
+import com.github.am4dr.rokusho.app.SimpleImageItem
 import com.github.am4dr.rokusho.core.Tag
 import javafx.application.Application
 import javafx.beans.property.ReadOnlyListProperty
@@ -62,7 +62,7 @@ class AdaptedDefaultMainModel : OldMainModel {
     override fun updateMetaData(picture: Picture, metaData: ImageMetaData) {
         val lib = library ?: return
         val item = picToItemMap[picture] ?: throw IllegalStateException()
-        val newItem = SimpleImage(item.id, item.url, metaData.tags)
+        val newItem = SimpleImageItem(item.id, item.url, metaData.tags)
         val newPic = picture.copy(metaData = newItem.tags.let(::ImageMetaData))
         lib.update(newItem.id, newItem.tags)
         picToItemMap[newPic] = newItem
