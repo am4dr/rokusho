@@ -4,10 +4,11 @@ import com.github.am4dr.image.tagger.core.ImageMetaData
 import com.github.am4dr.image.tagger.core.Picture
 import com.github.am4dr.image.tagger.node.ImageTile
 import com.github.am4dr.image.tagger.node.ImageTileScrollPane
-import com.github.am4dr.image.tagger.node.TagNode
 import com.github.am4dr.image.tagger.node.ThumbnailPane
 import com.github.am4dr.rokusho.core.Tag
 import com.github.am4dr.rokusho.gui.AdaptedDefaultMainModel
+import com.github.am4dr.rokusho.gui.TagNode
+import com.github.am4dr.rokusho.gui.TagNodeFactory
 import javafx.application.Application
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyMapProperty

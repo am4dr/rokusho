@@ -6,6 +6,9 @@ import com.github.am4dr.image.tagger.util.TransformedList
 import com.github.am4dr.rokusho.core.SimpleTag
 import com.github.am4dr.rokusho.core.Tag
 import com.github.am4dr.rokusho.core.TagType
+import com.github.am4dr.rokusho.gui.FittingTextField
+import com.github.am4dr.rokusho.gui.TagNode
+import com.github.am4dr.rokusho.gui.TextTagNode
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.ListBinding
 import javafx.beans.property.*

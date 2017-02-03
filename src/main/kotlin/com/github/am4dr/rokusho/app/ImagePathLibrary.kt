@@ -86,4 +86,5 @@ class SimpleImageItem(
     }
     init { super.bind(this.tags) }
     override fun computeValue(): ImageItem = this
+    override fun toString(): String = "SimpleImageItem(id: $id, url: $url, tags: $tags)"
 }

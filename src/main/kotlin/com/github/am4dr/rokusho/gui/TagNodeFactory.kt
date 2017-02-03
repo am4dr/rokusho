@@ -1,13 +1,11 @@
-package com.github.am4dr.image.tagger.app
+package com.github.am4dr.rokusho.gui
 
-import com.github.am4dr.image.tagger.node.TagNode
-import com.github.am4dr.image.tagger.node.TextTagNode
 import com.github.am4dr.rokusho.core.Tag
 import com.github.am4dr.rokusho.core.TagType
 import javafx.beans.binding.StringBinding
 import javafx.beans.property.MapProperty
 
-class TagNodeFactory(val prototypes: MapProperty<String, Tag>) {
+class TagNodeFactory(val prototypes: MapProperty<String, out Tag>) {
     fun createTagNode(tag: Tag): TagNode =
         TextTagNode(object : StringBinding() {
             init {

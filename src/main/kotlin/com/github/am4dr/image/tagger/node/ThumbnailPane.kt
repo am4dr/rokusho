@@ -2,6 +2,7 @@ package com.github.am4dr.image.tagger.node
 
 import com.github.am4dr.image.tagger.core.Picture
 import com.github.am4dr.image.tagger.util.createEmptyListProperty
+import com.github.am4dr.rokusho.gui.ImageOverlay
 import javafx.beans.property.*
 import javafx.event.EventHandler
 import javafx.scene.image.Image
