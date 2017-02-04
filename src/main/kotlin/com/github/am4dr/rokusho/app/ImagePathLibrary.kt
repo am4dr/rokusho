@@ -2,8 +2,11 @@ package com.github.am4dr.rokusho.app
 
 import com.github.am4dr.rokusho.core.DefaultLibraryFileLocator
 import com.github.am4dr.rokusho.core.LibraryItemMetaData
-import com.github.am4dr.rokusho.core.SimpleLibraryItemMetaData
 import com.github.am4dr.rokusho.core.Tag
+import javafx.beans.binding.ObjectBinding
+import javafx.beans.value.ObservableValue
+import javafx.collections.FXCollections.observableList
+import javafx.collections.ObservableList
 import java.net.URL
 import java.nio.file.FileVisitOption
 import java.nio.file.Files
@@ -36,21 +39,9 @@ class ImagePathLibrary(path: Path) {
         images.putAll(
                 library.toLibraryItems(paths).map { toImageItem(it) }.associateBy(ImageItem::id))
     }
-    fun update(id: String, tags: List<Tag>) {
-        library.updateItemMetaData(SimpleLibraryItemMetaData(id, tags))
-        (images as MutableMap).run {
-            get(id)?.let { set(id, SimpleImage(id, it.url, tags)) }
-        }
-    }
-    fun update(tag: Tag) {
-        library.updateTag(tag)
-        (baseTags as MutableMap).run {
-            get(tag.id)?.let { it.putAllData(tag.data) }
-        }
-    }
     private fun toImageItem(pair: Pair<Path, LibraryItemMetaData>): ImageItem {
         val (path, meta) = pair
-        return SimpleImage(library.toIdFormat(path),
+        return SimpleImageItem(library.toIdFormat(path),
                 path.toUri().toURL(), meta.tags.map { toDerivedTag(it) })
     }
     private fun toDerivedTag(tag: Tag): Tag {
@@ -58,12 +49,29 @@ class ImagePathLibrary(path: Path) {
     }
 }
 
-interface ImageItem {
+interface ImageItem : ObservableValue<ImageItem> {
     val id: String
     val url: URL
-    val tags: List<Tag>
+    val tags: ObservableList<Tag>
+    fun addOrUpdateTag(tag: Tag)
+    fun removeTag(id: String)
 }
-data class SimpleImage(
+class SimpleImageItem(
         override val id: String,
         override val url: URL,
-        override val tags: List<Tag>) : ImageItem
+        tags: List<Tag>) : ImageItem, ObjectBinding<ImageItem>() {
+    override val tags: ObservableList<Tag> = observableList(tags.toMutableList())
+    override fun addOrUpdateTag(tag: Tag) {
+        tags.run {
+            val i = indexOfFirst { it.id == tag.id }
+            if (i >= 0) { set(i, tag) }
+            else { add(tag) }
+        }
+    }
+    override fun removeTag(id: String) {
+        tags.removeAll { it.id == id }
+    }
+    init { super.bind(this.tags) }
+    override fun computeValue(): ImageItem = this
+    override fun toString(): String = "SimpleImageItem(id: $id, url: $url, tags: $tags)"
+}
