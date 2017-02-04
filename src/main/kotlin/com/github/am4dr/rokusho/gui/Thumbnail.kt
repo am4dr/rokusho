@@ -1,8 +1,6 @@
 package com.github.am4dr.rokusho.gui
 
-import com.github.am4dr.rokusho.core.SimpleTag
 import com.github.am4dr.rokusho.core.Tag
-import com.github.am4dr.rokusho.core.TagType
 import com.github.am4dr.rokusho.util.TransformedList
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.ListBinding
@@ -24,6 +22,7 @@ import javafx.scene.text.Font
 class Thumbnail(
         private val image: Image,
         private val tags: ObservableList<Tag>,
+        private val tagParser: (String) -> Tag,
         private val tagNodeFactory: (Tag) -> TagNode) : StackPane() {
     val imageProperty: ObjectProperty<Image> = ReadOnlyObjectWrapper(image)
     private val tagNodes = TransformedList(tags) { tag ->
@@ -40,7 +39,7 @@ class Thumbnail(
         }
         onAction = EventHandler {
             when (text) { null, "" -> return@EventHandler }
-            tags.add(SimpleTag(text, TagType.TEXT, mapOf("value" to text)))
+            tags.add(tagParser(text))
             text = ""
         }
     }

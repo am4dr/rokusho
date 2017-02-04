@@ -1,8 +1,6 @@
 package com.github.am4dr.rokusho.gui
 
-import com.github.am4dr.rokusho.app.ImageItem
-import com.github.am4dr.rokusho.app.ImagePathLibrary
-import com.github.am4dr.rokusho.app.StringImageItemFilter
+import com.github.am4dr.rokusho.app.*
 import com.github.am4dr.rokusho.gui.ThumbnailNode.Companion.thumbnailMaxHeight
 import com.github.am4dr.rokusho.gui.ThumbnailNode.Companion.thumbnailMaxWidth
 import com.github.am4dr.rokusho.util.createEmptyListProperty
@@ -73,9 +71,11 @@ class Main : Application() {
         val imageLoader = UrlImageLoader()
         val thumbnailFactory: (ImageItem) -> Thumbnail = { item ->
             val tagNodeFactory = model.getTagNodeFactory(item)
+            val tagParser = model.getTagParser(item)
             Thumbnail(
                     imageLoader.getImage(item.url, thumbnailMaxWidth, thumbnailMaxHeight, true),
                     item.tags,
+                    { tagParser.parse(it) },
                     { tagNodeFactory.createTagNode(it) })
         }
         val thumbnailNode =
@@ -110,6 +110,7 @@ interface MainModel {
     fun saveLibraries()
     fun getLibrary(item: ImageItem): ImagePathLibrary
     fun getTagNodeFactory(item: ImageItem): TagNodeFactory
+    fun getTagParser(item: ImageItem): TagStringParser
 }
 class DefaultMainModel : MainModel {
     private val _libraries = createEmptyListProperty<ImagePathLibrary>()
@@ -118,12 +119,14 @@ class DefaultMainModel : MainModel {
     override val items: ObservableList<ImageItem> = _items
     private val itemToLibrary = mutableMapOf<ImageItem, ImagePathLibrary>()
     private val libToTagNodeFactory = mutableMapOf<ImagePathLibrary, TagNodeFactory>()
+    private val libToTagParser = mutableMapOf<ImagePathLibrary, TagStringParser>()
     override fun addLibrary(path: Path) {
         val lib = ImagePathLibrary(path)
         _libraries.add(lib)
         _items.addAll(lib.images.values)
         itemToLibrary.putAll(lib.images.values.map { Pair(it, lib) })
         libToTagNodeFactory[lib] = TagNodeFactory(ReadOnlyMapWrapper(observableMap(lib.baseTags)))
+        libToTagParser[lib] = DefaultTagStringParser(lib.baseTags)
     }
     override fun saveLibraries() {
         TODO() // TODO
@@ -133,5 +136,8 @@ class DefaultMainModel : MainModel {
     }
     override fun getTagNodeFactory(item: ImageItem): TagNodeFactory {
         return itemToLibrary[item]?.let { libToTagNodeFactory[it] } ?: throw IllegalStateException()
+    }
+    override fun getTagParser(item: ImageItem): TagStringParser {
+        return itemToLibrary[item]?.let { libToTagParser[it] } ?: throw IllegalStateException()
     }
 }

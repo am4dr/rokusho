@@ -23,8 +23,3 @@ enum class TagType {
                 }
     }
 }
-class TagParser {
-    companion object {
-        fun parse(string: String): Tag = SimpleTag(string, TagType.TEXT, mapOf())
-    }
-}

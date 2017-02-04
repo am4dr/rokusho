@@ -1,8 +1,8 @@
 package com.github.am4dr.image.tagger.app
 
 import com.github.am4dr.image.tagger.core.ImageMetaData
+import com.github.am4dr.rokusho.app.DefaultTagStringParser
 import com.github.am4dr.rokusho.core.Tag
-import com.github.am4dr.rokusho.core.TagParser
 import javafx.beans.property.SimpleStringProperty
 import javafx.event.EventHandler
 import javafx.scene.Scene
@@ -40,11 +40,12 @@ internal class DraftMetaDataEditor(val metaData: ImageMetaData, val image: Image
         )
         scene = Scene(root, 600.0, 400.0)
     }
+    private val tagParser = DefaultTagStringParser()
     private fun createImageMetaData(): ImageMetaData =
             tagsText.get()
                     .split(Regex("\\s*,\\s*"))
                     .filter(String::isNotBlank)
-                    .map { TagParser.parse(it) }
+                    .map { tagParser.parse(it) }
                     .let(::ImageMetaData)
 }
 
