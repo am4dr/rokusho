@@ -53,24 +53,12 @@ interface ImageItem : ObservableValue<ImageItem> {
     val id: String
     val url: URL
     val tags: ObservableList<Tag>
-    fun addOrUpdateTag(tag: Tag)
-    fun removeTag(id: String)
 }
 class SimpleImageItem(
         override val id: String,
         override val url: URL,
         tags: List<Tag>) : ImageItem, ObjectBinding<ImageItem>() {
     override val tags: ObservableList<Tag> = observableList(tags.toMutableList())
-    override fun addOrUpdateTag(tag: Tag) {
-        tags.run {
-            val i = indexOfFirst { it.id == tag.id }
-            if (i >= 0) { set(i, tag) }
-            else { add(tag) }
-        }
-    }
-    override fun removeTag(id: String) {
-        tags.removeAll { it.id == id }
-    }
     init { super.bind(this.tags) }
     override fun computeValue(): ImageItem = this
     override fun toString(): String = "SimpleImageItem(id: $id, url: $url, tags: $tags)"
