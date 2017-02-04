@@ -22,8 +22,9 @@ private fun isSupportedImageFile(path: Path) =
 
 class ImagePathLibrary(path: Path) {
     private val library = DefaultLibraryFileLocator().locate(path)
+    val savefilePath: Path = library.savefilePath
 
-    private val fileWalkRoot: Path = path
+    val fileWalkRoot: Path = path
     private val matcher: (Path?, BasicFileAttributes?) -> Boolean =
             { path, attr -> path?.let(::isSupportedImageFile) ?: false }
     private val paths =

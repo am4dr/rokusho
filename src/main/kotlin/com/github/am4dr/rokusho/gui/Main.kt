@@ -82,7 +82,8 @@ class Main : Application() {
                 ThumbnailNode(model.items, filter.filterProperty, thumbnailFactory, imageLoader)
         val mainScene =
                 MainScene(
-                        ImageFiler(filterInputNode, listNode, thumbnailNode),
+                        ImageFiler({ selectLibraryDirectory(stage) },
+                                filterInputNode, listNode, thumbnailNode),
                         makeDirectorySelectorPane(stage))
         mainScene.librariesNotSelectedProperty.bind(model.libraries.emptyProperty())
         return mainScene
@@ -90,7 +91,9 @@ class Main : Application() {
     private fun selectLibraryDirectory(window: Window) {
         DirectoryChooser().run {
             title = "画像があるディレクトリを選択してください"
-            //initialDirectory = mainModel.libraryProperty.get()?.let { it.fileWalkRoot.toFile() }
+            initialDirectory = model.libraries.lastOrNull()?.let {
+                it.savefilePath.parent.toFile()
+            }
             val selected = showDialog(window)?.toPath()
             if (selected != null) { model.addLibrary(selected) }
         }
@@ -122,11 +125,13 @@ class DefaultMainModel : MainModel {
     private val libToTagParser = mutableMapOf<ImagePathLibrary, TagStringParser>()
     override fun addLibrary(path: Path) {
         val lib = ImagePathLibrary(path)
-        _libraries.add(lib)
-        _items.addAll(lib.images.values)
+        // must set up these before updating observables
         itemToLibrary.putAll(lib.images.values.map { Pair(it, lib) })
         libToTagNodeFactory[lib] = TagNodeFactory(ReadOnlyMapWrapper(observableMap(lib.baseTags)))
         libToTagParser[lib] = DefaultTagStringParser(lib.baseTags)
+        // update observables
+        _libraries.add(lib)
+        _items.addAll(lib.images.values)
     }
     override fun saveLibraries() {
         TODO() // TODO

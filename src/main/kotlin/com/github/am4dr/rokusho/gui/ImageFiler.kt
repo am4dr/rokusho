@@ -1,7 +1,6 @@
 package com.github.am4dr.rokusho.gui
 
 import javafx.beans.property.SimpleObjectProperty
-import javafx.event.EventHandler
 import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.ContentDisplay
@@ -12,6 +11,7 @@ import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 
 class ImageFiler(
+        onAddLibraryClicked: () -> Unit,
         filterInputNode: Node,
         listNode: ListNode,
         thumbnailNode: ThumbnailNode) : VBox() {
@@ -23,11 +23,12 @@ class ImageFiler(
     init {
         children.addAll(
                 HBox(
-                        Button("リスト").apply { onAction = EventHandler {
+                        Button("追加").apply { setOnAction { onAddLibraryClicked() } },
+                        Button("リスト").apply { setOnAction {
                             selectedView.set(listNode)
                             listNode.refresh()
                         } },
-                        Button("サムネイル").apply { onAction = EventHandler { selectedView.set(thumbnailNode) } },
+                        Button("サムネイル").apply { setOnAction { selectedView.set(thumbnailNode) } },
                         Label("フィルター", filterInputNode).apply { contentDisplay = ContentDisplay.RIGHT}),
                 currentNode)
     }
