@@ -107,24 +107,24 @@ class Main : Application() {
     }
 }
 interface MainModel {
-    val libraries: ReadOnlyListProperty<ImagePathLibrary>
+    val libraries: ReadOnlyListProperty<ImageLibrary>
     val items: ObservableList<ImageItem>
     fun addLibrary(path: Path)
     fun saveLibraries()
-    fun getLibrary(item: ImageItem): ImagePathLibrary
+    fun getLibrary(item: ImageItem): ImageLibrary
     fun getTagNodeFactory(item: ImageItem): TagNodeFactory
     fun getTagParser(item: ImageItem): TagStringParser
 }
 class DefaultMainModel : MainModel {
-    private val _libraries = createEmptyListProperty<ImagePathLibrary>()
-    override val libraries: ReadOnlyListProperty<ImagePathLibrary> = _libraries
+    private val _libraries = createEmptyListProperty<ImageLibrary>()
+    override val libraries: ReadOnlyListProperty<ImageLibrary> = _libraries
     private val _items = createEmptyListProperty<ImageItem>()
     override val items: ObservableList<ImageItem> = _items
-    private val itemToLibrary = mutableMapOf<ImageItem, ImagePathLibrary>()
-    private val libToTagNodeFactory = mutableMapOf<ImagePathLibrary, TagNodeFactory>()
-    private val libToTagParser = mutableMapOf<ImagePathLibrary, TagStringParser>()
+    private val itemToLibrary = mutableMapOf<ImageItem, ImageLibrary>()
+    private val libToTagNodeFactory = mutableMapOf<ImageLibrary, TagNodeFactory>()
+    private val libToTagParser = mutableMapOf<ImageLibrary, TagStringParser>()
     override fun addLibrary(path: Path) {
-        val lib = ImagePathLibrary(path)
+        val lib = ImageLibrary(path)
         // must set up these before updating observables
         itemToLibrary.putAll(lib.images.values.map { Pair(it, lib) })
         libToTagNodeFactory[lib] = TagNodeFactory(ReadOnlyMapWrapper(observableMap(lib.baseTags)))
@@ -136,7 +136,7 @@ class DefaultMainModel : MainModel {
     override fun saveLibraries() {
         TODO() // TODO
     }
-    override fun getLibrary(item: ImageItem): ImagePathLibrary {
+    override fun getLibrary(item: ImageItem): ImageLibrary {
         return itemToLibrary[item] ?: throw IllegalStateException()
     }
     override fun getTagNodeFactory(item: ImageItem): TagNodeFactory {

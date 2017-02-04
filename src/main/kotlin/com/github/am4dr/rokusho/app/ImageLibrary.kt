@@ -20,7 +20,7 @@ private fun isSupportedImageFile(path: Path) =
         Files.isRegularFile(path)
                 && imageFileNameMatcher.matches(path.fileName.toString())
 
-class ImagePathLibrary(path: Path) {
+class ImageLibrary(path: Path) {
     private val library = DefaultLibraryFileLocator().locate(path)
     val savefilePath: Path = library.savefilePath
 
