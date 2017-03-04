@@ -1,4 +1,4 @@
-package com.github.am4dr.image.tagger.node
+package com.github.am4dr.rokusho.gui
 
 import javafx.beans.binding.DoubleBinding
 import javafx.beans.property.DoubleProperty

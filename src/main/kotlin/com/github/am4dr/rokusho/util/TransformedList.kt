@@ -1,4 +1,4 @@
-package com.github.am4dr.image.tagger.util
+package com.github.am4dr.rokusho.util
 
 import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
