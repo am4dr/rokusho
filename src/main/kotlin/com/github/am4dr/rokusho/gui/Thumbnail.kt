@@ -34,7 +34,7 @@ class Thumbnail(
         padding = Insets(-1.0, 2.0, 0.0, 2.0)
         visibleProperty().set(false)
         managedProperty().bind(visibleProperty())
-        focusedProperty().addListener { observableValue, old, new ->
+        focusedProperty().addListener { _, _, new ->
             if (new == false) { visibleProperty().set(false) }
         }
         onAction = EventHandler {

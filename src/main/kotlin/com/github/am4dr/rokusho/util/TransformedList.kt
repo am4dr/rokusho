@@ -21,7 +21,7 @@ class TransformedList<E, F>(source: ObservableList<out F>, private val transform
         endChange()
     }
     private fun  permutate(c: ListChangeListener.Change<out F>) {
-        throw UnsupportedOperationException("observing permutation is not support yet")
+        throw UnsupportedOperationException("observing permutation is not support yet: arg=$c")
     }
     private fun  removeOrAdd(c: ListChangeListener.Change<out F>) {
         if (c.wasRemoved()) {

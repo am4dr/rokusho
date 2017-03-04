@@ -26,7 +26,7 @@ class ImageLibrary(path: Path) {
 
     val fileWalkRoot: Path = path
     private val matcher: (Path?, BasicFileAttributes?) -> Boolean =
-            { path, attr -> path?.let(::isSupportedImageFile) ?: false }
+            { path, _ -> path?.let(::isSupportedImageFile) ?: false }
     private val paths =
             Files.find(fileWalkRoot, Int.MAX_VALUE, matcher, arrayOf(FileVisitOption.FOLLOW_LINKS))
                     .collect(Collectors.toList<Path>())

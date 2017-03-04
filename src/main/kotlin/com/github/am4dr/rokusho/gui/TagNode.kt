@@ -18,7 +18,7 @@ import javafx.scene.paint.Color
 import javafx.scene.text.Font
 
 abstract class TagNode : Pane() {
-    open val onRemovedProperty: ObjectProperty<(TagNode) -> Unit> = SimpleObjectProperty({ it -> })
+    open val onRemovedProperty: ObjectProperty<(TagNode) -> Unit> = SimpleObjectProperty({ _ -> })
 }
 class TextTagNode(text: ObservableObjectValue<String>? = null) : TagNode() {
     constructor(text: String) : this(ReadOnlyObjectWrapper(text))
@@ -33,7 +33,7 @@ class TextTagNode(text: ObservableObjectValue<String>? = null) : TagNode() {
         background = Background(BackgroundFill(Color.BLACK, CornerRadii(2.0), null))
     }
     val textProperty: StringProperty = label.textProperty()
-    override val onRemovedProperty: ObjectProperty<(TagNode) -> Unit> = SimpleObjectProperty({ it -> })
+    override val onRemovedProperty: ObjectProperty<(TagNode) -> Unit> = SimpleObjectProperty({ _ -> })
 
     private val removeButton = Button(" × ").apply {
         padding = Insets(-1.0, 2.0, 0.0, 2.0)
