@@ -20,16 +20,22 @@ private fun isSupportedImageFile(path: Path) =
         Files.isRegularFile(path)
                 && imageFileNameMatcher.matches(path.fileName.toString())
 
-class ImageLibrary(path: Path) {
+typealias FileWalker = (Path) -> List<Path>
+class ImageLibrary(path: Path, val fileWalker: FileWalker = ImageLibrary.defaultFileWalker) {
+    companion object {
+        private val matcher: (Path?, BasicFileAttributes?) -> Boolean =
+                { path, _ -> path?.let(::isSupportedImageFile) ?: false }
+        val defaultFileWalker: FileWalker = { root ->
+            Files.find(root, Int.MAX_VALUE, matcher, arrayOf(FileVisitOption.FOLLOW_LINKS))
+                    .collect(Collectors.toList<Path>())
+        }
+
+    }
     private val library = DefaultLibraryFileLocator().locate(path)
     val savefilePath: Path = library.savefilePath
 
     val fileWalkRoot: Path = path
-    private val matcher: (Path?, BasicFileAttributes?) -> Boolean =
-            { path, _ -> path?.let(::isSupportedImageFile) ?: false }
-    private val paths =
-            Files.find(fileWalkRoot, Int.MAX_VALUE, matcher, arrayOf(FileVisitOption.FOLLOW_LINKS))
-                    .collect(Collectors.toList<Path>())
+    private val paths = fileWalker(fileWalkRoot)
 
     val baseTags: Map<String, ObservableTag>
     val images: Map<String, ImageItem>
