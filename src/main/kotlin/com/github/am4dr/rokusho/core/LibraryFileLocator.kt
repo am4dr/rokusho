@@ -6,8 +6,7 @@ import java.nio.file.Path
 
 interface LibraryFileLocator {
     companion object {
-        // TODO rokushoを入れた名前に変更
-        const val DEFAULT_SAVEFILE_NAME = "image_tag_info.yaml"
+        const val DEFAULT_SAVEFILE_NAME = "rokusho.yaml"
     }
     fun locate(path: Path): ParsedLibrary
 }
