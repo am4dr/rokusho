@@ -1,19 +1,13 @@
-package com.github.am4dr.image.tagger.core
+package com.github.am4dr.rokusho.core
 
-import com.github.am4dr.rokusho.core.SimpleTag
-import com.github.am4dr.rokusho.core.Tag
-import com.github.am4dr.rokusho.core.TagType
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.nio.file.Path
 import java.nio.file.Paths
 
-data class SaveFile(
-        val version: String,
-        val tags: Map<String, Tag>,
-        val metaData: Map<Path, ImageMetaData>) {
+class YamlSaveFileParser {
     companion object {
-        private val log = LoggerFactory.getLogger(SaveFile::class.java)
+        private val log = LoggerFactory.getLogger(YamlSaveFileParser::class.java)
         fun parse(string: String): SaveFile {
             val yaml = Yaml().load(string)
             if (yaml == null || yaml !is Map<*,*>) { throw IllegalSaveFormatException("top level of save file must be a Map") }
@@ -68,26 +62,5 @@ data class SaveFile(
                 SimpleTag(name, TagType.TEXT, ops)
             }
         }
-        const val pathSeparator: String = "/"
-        fun ImageMetaData.toDumpStructure(): Map<String, Any> =
-                mapOf("tags" to tags.map { it.id to it.data }.toMap())
     }
-    fun toTextFormat(): String =
-        Yaml().dump(toDumpStructure())
-    fun toDumpStructure(): Map<String, Any> =
-        mapOf(
-                "version" to version,
-                "tags" to tags.map {
-                    val name = it.key
-                    val info = it.value
-                    Pair(name, info.data)
-                }.toMap(),
-                "metaData" to metaData.map {
-                    val path = it.key.joinToString(pathSeparator)
-                    val data = it.value
-                    Pair(path, data.toDumpStructure())
-                }.toMap())
 }
-open class IllegalSaveFormatException(message: String = "") : RuntimeException(message)
-class VersionNotSpecifiedException(message: String = ""): IllegalSaveFormatException(message)
-
