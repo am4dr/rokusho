@@ -12,7 +12,7 @@ interface LibraryFileLocator {
     fun locate(path: Path): ParsedLibrary
 }
 class DefaultLibraryFileLocator : LibraryFileLocator {
-    private val parser = DefaultLibraryFileParser()
+    private val parser = YamlSaveFileParser()
     override fun locate(path: Path): ParsedLibrary {
         val real = path.toRealPath() ?: throw IllegalArgumentException("path $path must be exist")
         if (Files.isRegularFile(real)) return parser.parse(real)
