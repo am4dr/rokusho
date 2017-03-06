@@ -21,7 +21,7 @@ abstract class TagNode : Pane() {
     open val onRemovedProperty: ObjectProperty<(TagNode) -> Unit> = SimpleObjectProperty({ _ -> })
 }
 class TextTagNode(text: ObservableObjectValue<String>? = null) : TagNode() {
-    constructor(text: String) : this(ReadOnlyObjectWrapper(text))
+    constructor(text: String) : this(ReadOnlyObjectWrapper(text).readOnlyProperty)
     companion object {
         private val buttonBackground = Background(BackgroundFill(Color.rgb(60, 50, 50), CornerRadii(2.0), null))
         private val buttonBackgroundHovered = Background(BackgroundFill(Color.DARKRED, CornerRadii(2.0), null))

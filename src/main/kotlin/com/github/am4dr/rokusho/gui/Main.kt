@@ -7,6 +7,7 @@ import com.github.am4dr.rokusho.util.createEmptyListProperty
 import javafx.application.Application
 import javafx.beans.binding.ListBinding
 import javafx.beans.property.ReadOnlyListProperty
+import javafx.beans.property.ReadOnlyListWrapper
 import javafx.beans.property.ReadOnlyMapWrapper
 import javafx.collections.FXCollections.observableMap
 import javafx.collections.ObservableList
@@ -116,10 +117,10 @@ interface MainModel {
     fun getTagParser(item: ImageItem): TagStringParser
 }
 class DefaultMainModel : MainModel {
-    private val _libraries = createEmptyListProperty<ImageLibrary>()
-    override val libraries: ReadOnlyListProperty<ImageLibrary> = _libraries
-    private val _items = createEmptyListProperty<ImageItem>()
-    override val items: ObservableList<ImageItem> = _items
+    private val _libraries = ReadOnlyListWrapper(createEmptyListProperty<ImageLibrary>())
+    override val libraries: ReadOnlyListProperty<ImageLibrary> = _libraries.readOnlyProperty
+    private val _items = ReadOnlyListWrapper(createEmptyListProperty<ImageItem>())
+    override val items: ObservableList<ImageItem> = _items.readOnlyProperty
     private val itemToLibrary = mutableMapOf<ImageItem, ImageLibrary>()
     private val libToTagNodeFactory = mutableMapOf<ImageLibrary, TagNodeFactory>()
     private val libToTagParser = mutableMapOf<ImageLibrary, TagStringParser>()
