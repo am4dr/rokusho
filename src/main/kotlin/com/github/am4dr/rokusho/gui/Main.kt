@@ -3,12 +3,9 @@ package com.github.am4dr.rokusho.gui
 import com.github.am4dr.rokusho.app.*
 import com.github.am4dr.rokusho.gui.ThumbnailNode.Companion.thumbnailMaxHeight
 import com.github.am4dr.rokusho.gui.ThumbnailNode.Companion.thumbnailMaxWidth
-import com.github.am4dr.rokusho.util.createEmptyListProperty
 import javafx.application.Application
 import javafx.beans.binding.ListBinding
 import javafx.beans.property.ReadOnlyListProperty
-import javafx.beans.property.ReadOnlyMapWrapper
-import javafx.collections.FXCollections.observableMap
 import javafx.collections.ObservableList
 import javafx.collections.transformation.FilteredList
 import javafx.event.EventHandler
@@ -116,33 +113,22 @@ interface MainModel {
     fun getTagParser(item: ImageItem): TagStringParser
 }
 class DefaultMainModel : MainModel {
-    private val _libraries = createEmptyListProperty<ImageLibrary>()
-    override val libraries: ReadOnlyListProperty<ImageLibrary> = _libraries
-    private val _items = createEmptyListProperty<ImageItem>()
-    override val items: ObservableList<ImageItem> = _items
-    private val itemToLibrary = mutableMapOf<ImageItem, ImageLibrary>()
-    private val libToTagNodeFactory = mutableMapOf<ImageLibrary, TagNodeFactory>()
-    private val libToTagParser = mutableMapOf<ImageLibrary, TagStringParser>()
+    private val _libraries = ImageLibraryCollection()
+    override val libraries: ReadOnlyListProperty<ImageLibrary> = _libraries.librariesProperty
+    override val items: ObservableList<ImageItem> = _libraries.itemsProperty
     override fun addLibrary(path: Path) {
-        val lib = ImageLibrary(path)
-        // must set up these before updating observables
-        itemToLibrary.putAll(lib.images.values.map { Pair(it, lib) })
-        libToTagNodeFactory[lib] = TagNodeFactory(ReadOnlyMapWrapper(observableMap(lib.baseTags)))
-        libToTagParser[lib] = DefaultTagStringParser(lib.baseTags)
-        // update observables
-        _libraries.add(lib)
-        _items.addAll(lib.images.values)
+        _libraries.addDirectory(path)
     }
     override fun saveLibraries() {
         TODO() // TODO
     }
     override fun getLibrary(item: ImageItem): ImageLibrary {
-        return itemToLibrary[item] ?: throw IllegalStateException()
+        return item.library
     }
     override fun getTagNodeFactory(item: ImageItem): TagNodeFactory {
-        return itemToLibrary[item]?.let { libToTagNodeFactory[it] } ?: throw IllegalStateException()
+        return item.library.tagNodeFactory
     }
     override fun getTagParser(item: ImageItem): TagStringParser {
-        return itemToLibrary[item]?.let { libToTagParser[it] } ?: throw IllegalStateException()
+        return item.library.tagStringParser
     }
 }

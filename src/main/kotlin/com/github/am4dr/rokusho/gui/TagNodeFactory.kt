@@ -3,9 +3,9 @@ package com.github.am4dr.rokusho.gui
 import com.github.am4dr.rokusho.core.Tag
 import com.github.am4dr.rokusho.core.TagType
 import javafx.beans.binding.StringBinding
-import javafx.beans.property.MapProperty
+import javafx.beans.property.ReadOnlyMapProperty
 
-class TagNodeFactory(val prototypes: MapProperty<String, out Tag>) {
+class TagNodeFactory(val prototypes: ReadOnlyMapProperty<String, out Tag>) {
     fun createTagNode(tag: Tag): TagNode =
         TextTagNode(object : StringBinding() {
             init {

@@ -1,7 +1,6 @@
-package com.github.am4dr.image.tagger.app
+package com.github.am4dr.rokusho.app
 
-import com.github.am4dr.image.tagger.core.ImageMetaData
-import com.github.am4dr.rokusho.app.DefaultTagStringParser
+import com.github.am4dr.rokusho.core.ImageMetaData
 import com.github.am4dr.rokusho.core.Tag
 import javafx.beans.property.SimpleStringProperty
 import javafx.event.EventHandler

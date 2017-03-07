@@ -4,7 +4,7 @@ import java.nio.file.Path
 
 interface ParsedLibrary : Library {
     val savefilePath: Path
-    fun toLibraryItems(path: List<Path>): List<Pair<Path, LibraryItemMetaData>> {
+    fun toLibraryItems(path: Iterable<Path>): List<Pair<Path, LibraryItemMetaData>> {
         val m = getItemMetaData()
         return path.map {
             val id = toIdFormat(it)

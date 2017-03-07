@@ -1,19 +1,19 @@
-package com.github.am4dr.image.tagger.core;
+package com.github.am4dr.rokusho.core;
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.nio.file.Paths
 
-class SaveFileTest {
+class YamlSaveFileParserTest {
     @Test
     fun emptyStringTest() {
         assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
-            SaveFile.parse("")
+            YamlSaveFileParser.parse("")
         }
     }
     @Test
     fun versionOnlyTest() {
-        val save = SaveFile.parse("version: \"1\"")
+        val save = YamlSaveFileParser.parse("version: \"1\"")
         assertEquals("1", save.version)
         assertEquals(0, save.tags.size)
         assertEquals(0, save.metaData.size)
@@ -21,13 +21,13 @@ class SaveFileTest {
     @Test
     fun intVersionTest() {
         val res = assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
-            SaveFile.parse("version: 1")
+            YamlSaveFileParser.parse("version: 1")
         }
         assertNotEquals(res.javaClass, VersionNotSpecifiedException::class.java)
     }
     @Test
     fun nullTagsMetaDataTest() {
-        val save = SaveFile.parse("""
+        val save = YamlSaveFileParser.parse("""
             |version: "1"
             |tags: null
             |""".trimMargin())
@@ -35,7 +35,7 @@ class SaveFileTest {
     }
     @Test
     fun emptyTagsMetaDataTest() {
-        val save = SaveFile.parse("""
+        val save = YamlSaveFileParser.parse("""
             |version: "1"
             |tags: {}
             |""".trimMargin())
@@ -46,7 +46,7 @@ class SaveFileTest {
     @Test
     fun tagsMetaDataIsNotAMapTest() {
         assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
-            SaveFile.parse("""
+            YamlSaveFileParser.parse("""
             |version: "1"
             |tags: ["tagA", "tagB"]
             |""".trimMargin())
@@ -54,31 +54,31 @@ class SaveFileTest {
     }
     @Test
     fun singleTagsMetaDataTest() {
-        val save = SaveFile.parse("""
+        val save = YamlSaveFileParser.parse("""
             |version: "1"
             |tags: { tagA: {} }
             |""".trimMargin())
         assertEquals(1, save.tags.size)
         assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
-            SaveFile.parse("""
+            YamlSaveFileParser.parse("""
             |version: "1"
             |tags: { tagA: data }
             |""".trimMargin())
         }
         assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
-            SaveFile.parse("""
+            YamlSaveFileParser.parse("""
             |version: "1"
             |tags: { tagA: { key: null } }
             |""".trimMargin())
         }
         assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
-            SaveFile.parse("""
+            YamlSaveFileParser.parse("""
             |version: "1"
             |tags: { tagA: { type: 1 } }
             |""".trimMargin())
         }
         assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
-            SaveFile.parse("""
+            YamlSaveFileParser.parse("""
             |version: "1"
             |tags: { tagA: { null: value } }
             |""".trimMargin())
@@ -86,7 +86,7 @@ class SaveFileTest {
     }
     @Test
     fun tagsMetaDataTest() {
-        val save = SaveFile.parse("""
+        val save = YamlSaveFileParser.parse("""
             |version: "1"
             |tags: { tagA: {}, tagB: {}, tagC: {} }
             |""".trimMargin())
@@ -99,7 +99,7 @@ class SaveFileTest {
     }
     @Test
     fun emptyMetaDataTest() {
-        val save = SaveFile.parse("""
+        val save = YamlSaveFileParser.parse("""
             |version: "1"
             |metaData: {}
             |""".trimMargin())
@@ -107,7 +107,7 @@ class SaveFileTest {
     }
     @Test
     fun nullMetaDataTest() {
-        val save = SaveFile.parse("""
+        val save = YamlSaveFileParser.parse("""
             |version: "1"
             |metaData: null
             |""".trimMargin())
@@ -116,7 +116,7 @@ class SaveFileTest {
     @Test
     fun metaDataIsNotAMapTest() {
         assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
-            SaveFile.parse("""
+            YamlSaveFileParser.parse("""
             |version: "1"
             |metaData: data
             |""".trimMargin())
@@ -125,7 +125,7 @@ class SaveFileTest {
     @Test
     fun keyOfMetaDataMustBeString() {
         assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
-            SaveFile.parse("""
+            YamlSaveFileParser.parse("""
             |version: "1"
             |metaData: { null: {} }
             |""".trimMargin())
@@ -133,7 +133,7 @@ class SaveFileTest {
     }
     @Test
     fun emptyTagMetaDataTest() {
-        val save = SaveFile.parse("""
+        val save = YamlSaveFileParser.parse("""
             |version: "1"
             |metaData: { path/to/image: {} }
             |""".trimMargin())
@@ -142,7 +142,7 @@ class SaveFileTest {
     @Test
     fun tagsInMetaDataMustBeMap() {
         assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
-            SaveFile.parse("""
+            YamlSaveFileParser.parse("""
             |version: "1"
             |metaData: { path/to/image: [tagA] }
             |""".trimMargin())
@@ -150,7 +150,7 @@ class SaveFileTest {
     }
     @Test
     fun singleTagInMetaDataTest() {
-        val save = SaveFile.parse("""
+        val save = YamlSaveFileParser.parse("""
             |version: "1"
             |metaData: { path/to/image: { tags: { tagA: {}} } }
             |""".trimMargin())
@@ -158,7 +158,7 @@ class SaveFileTest {
         assert(save.metaData.containsKey(Paths.get("path/to/image")))
         assert(save.metaData[Paths.get("path/to/image")]!!.tags.first().id == "tagA")
 
-        val withOption = SaveFile.parse("""
+        val withOption = YamlSaveFileParser.parse("""
             |version: "1"
             |metaData: { path/to/image: { tags: { tagA: { option: value }} } }
             |""".trimMargin())
@@ -167,7 +167,7 @@ class SaveFileTest {
         assert(withOption.metaData[Paths.get("path/to/image")]!!.tags.first().id == "tagA")
 
         assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
-            SaveFile.parse("""
+            YamlSaveFileParser.parse("""
             |version: "1"
             |metaData: { path/to/image: { tags: { tagA: { opt: null } } } }
             |""".trimMargin())
@@ -175,12 +175,12 @@ class SaveFileTest {
     }
     @Test
     fun dumpAndParseTest() {
-        val original = SaveFile.parse("""
+        val original = YamlSaveFileParser.parse("""
             |version: "1"
             |tags: { tagA: { type: "selection" }, tagB: { type: "text" }, tagC: {} }
             |metaData: { path/to/image: { tags: { tagA: {}, tagB: null } } }
             |""".trimMargin())
-        val dumped = SaveFile.parse(original.toTextFormat())
+        val dumped = YamlSaveFileParser.parse(original.toTextFormat())
         assertEquals(original, dumped)
         println(original.toTextFormat())
     }

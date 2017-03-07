@@ -6,21 +6,15 @@ import java.nio.file.Path
 
 interface LibraryFileLocator {
     companion object {
-        // TODO rokushoを入れた名前に変更
-        const val DEFAULT_SAVEFILE_NAME = "image_tag_info.yaml"
+        const val DEFAULT_SAVEFILE_NAME = "rokusho.yaml"
     }
-    fun locate(path: Path): ParsedLibrary
+    fun locate(path: Path): Path
 }
 class DefaultLibraryFileLocator : LibraryFileLocator {
-    private val parser = DefaultLibraryFileParser()
-    override fun locate(path: Path): ParsedLibrary {
+    override fun locate(path: Path): Path {
         val real = path.toRealPath() ?: throw IllegalArgumentException("path $path must be exist")
-        if (Files.isRegularFile(real)) return parser.parse(real)
-        val location = recursiveLocate(real)
-        return if (location != null) parser.parse(location)
-        else {
-            SimpleParsedLibrary(path.resolve(DEFAULT_SAVEFILE_NAME))
-        }
+        if (Files.isRegularFile(real)) return real
+        return recursiveLocate(real) ?: path.resolve(DEFAULT_SAVEFILE_NAME)
     }
     private tailrec fun recursiveLocate(path: Path?): Path? {
         if (path == null) { return null }
