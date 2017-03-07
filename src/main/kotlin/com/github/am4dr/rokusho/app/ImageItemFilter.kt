@@ -21,7 +21,7 @@ class StringImageItemFilter : ImageItemFilter<String?> {
             override fun computeValue(): (ImageItem) -> Boolean = { item ->
                 val text = inputProperty.get()
                 if (text == null || text == "") { true }
-                else {item.tags.find { it.id.contains(text) } != null }
+                else { item.tags.find { it.id.contains(text) } != null }
             }
         })
     }

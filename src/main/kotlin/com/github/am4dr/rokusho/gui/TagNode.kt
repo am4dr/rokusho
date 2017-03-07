@@ -33,7 +33,7 @@ class TextTagNode(text: ObservableObjectValue<String>? = null) : TagNode() {
         background = Background(BackgroundFill(Color.BLACK, CornerRadii(2.0), null))
     }
     val textProperty: StringProperty = label.textProperty()
-    override val onRemovedProperty: ObjectProperty<(TagNode) -> Unit> = SimpleObjectProperty({ _ -> })
+    override val onRemovedProperty: ObjectProperty<(TagNode) -> Unit> = super.onRemovedProperty
 
     private val removeButton = Button(" × ").apply {
         padding = Insets(-1.0, 2.0, 0.0, 2.0)

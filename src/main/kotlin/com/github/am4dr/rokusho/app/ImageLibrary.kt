@@ -28,20 +28,18 @@ class ImageLibrary(path: Path) {
     }
     val savefilePath: Path = library.savefilePath
 
-    private val baseTags = ReadOnlyMapWrapper(library.getTags().map(::SimpleObservableTag).associateBy(Tag::id).toMutableMap().let(::observableMap))
+    private val baseTags = ReadOnlyMapWrapper(library.getTags().map(::SimpleObservableTag).associateByTo(mutableMapOf(), Tag::id).let(::observableMap))
     val baseTagsProperty: ReadOnlyMapProperty<String, out ObservableTag> = baseTags.readOnlyProperty
 
     val tagNodeFactory: TagNodeFactory = TagNodeFactory(baseTagsProperty)
     val tagStringParser: TagStringParser = DefaultTagStringParser(baseTagsProperty)
 
     fun toImageItem(paths: Iterable<Path>): List<ImageItem> = library.toLibraryItems(paths).map(this::toImageItem)
-    private fun toImageItem(pair: Pair<Path, LibraryItemMetaData>): ImageItem {
-        val (path, meta) = pair
-        return SimpleImageItem(this, library.toIdFormat(path), path.toUri().toURL(), meta.tags.map(this::toDerivedTag))
-    }
-    private fun toDerivedTag(tag: Tag): Tag {
-        return baseTagsProperty[tag.id]?.let { DerivedObservableTag(it, tag.data) } ?: tag
-    }
+    private fun toImageItem(path: Path, meta: LibraryItemMetaData): ImageItem =
+            SimpleImageItem(this, library.toIdFormat(path), path.toUri().toURL(), meta.tags.map(this::toDerivedTag))
+    private fun toImageItem(pair: Pair<Path, LibraryItemMetaData>): ImageItem =
+            toImageItem(pair.first, pair.second)
+    private fun toDerivedTag(tag: Tag): Tag = baseTagsProperty[tag.id]?.let { DerivedObservableTag(it, tag.data) } ?: tag
 }
 
 interface ImageItem : ObservableValue<ImageItem> {

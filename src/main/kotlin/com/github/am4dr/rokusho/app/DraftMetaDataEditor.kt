@@ -31,8 +31,7 @@ internal class DraftMetaDataEditor(val metaData: ImageMetaData, val image: Image
                             // TODO 変更がない場合は無効化
                             defaultButtonProperty().set(true)
                             onAction = EventHandler {
-                                val new = createImageMetaData()
-                                if (new != metaData) { onUpdate(new) }
+                                createImageMetaData().takeIf { it != metaData }?.let(onUpdate)
                             }
                         })
                 )
@@ -44,7 +43,7 @@ internal class DraftMetaDataEditor(val metaData: ImageMetaData, val image: Image
             tagsText.get()
                     .split(Regex("\\s*,\\s*"))
                     .filter(String::isNotBlank)
-                    .map { tagParser.parse(it) }
+                    .map(tagParser::parse)
                     .let(::ImageMetaData)
 }
 

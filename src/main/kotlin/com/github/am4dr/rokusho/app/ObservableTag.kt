@@ -26,7 +26,7 @@ class SimpleObservableTag(
 
     private val _id: ObservableStringValue = SimpleStringProperty(id)
     private val _type: ObservableObjectValue<TagType> = SimpleObjectProperty<TagType>(type)
-    private val _data: ObservableMap<String, Any> = observableMap(mutableMapOf<String, Any>().apply { putAll(data) })
+    private val _data: ObservableMap<String, Any> = observableMap(data.toMutableMap())
     override val id: String get() = _id.value
     override val type: TagType get() = _type.value
     override val data: Map<String, Any> = _data
@@ -44,15 +44,10 @@ class DerivedObservableTag(
         private val base: ObservableValue<Tag>,
         data: Map<String, Any> = mapOf()) : ObservableTag, ObjectBinding<Tag>() {
 
-    private val _data = observableMap(mutableMapOf<String, Any>().apply { putAll(data) })
+    private val _data = observableMap(data.toMutableMap())
     private val mergedData = object : MapBinding<String, Any>() {
         init { super.bind(base, _data) }
-        override fun computeValue(): ObservableMap<String, Any> {
-            return observableMap(mutableMapOf<String, Any>().apply {
-                putAll(base.value.data)
-                putAll(_data)
-            })
-        }
+        override fun computeValue(): ObservableMap<String, Any> = observableMap((base.value.data + _data).toMutableMap())
     }
     init { super.bind(mergedData) }
     override fun computeValue(): Tag = this

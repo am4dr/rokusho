@@ -67,13 +67,11 @@ class Main : Application() {
         val listNode = ListNode(filteredItems)
         val imageLoader = UrlImageLoader()
         val thumbnailFactory: (ImageItem) -> Thumbnail = { item ->
-            val tagNodeFactory = model.getTagNodeFactory(item)
-            val tagParser = model.getTagParser(item)
             Thumbnail(
                     imageLoader.getImage(item.url, thumbnailMaxWidth, thumbnailMaxHeight, true),
                     item.tags,
-                    { tagParser.parse(it) },
-                    { tagNodeFactory.createTagNode(it) })
+                    model.getTagParser(item)::parse,
+                    model.getTagNodeFactory(item)::createTagNode)
         }
         val thumbnailNode =
                 ThumbnailNode(model.items, filter.filterProperty, thumbnailFactory, imageLoader)
@@ -91,8 +89,7 @@ class Main : Application() {
             initialDirectory = model.libraries.lastOrNull()?.let {
                 it.savefilePath.parent.toFile()
             }
-            val selected = showDialog(window)?.toPath()
-            if (selected != null) { model.addLibrary(selected) }
+            showDialog(window)?.toPath()?.let(model::addLibrary)
         }
     }
     private fun makeDirectorySelectorPane(window: Window): Pane {
@@ -116,19 +113,11 @@ class DefaultMainModel : MainModel {
     private val _libraries = ImageLibraryCollection()
     override val libraries: ReadOnlyListProperty<ImageLibrary> = _libraries.librariesProperty
     override val items: ObservableList<ImageItem> = _libraries.itemsProperty
-    override fun addLibrary(path: Path) {
-        _libraries.addDirectory(path)
-    }
+    override fun addLibrary(path: Path) = _libraries.addDirectory(path)
     override fun saveLibraries() {
         TODO() // TODO
     }
-    override fun getLibrary(item: ImageItem): ImageLibrary {
-        return item.library
-    }
-    override fun getTagNodeFactory(item: ImageItem): TagNodeFactory {
-        return item.library.tagNodeFactory
-    }
-    override fun getTagParser(item: ImageItem): TagStringParser {
-        return item.library.tagStringParser
-    }
+    override fun getLibrary(item: ImageItem): ImageLibrary  = item.library
+    override fun getTagNodeFactory(item: ImageItem): TagNodeFactory = item.library.tagNodeFactory
+    override fun getTagParser(item: ImageItem): TagStringParser = item.library.tagStringParser
 }
