@@ -16,27 +16,10 @@ class ImageLibraryCollection {
     private val items = ReadOnlyListWrapper(observableList(mutableListOf<ImageItem>()))
     val itemsProperty: ReadOnlyListProperty<ImageItem> = items.readOnlyProperty
 
-    private val roots get() = libraries.map(ImageLibrary::fileWalkRoot)
-
-    private val fileWalker: FileWalker = this::listImages
-    private fun listImages(root: Path): List<Path> {
-        val queue = mutableListOf(root)
-        val paths = mutableListOf<Path>()
-        while (queue.isNotEmpty()) {
-            Files.list(queue.first()).forEach { path ->
-                if (Files.isDirectory(path)) {
-                    if (roots.none(path::startsWith)) { queue.add(path) }
-                }
-                else if (isSupportedImageFile(path)) { paths.add(path) }
-            }
-            queue.remove(queue.first())
-        }
-        return paths
-    }
     fun addDirectory(path: Path, depth: Int = Int.MAX_VALUE) {
         if (!Files.isDirectory(path)) return
         if (managedDirectories.contains(path)) return
-        val lib = findLibraryContains(path) ?: (ImageLibrary(path, fileWalker).also { libraries.add(it) })
+        val lib = findLibraryContains(path) ?: (ImageLibrary(path).also { libraries.add(it) })
         val paths = mutableListOf<Path>()
         val dirs = mutableListOf<Path>()
         Files.list(path).forEach {
