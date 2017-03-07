@@ -19,7 +19,7 @@ class ImageLibraryCollection {
     fun addDirectory(path: Path, depth: Int = Int.MAX_VALUE) {
         if (!Files.isDirectory(path)) return
         if (managedDirectories.contains(path)) return
-        val lib = findLibraryContains(path) ?: (ImageLibrary(path).also { libraries.add(it) })
+        val lib = findLibrary(path) ?: (ImageLibrary(path).also { libraries.add(it) })
         val paths = mutableListOf<Path>()
         val dirs = mutableListOf<Path>()
         Files.list(path).forEach {
@@ -30,8 +30,8 @@ class ImageLibraryCollection {
         items.addAll(lib.toImageItem(paths))
         if (depth > 1) { dirs.forEach { addDirectory(it, depth - 1) } }
     }
-    fun findLibraryContains(path: Path): ImageLibrary? {
+    fun findLibrary(path: Path): ImageLibrary? {
         val savefilePath = DefaultLibraryFileLocator().locate(path)
-        return libraries.find { it.savefilePath == savefilePath }
+        return libraries.filter { savefilePath.startsWith(it.savefilePath.parent) }.maxBy { it.savefilePath.toString().length }
     }
 }
