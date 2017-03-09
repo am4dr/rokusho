@@ -1,8 +1,6 @@
 package com.github.am4dr.rokusho.gui
 
 import com.github.am4dr.rokusho.app.*
-import com.github.am4dr.rokusho.core.ImageMetaData
-import com.github.am4dr.rokusho.core.SaveFile
 import com.github.am4dr.rokusho.gui.ThumbnailNode.Companion.thumbnailMaxHeight
 import com.github.am4dr.rokusho.gui.ThumbnailNode.Companion.thumbnailMaxWidth
 import javafx.application.Application
@@ -117,13 +115,7 @@ class DefaultMainModel : MainModel {
     override val libraries: ReadOnlyListProperty<ImageLibrary> = _libraries.librariesProperty
     override val items: ObservableList<ImageItem> = _libraries.itemsProperty
     override fun addLibrary(path: Path) = _libraries.addDirectory(path)
-    override fun saveLibraries() {
-        items.groupBy(ImageItem::library).forEach { lib, items ->
-            val metaDataList = items.map { Pair(Paths.get(it.id), ImageMetaData(it.tags)) }.toMap()
-            val savefile = SaveFile("1", lib.baseTagsProperty.get(), metaDataList)
-            lib.save(savefile.toTextFormat())
-        }
-    }
+    override fun saveLibraries() = items.groupBy(ImageItem::library).forEach(ImageLibrary::save)
     override fun getLibrary(item: ImageItem): ImageLibrary  = item.library
     override fun getTagNodeFactory(item: ImageItem): TagNodeFactory = item.library.tagNodeFactory
     override fun getTagParser(item: ImageItem): TagStringParser = item.library.tagStringParser

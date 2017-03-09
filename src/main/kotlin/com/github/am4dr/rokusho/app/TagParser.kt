@@ -13,3 +13,11 @@ class DefaultTagStringParser(val base: Map<String, ObservableTag> = mapOf()) : T
                 ?: SimpleObservableTag(string, TagType.TEXT, mapOf("value" to string))
     }
 }
+class BaseUpdatingTagStringParser(
+        val base: Map<String, ObservableTag> = mutableMapOf(),
+        private val addToBase: (ObservableTag) -> ObservableTag) : TagStringParser {
+    override fun parse(string: String): ObservableTag {
+        val baseTag = base[string] ?: addToBase(SimpleObservableTag(string, TagType.TEXT, mapOf("value" to string)))
+        return DerivedObservableTag(baseTag, mapOf())
+    }
+}
