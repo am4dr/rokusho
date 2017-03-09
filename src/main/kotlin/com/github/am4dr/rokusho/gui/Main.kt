@@ -78,6 +78,7 @@ class Main : Application() {
         val mainScene =
                 MainScene(
                         ImageFiler({ selectLibraryDirectory(stage) },
+                                { model.saveLibraries() },
                                 filterInputNode, listNode, thumbnailNode),
                         makeDirectorySelectorPane(stage))
         mainScene.librariesNotSelectedProperty.bind(model.libraries.emptyProperty())
@@ -114,9 +115,7 @@ class DefaultMainModel : MainModel {
     override val libraries: ReadOnlyListProperty<ImageLibrary> = _libraries.librariesProperty
     override val items: ObservableList<ImageItem> = _libraries.itemsProperty
     override fun addLibrary(path: Path) = _libraries.addDirectory(path)
-    override fun saveLibraries() {
-        TODO() // TODO
-    }
+    override fun saveLibraries() = items.groupBy(ImageItem::library).forEach(ImageLibrary::save)
     override fun getLibrary(item: ImageItem): ImageLibrary  = item.library
     override fun getTagNodeFactory(item: ImageItem): TagNodeFactory = item.library.tagNodeFactory
     override fun getTagParser(item: ImageItem): TagStringParser = item.library.tagStringParser

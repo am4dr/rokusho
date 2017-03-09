@@ -9,14 +9,17 @@ import javafx.beans.value.ObservableValue
 import javafx.collections.FXCollections.observableList
 import javafx.collections.FXCollections.observableMap
 import javafx.collections.ObservableList
+import org.slf4j.LoggerFactory
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.Paths
 import java.nio.file.attribute.BasicFileAttributes
 
 
 class ImageLibrary(path: Path) {
     companion object {
+        private val log = LoggerFactory.getLogger(ImageLibrary::class.java)
         private val imageFileNameMatcher = Regex(".*\\.(bmp|gif|jpe?g|png)$", RegexOption.IGNORE_CASE)
         fun isSupportedImageFile(path: Path) =
                 Files.isRegularFile(path) && imageFileNameMatcher.matches(path.fileName.toString())
@@ -28,12 +31,26 @@ class ImageLibrary(path: Path) {
     }
     val savefilePath: Path = library.savefilePath
 
-    private val baseTags = ReadOnlyMapWrapper(library.getTags().map(::SimpleObservableTag).associateByTo(mutableMapOf(), Tag::id).let(::observableMap))
-    val baseTagsProperty: ReadOnlyMapProperty<String, out ObservableTag> = baseTags.readOnlyProperty
+    private val baseTags = ReadOnlyMapWrapper(library.getTags().map(::SimpleObservableTag).associateByTo(mutableMapOf<String, ObservableTag>(), Tag::id).let(::observableMap))
+    val baseTagsProperty: ReadOnlyMapProperty<String, ObservableTag> = baseTags.readOnlyProperty
 
     val tagNodeFactory: TagNodeFactory = TagNodeFactory(baseTagsProperty)
-    val tagStringParser: TagStringParser = DefaultTagStringParser(baseTagsProperty)
+    val tagStringParser: TagStringParser = BaseUpdatingTagStringParser(baseTagsProperty, { it.also { baseTags[it.id] = it } })
 
+    fun save(items: Iterable<ImageItem>) {
+        val metaDataList = items.map { Pair(Paths.get(it.id), ImageMetaData(it.tags.map(DerivedObservableTag.Companion::extractDerivedPart))) }.toMap()
+        val savefile = SaveFile("1", baseTagsProperty.get(), metaDataList)
+        save(savefile.toTextFormat())
+    }
+    private fun save(string: String) {
+        if (!Files.exists(savefilePath)) {
+            log.info("$savefilePath is not exists; create it")
+            Files.createFile(savefilePath)
+        }
+        log.info("save to $savefilePath")
+        savefilePath.toFile().writeText(string)
+        log.info("wrote to $savefilePath (size=${string.length})")
+    }
     fun toImageItem(paths: Iterable<Path>): List<ImageItem> = library.toLibraryItems(paths).map(this::toImageItem)
     private fun toImageItem(path: Path, meta: LibraryItemMetaData): ImageItem =
             SimpleImageItem(this, library.toIdFormat(path), path.toUri().toURL(), meta.tags.map(this::toDerivedTag))

@@ -1,5 +1,6 @@
 package com.github.am4dr.rokusho.app
 
+import com.github.am4dr.rokusho.core.SimpleTag
 import com.github.am4dr.rokusho.core.Tag
 import com.github.am4dr.rokusho.core.TagType
 import javafx.beans.binding.MapBinding
@@ -43,7 +44,11 @@ class SimpleObservableTag(
 class DerivedObservableTag(
         private val base: ObservableValue<Tag>,
         data: Map<String, Any> = mapOf()) : ObservableTag, ObjectBinding<Tag>() {
-
+    companion object {
+        fun extractDerivedPart(tag: Tag): Tag =
+                if (tag is DerivedObservableTag) SimpleTag(tag.id, tag.type, tag.ownData.toMutableMap())
+                else tag
+    }
     private val _data = observableMap(data.toMutableMap())
     private val mergedData = object : MapBinding<String, Any>() {
         init { super.bind(base, _data) }
@@ -55,6 +60,7 @@ class DerivedObservableTag(
     override val id: String get() = base.value.id
     override val type: TagType get() = base.value.type
     override val data: Map<String, Any> get() = mergedData
+    val ownData: Map<String, Any> get() = _data.toMap()
 
     override fun putAllData(data: Map<String, Any>) { _data.putAll(data) }
     override fun putData(key: String, value: Any) { _data.put(key, value) }

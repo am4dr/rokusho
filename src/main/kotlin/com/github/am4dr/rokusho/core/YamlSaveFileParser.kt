@@ -59,7 +59,8 @@ class YamlSaveFileParser : LibraryFileParser {
                 }
                 @Suppress("UNCHECKED_CAST")
                 ops as Map<String, Any>
-                SimpleTag(name, TagType.TEXT, ops)
+                val type = ops["type"].let { if (it is String) TagType.from(it) else TagType.TEXT }
+                SimpleTag(name, type, ops)
             }
         }
     }
