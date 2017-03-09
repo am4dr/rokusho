@@ -5,9 +5,10 @@ import com.github.am4dr.rokusho.gui.TagNodeFactory
 import javafx.beans.binding.ObjectBinding
 import javafx.beans.property.ReadOnlyMapProperty
 import javafx.beans.property.ReadOnlyMapWrapper
+import javafx.beans.property.ReadOnlySetProperty
+import javafx.beans.property.ReadOnlySetWrapper
 import javafx.beans.value.ObservableValue
-import javafx.collections.FXCollections.observableList
-import javafx.collections.FXCollections.observableMap
+import javafx.collections.FXCollections.*
 import javafx.collections.ObservableList
 import org.slf4j.LoggerFactory
 import java.net.URL
@@ -37,10 +38,21 @@ class ImageLibrary(path: Path) {
     val tagNodeFactory: TagNodeFactory = TagNodeFactory(baseTagsProperty)
     val tagStringParser: TagStringParser = BaseUpdatingTagStringParser(baseTagsProperty, { it.also { baseTags[it.id] = it } })
 
-    fun save(items: Iterable<ImageItem>) {
+    private val images = ReadOnlySetWrapper(observableSet(mutableSetOf<ImageItem>()))
+    val imagesProperty: ReadOnlySetProperty<ImageItem> = images.readOnlyProperty
+
+    fun addPaths(paths: Iterable<Path>) = addItems(toImageItem(paths))
+    fun addItems(items: Iterable<ImageItem>) {
+        val managedByOthers = items.filter { it.library != this }
+        if (managedByOthers.isNotEmpty()) throw IllegalArgumentException("the passed items are managed by another library: $managedByOthers")
+        images.addAll(items)
+    }
+
+    fun save(items: Iterable<ImageItem> = images) = save(toSaveString(items))
+    fun toSaveString(items: Iterable<ImageItem> = images): String {
         val metaDataList = items.map { Pair(Paths.get(it.id), ImageMetaData(it.tags.map(DerivedObservableTag.Companion::extractDerivedPart))) }.toMap()
         val savefile = SaveFile("1", baseTagsProperty.get(), metaDataList)
-        save(savefile.toTextFormat())
+        return savefile.toTextFormat()
     }
     private fun save(string: String) {
         if (!Files.exists(savefilePath)) {

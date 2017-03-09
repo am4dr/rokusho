@@ -115,7 +115,7 @@ class DefaultMainModel : MainModel {
     override val libraries: ReadOnlyListProperty<ImageLibrary> = _libraries.librariesProperty
     override val items: ObservableList<ImageItem> = _libraries.itemsProperty
     override fun addLibrary(path: Path) = _libraries.addDirectory(path)
-    override fun saveLibraries() = items.groupBy(ImageItem::library).forEach(ImageLibrary::save)
+    override fun saveLibraries() = libraries.forEach { it.save() }
     override fun getLibrary(item: ImageItem): ImageLibrary  = item.library
     override fun getTagNodeFactory(item: ImageItem): TagNodeFactory = item.library.tagNodeFactory
     override fun getTagParser(item: ImageItem): TagStringParser = item.library.tagStringParser

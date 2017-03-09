@@ -13,6 +13,7 @@ class ImageLibraryCollection {
     private val libraries: ReadOnlyListWrapper<ImageLibrary> = ReadOnlyListWrapper(createEmptyListProperty<ImageLibrary>())
     val librariesProperty: ReadOnlyListProperty<ImageLibrary> = libraries.readOnlyProperty
     private val managedDirectories: MutableSet<Path> = mutableSetOf()
+    // TOOD use bindings of libraries.imagesProperty
     private val items = ReadOnlyListWrapper(observableList(mutableListOf<ImageItem>()))
     val itemsProperty: ReadOnlyListProperty<ImageItem> = items.readOnlyProperty
 
@@ -27,7 +28,10 @@ class ImageLibraryCollection {
             else if (isSupportedImageFile(it)) paths.add(it)
         }
         managedDirectories.add(path)
-        items.addAll(lib.toImageItem(paths))
+        lib.toImageItem(paths).let {
+            items.addAll(it)
+            lib.addItems(it)
+        }
         if (depth > 1) { dirs.forEach { addDirectory(it, depth - 1) } }
     }
     fun findLibrary(path: Path): ImageLibrary? {
