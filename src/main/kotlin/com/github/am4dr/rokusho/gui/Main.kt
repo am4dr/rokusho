@@ -1,6 +1,8 @@
 package com.github.am4dr.rokusho.gui
 
 import com.github.am4dr.rokusho.app.*
+import com.github.am4dr.rokusho.core.ImageMetaData
+import com.github.am4dr.rokusho.core.SaveFile
 import com.github.am4dr.rokusho.gui.ThumbnailNode.Companion.thumbnailMaxHeight
 import com.github.am4dr.rokusho.gui.ThumbnailNode.Companion.thumbnailMaxWidth
 import javafx.application.Application
@@ -78,6 +80,7 @@ class Main : Application() {
         val mainScene =
                 MainScene(
                         ImageFiler({ selectLibraryDirectory(stage) },
+                                { model.saveLibraries() },
                                 filterInputNode, listNode, thumbnailNode),
                         makeDirectorySelectorPane(stage))
         mainScene.librariesNotSelectedProperty.bind(model.libraries.emptyProperty())
@@ -115,7 +118,11 @@ class DefaultMainModel : MainModel {
     override val items: ObservableList<ImageItem> = _libraries.itemsProperty
     override fun addLibrary(path: Path) = _libraries.addDirectory(path)
     override fun saveLibraries() {
-        TODO() // TODO
+        items.groupBy(ImageItem::library).forEach { lib, items ->
+            val metaDataList = items.map { Pair(Paths.get(it.id), ImageMetaData(it.tags)) }.toMap()
+            val savefile = SaveFile("1", lib.baseTagsProperty.get(), metaDataList)
+            lib.save(savefile.toTextFormat())
+        }
     }
     override fun getLibrary(item: ImageItem): ImageLibrary  = item.library
     override fun getTagNodeFactory(item: ImageItem): TagNodeFactory = item.library.tagNodeFactory
