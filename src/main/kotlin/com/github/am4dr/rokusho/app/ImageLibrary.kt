@@ -41,7 +41,7 @@ class ImageLibrary(path: Path) {
     private val images = ReadOnlySetWrapper(observableSet(mutableSetOf<ImageItem>()))
     val imagesProperty: ReadOnlySetProperty<ImageItem> = images.readOnlyProperty
 
-    fun addPaths(paths: Iterable<Path>) = addItems(toImageItem(paths))
+    fun addItemsByPaths(paths: Iterable<Path>) = addItems(toImageItem(paths))
     fun addItems(items: Iterable<ImageItem>) {
         val managedByOthers = items.filter { it.library != this }
         if (managedByOthers.isNotEmpty()) throw IllegalArgumentException("the passed items are managed by another library: $managedByOthers")
