@@ -11,8 +11,6 @@ import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 
 class ImageFiler(
-        onAddLibraryClicked: () -> Unit,
-        onSaveClicked: () -> Unit,
         filterInputNode: Node,
         listNode: ListNode,
         thumbnailNode: ThumbnailNode) : VBox() {
@@ -24,9 +22,6 @@ class ImageFiler(
     init {
         children.addAll(
                 HBox(
-                        Label("[仮実装]"),
-                        Button("保存").apply { setOnAction { onSaveClicked() } },
-                        Button("追加").apply { setOnAction { onAddLibraryClicked() } },
                         Button("リスト").apply { setOnAction {
                             selectedView.set(listNode)
                             listNode.refresh()

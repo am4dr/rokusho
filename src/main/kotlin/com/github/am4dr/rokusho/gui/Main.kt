@@ -77,9 +77,9 @@ class Main : Application() {
                 ThumbnailNode(model.items, filter.filterProperty, thumbnailFactory, imageLoader)
         val mainScene =
                 MainScene(
-                        ImageFiler({ selectLibraryDirectory(stage) },
-                                { model.saveLibraries() },
-                                filterInputNode, listNode, thumbnailNode),
+                        { selectLibraryDirectory(stage) },
+                        { model.saveLibraries() },
+                        ImageFiler(filterInputNode, listNode, thumbnailNode),
                         makeDirectorySelectorPane(stage))
         mainScene.librariesNotSelectedProperty.bind(model.libraries.emptyProperty())
         return mainScene
