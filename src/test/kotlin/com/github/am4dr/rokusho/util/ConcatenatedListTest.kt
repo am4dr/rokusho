@@ -1,8 +1,8 @@
 package com.github.am4dr.rokusho.util
 
 import javafx.beans.property.SimpleListProperty
-import javafx.collections.FXCollections.emptyObservableList
-import javafx.collections.FXCollections.observableList
+import javafx.collections.FXCollections
+import javafx.collections.FXCollections.*
 import javafx.collections.ObservableList
 import org.junit.jupiter.api.Assertions.assertIterableEquals
 import org.junit.jupiter.api.BeforeEach
@@ -103,6 +103,18 @@ class ConcatenatedListTest {
             assertIterableEquals(listOf(1,2,3,10,20,30,100,200,300), concat)
             mid.clear()
             assertIterableEquals(listOf(1,2,3,100,200,300), concat)
+        }
+    }
+    @Nested
+    class FXCollectionsConcat {
+        @Test
+        fun fxConcatIsNotBoundedToOriginalLists() {
+            val expected = listOf(1,2,3,10,20,30,100,200,300)
+            val mid = observableList(mutableListOf(10,20,30))
+            val concat = FXCollections.concat(observableArrayList(1,2,3), mid, observableArrayList(100,200,300))
+            assertIterableEquals(expected, concat, "before the mid cleared")
+            mid.clear()
+            assertIterableEquals(expected, concat, "after the mid cleared")
         }
     }
 }
