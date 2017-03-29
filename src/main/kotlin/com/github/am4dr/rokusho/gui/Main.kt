@@ -4,7 +4,7 @@ import com.github.am4dr.rokusho.app.*
 import com.github.am4dr.rokusho.gui.ThumbnailNode.Companion.thumbnailMaxHeight
 import com.github.am4dr.rokusho.gui.ThumbnailNode.Companion.thumbnailMaxWidth
 import javafx.application.Application
-import javafx.beans.binding.Bindings.bindContent
+import javafx.beans.binding.Bindings.bindContentBidirectional
 import javafx.beans.binding.ListBinding
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.collections.ObservableList
@@ -73,7 +73,7 @@ class Main : Application() {
                     item.tags,
                     model.getTagParser(item)::parse,
                     model.getTagNodeFactory(item)::createTagNode).apply {
-                bindContent(item.tags, tags)
+                bindContentBidirectional(item.tags, tags)
             }
         }
         val thumbnailNode =
