@@ -44,9 +44,7 @@ class ThumbnailNode(
                     managedProperty()
                             .and(layoutYProperty().greaterThanOrEqualTo(screenTop))
                             .and(layoutYProperty().lessThanOrEqualTo(screenBottom)))
-            managedProperty().bind(
-                    imageProperty.get().widthProperty().isNotEqualTo(0)     // image is loaded
-                            .and(filterPassedProperty))
+            managedProperty().bind(imageLoadedProperty.and(filterPassedProperty))
         }
     }
     private val overlay: ImageOverlay = ImageOverlay().apply {

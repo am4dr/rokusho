@@ -22,7 +22,10 @@ class Thumbnail(
         initialTags: List<Tag>,
         private val tagParser: (String) -> Tag,
         private val tagNodeFactory: (Tag) -> TagNode) : StackPane() {
-    val imageProperty: ObjectProperty<Image> = SimpleObjectProperty(image)
+    val imageProperty: ReadOnlyObjectProperty<Image> = ReadOnlyObjectWrapper(image).readOnlyProperty
+    val imageLoadedProperty: ReadOnlyBooleanProperty = SimpleBooleanProperty(false).apply {
+        bind(image.widthProperty().isNotEqualTo(0).and(image.heightProperty().isNotEqualTo(0)))
+    }
     val tags: ObservableList<Tag> = observableArrayList(initialTags)
     private val tagNodes = TransformedList(this.tags) { tag ->
         tagNodeFactory(tag).apply { onRemovedProperty.set({ this@Thumbnail.tags.remove(tag) }) }
