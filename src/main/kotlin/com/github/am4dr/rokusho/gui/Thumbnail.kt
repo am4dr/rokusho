@@ -4,10 +4,9 @@ import com.github.am4dr.rokusho.core.Tag
 import com.github.am4dr.rokusho.util.ConcatenatedList
 import com.github.am4dr.rokusho.util.TransformedList
 import javafx.beans.binding.Bindings
-import javafx.beans.property.ObjectProperty
-import javafx.beans.property.ReadOnlyBooleanProperty
-import javafx.beans.property.ReadOnlyObjectWrapper
+import javafx.beans.property.*
 import javafx.collections.FXCollections
+import javafx.collections.FXCollections.observableArrayList
 import javafx.collections.ObservableList
 import javafx.event.EventHandler
 import javafx.geometry.Insets
@@ -19,13 +18,14 @@ import javafx.scene.paint.Color
 import javafx.scene.text.Font
 
 class Thumbnail(
-        private val image: Image,
-        private val tags: ObservableList<Tag>,
+        image: Image,
+        initialTags: List<Tag>,
         private val tagParser: (String) -> Tag,
         private val tagNodeFactory: (Tag) -> TagNode) : StackPane() {
-    val imageProperty: ObjectProperty<Image> = ReadOnlyObjectWrapper(image)
-    private val tagNodes = TransformedList(tags) { tag ->
-        tagNodeFactory(tag).apply { onRemovedProperty.set({ tags.remove(tag) }) }
+    val imageProperty: ObjectProperty<Image> = SimpleObjectProperty(image)
+    val tags: ObservableList<Tag> = observableArrayList(initialTags)
+    private val tagNodes = TransformedList(this.tags) { tag ->
+        tagNodeFactory(tag).apply { onRemovedProperty.set({ this@Thumbnail.tags.remove(tag) }) }
     }
     private val tagInput = FittingTextField().apply {
         font = Font(14.0)
@@ -38,7 +38,7 @@ class Thumbnail(
         }
         onAction = EventHandler {
             when (text) { null, "" -> return@EventHandler }
-            tags.add(tagParser(text))
+            this@Thumbnail.tags.add(tagParser(text))
             text = ""
         }
     }
