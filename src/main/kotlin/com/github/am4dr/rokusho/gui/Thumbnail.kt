@@ -44,7 +44,6 @@ class Thumbnail(
             text = ""
         }
     }
-    val tagInputFocusedProperty: ReadOnlyBooleanProperty = tagInput.focusedProperty()
     private val addTagButton = Button(" + ").apply {
         textFill = Color.rgb(200, 200, 200)
         padding = Insets(-1.0, 2.0, 0.0, 2.0)
@@ -63,7 +62,7 @@ class Thumbnail(
             padding = Insets(10.0)
             background = Background(BackgroundFill(Color.rgb(0, 0, 0, 0.5), null, null))
             Bindings.bindContent(children, ConcatenatedList(tagNodes, FXCollections.observableList(listOf(tagInput, addTagButton))))
-            visibleProperty().bind(this@Thumbnail.hoverProperty().or(tagInputFocusedProperty))
+            visibleProperty().bind(this@Thumbnail.hoverProperty().or(tagInput.focusedProperty()))
         }
         children.setAll(imageView, overlay)
     }
