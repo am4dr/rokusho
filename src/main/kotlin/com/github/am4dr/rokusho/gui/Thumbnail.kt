@@ -18,11 +18,10 @@ import javafx.scene.paint.Color
 import javafx.scene.text.Font
 
 class Thumbnail(
-        image: Image,
+        val image: Image,
         initialTags: List<Tag>,
         private val tagParser: (String) -> Tag,
         private val tagNodeFactory: (Tag) -> TagNode) : StackPane() {
-    val imageProperty: ReadOnlyObjectProperty<Image> = ReadOnlyObjectWrapper(image).readOnlyProperty
     val imageLoadedProperty: ReadOnlyBooleanProperty = SimpleBooleanProperty(false).apply {
         bind(image.widthProperty().isNotEqualTo(0).and(image.heightProperty().isNotEqualTo(0)))
     }
@@ -57,8 +56,8 @@ class Thumbnail(
         }
     }
     init {
-        maxWidthProperty().bind(imageProperty.get().widthProperty())
-        maxHeightProperty().bind(imageProperty.get().heightProperty())
+        maxWidthProperty().bind(image.widthProperty())
+        maxHeightProperty().bind(image.heightProperty())
         val imageView = ImageView(image)
         val overlay = FlowPane(7.5, 5.0).apply {
             padding = Insets(10.0)
