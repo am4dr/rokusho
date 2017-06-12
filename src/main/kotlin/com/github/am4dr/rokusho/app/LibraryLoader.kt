@@ -9,9 +9,6 @@ import java.nio.file.Path
 import java.util.stream.Collectors
 
 class LibraryLoader {
-    companion object {
-        private const val SAVEFILE_NAME = "rokusho.yaml"
-    }
     private data class LoadedLibrary(val library: Library<ImageUrl>, val path: Path, val depth: Int)
 
     private val loadedLibraries: List<LoadedLibrary> = mutableListOf()
@@ -25,9 +22,9 @@ class LibraryLoader {
 
     private fun findLibrary(directory: Path): LoadedLibrary? =
             loadedLibraries.find { Files.isSameFile(it.path, directory) }?.let { return it }
-
+    // TODO SaveFileLoaderにうつすか
     private fun locateSaveFilePath(directory: Path): Path? =
-            directory.resolve(SAVEFILE_NAME).takeIf { Files.exists(it) }
+            directory.resolve(SaveFileLoader.SAVEFILE_NAME).takeIf { Files.exists(it) }
                     ?: directory.parent?.let { locateSaveFilePath(it) }
 
     private fun loadSaveFile(savefile: Path, depth: Int): LoadedLibrary =

@@ -1,11 +1,11 @@
-package com.github.am4dr.rokusho.core
+package com.github.am4dr.rokusho.app.savefile
 
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.nio.file.Path
 import java.nio.file.Paths
 
-class YamlSaveFileParser : LibraryFileParser {
+class YamlSaveFileParser : SaveFileParser {
     companion object {
         private val log = LoggerFactory.getLogger(YamlSaveFileParser::class.java)
         fun parse(string: String): SaveFile {
@@ -65,10 +65,5 @@ class YamlSaveFileParser : LibraryFileParser {
         }
     }
 
-    override fun parse(path: Path): ParsedLibrary {
-        val s = YamlSaveFileParser.parse(path.toFile().readText())
-        val tags = s.tags.map { e: Map.Entry<String, Tag> -> SimpleTag(e.key, e.value.type, e.value.data) }
-        val items = s.metaData.map { e -> SimpleLibraryItemMetaData(e.key.joinToString("/"), e.value.tags) }
-        return SimpleParsedLibrary(path, SimpleLibrary(tags, items))
-    }
+    override fun parse(path: Path): SaveFile = parse(path.toFile().readText())
 }

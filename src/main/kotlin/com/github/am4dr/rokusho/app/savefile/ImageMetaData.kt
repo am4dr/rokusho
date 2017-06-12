@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.core
+package com.github.am4dr.rokusho.app.savefile
 
 data class ImageMetaData(val tags: List<Tag> = listOf()) {
     // Dump method of SnakeYAML converts same objects into a YAML anchor and references.

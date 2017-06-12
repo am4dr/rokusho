@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.core
+package com.github.am4dr.rokusho.app.savefile
 
 interface Tag {
     val id: String

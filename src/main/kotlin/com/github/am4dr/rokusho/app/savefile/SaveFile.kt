@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.core
+package com.github.am4dr.rokusho.app.savefile
 
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
