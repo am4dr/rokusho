@@ -7,9 +7,15 @@ import com.github.am4dr.rokusho.core.library.Library
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyListWrapper
 import javafx.collections.FXCollections.observableArrayList
+import java.nio.file.Files
 import java.nio.file.Path
 
 class Rokusho {
+    companion object {
+        val imageFileNameMatcher = Regex(".*\\.(bmp|gif|jpe?g|png)$", RegexOption.IGNORE_CASE)
+        fun isSupportedImageFile(path: Path) =
+                Files.isRegularFile(path) && imageFileNameMatcher.matches(path.fileName.toString())
+    }
     private val libraryLoader = LibraryLoader()
 
     private val _libraries = observableArrayList<Library<ImageUrl>>()

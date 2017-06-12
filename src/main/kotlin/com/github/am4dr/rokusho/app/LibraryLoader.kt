@@ -38,7 +38,7 @@ class LibraryLoader {
 
     private fun collectImageUrls(directory: Path, depth: Int): List<ImageUrl> =
             Files.walk(directory, depth)
-                    .filter(ImageLibrary.Companion::isSupportedImageFile)
+                    .filter(Rokusho.Companion::isSupportedImageFile)
                     .map { ImageUrl(it.toUri().toURL()) }
                     .collect(Collectors.toList())
 }
