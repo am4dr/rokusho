@@ -5,8 +5,11 @@ import com.github.am4dr.rokusho.util.ConcatenatedList
 import com.github.am4dr.rokusho.util.TransformedList
 import javafx.beans.binding.Bindings
 import javafx.beans.property.ReadOnlyBooleanProperty
+import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections
+import javafx.collections.FXCollections.observableArrayList
 import javafx.collections.ObservableList
 import javafx.event.EventHandler
 import javafx.geometry.Insets
@@ -17,7 +20,6 @@ import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.scene.text.Font
 
-// TODO 続けてタグを入力するときに入力を終了するまで外部に変更を通知しないようにする
 class Thumbnail(
         val image: Image,
         initialTags: List<ItemTag>,
@@ -27,11 +29,16 @@ class Thumbnail(
     val imageLoadedProperty: ReadOnlyBooleanProperty = SimpleBooleanProperty(false).apply {
         bind(image.widthProperty().isNotEqualTo(0).and(image.heightProperty().isNotEqualTo(0)))
     }
-    val inputModeProperty: ReadOnlyBooleanProperty
 
-    val tags: ObservableList<ItemTag> = FXCollections.observableArrayList(initialTags)
-    private val tagNodes = TransformedList(this.tags) { tag ->
-        tagNodeFactory(tag).apply { onRemovedProperty.set({ this@Thumbnail.tags.remove(tag) }) }
+    private val _tags: ObservableList<ItemTag> = observableArrayList(initialTags)
+    val tags: ReadOnlyListProperty<ItemTag> = SimpleListProperty(observableArrayList(initialTags))
+    private fun syncTags() = tags.setAll(_tags)
+
+    private val tagNodes = TransformedList(_tags) { tag ->
+        tagNodeFactory(tag).apply { onRemovedProperty.set({
+            this@Thumbnail._tags.remove(tag)
+            syncTags()
+        }) }
     }
     private val tagInput = FittingTextField().apply {
         font = Font(14.0)
@@ -40,11 +47,14 @@ class Thumbnail(
         visibleProperty().set(false)
         managedProperty().bind(visibleProperty())
         focusedProperty().addListener { _, _, new ->
-            if (new == false) { visibleProperty().set(false) }
+            if (new == false) {
+                visibleProperty().set(false)
+                syncTags()
+            }
         }
         onAction = EventHandler {
             when (text) { null, "" -> return@EventHandler }
-            this@Thumbnail.tags.add(tagParser(text))
+            this@Thumbnail._tags.add(tagParser(text))
             text = ""
         }
     }
@@ -59,9 +69,6 @@ class Thumbnail(
         }
     }
     init {
-        inputModeProperty = SimpleBooleanProperty().apply {
-            bind(tagInput.focusedProperty())
-        }
         maxWidthProperty().bind(image.widthProperty())
         maxHeightProperty().bind(image.heightProperty())
         val imageView = ImageView(image)

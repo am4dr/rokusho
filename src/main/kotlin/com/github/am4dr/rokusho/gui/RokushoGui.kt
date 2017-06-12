@@ -90,14 +90,8 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
         val thumbnails = TransformedList(items) { item ->
             val image = imageLoader.getImage(item.value.url, 500.0, 200.0, true)
 
-            var oldTags = item.itemTags.toSet()
             Thumbnail(image, item.itemTags, parser, tagNodeFactory).apply {
-                inputModeProperty.addListener({ _, _, isInputMode ->
-                    if (!isInputMode && (tags.size != oldTags.size || !oldTags.containsAll(tags))) {
-                        oldTags = tags.toSet()
-                        rokusho.updateItemTags(item, tags)
-                    }
-                })
+                tags.addListener({ _, _, new -> rokusho.updateItemTags(item, new) })
                 onMouseClicked = EventHandler {
                     overlay.imageProperty.value = imageLoader.getImage(item.value.url)
                     overlay.isVisible = true
