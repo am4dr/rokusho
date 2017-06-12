@@ -1,7 +1,6 @@
 package com.github.am4dr.rokusho.gui2
 
 import com.github.am4dr.rokusho.app.Rokusho
-import com.github.am4dr.rokusho.gui.Main
 import javafx.application.Application
 import javafx.scene.Scene
 import javafx.stage.Stage
@@ -18,7 +17,7 @@ class Launcher : Application() {
     private val rokusho = Rokusho()
 
     companion object {
-        private val log = LoggerFactory.getLogger(Main::class.java)
+        private val log = LoggerFactory.getLogger(Launcher::class.java)
     }
 
     override fun init() {
