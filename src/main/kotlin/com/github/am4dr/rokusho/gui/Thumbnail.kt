@@ -1,10 +1,13 @@
 package com.github.am4dr.rokusho.gui
 
-import com.github.am4dr.rokusho.core.Tag
+import com.github.am4dr.rokusho.core.library.ItemTag
 import com.github.am4dr.rokusho.util.ConcatenatedList
 import com.github.am4dr.rokusho.util.TransformedList
 import javafx.beans.binding.Bindings
-import javafx.beans.property.*
+import javafx.beans.property.ReadOnlyBooleanProperty
+import javafx.beans.property.ReadOnlyListProperty
+import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections
 import javafx.collections.FXCollections.observableArrayList
 import javafx.collections.ObservableList
@@ -19,15 +22,23 @@ import javafx.scene.text.Font
 
 class Thumbnail(
         val image: Image,
-        initialTags: List<Tag>,
-        private val tagParser: (String) -> Tag,
-        private val tagNodeFactory: (Tag) -> TagNode) : StackPane() {
+        initialTags: List<ItemTag>,
+        private val tagParser: (String) -> ItemTag,
+        private val tagNodeFactory: (ItemTag) -> TagNode) : StackPane() {
+
     val imageLoadedProperty: ReadOnlyBooleanProperty = SimpleBooleanProperty(false).apply {
         bind(image.widthProperty().isNotEqualTo(0).and(image.heightProperty().isNotEqualTo(0)))
     }
-    val tags: ObservableList<Tag> = observableArrayList(initialTags)
-    private val tagNodes = TransformedList(this.tags) { tag ->
-        tagNodeFactory(tag).apply { onRemovedProperty.set({ this@Thumbnail.tags.remove(tag) }) }
+
+    private val _tags: ObservableList<ItemTag> = observableArrayList(initialTags)
+    val tags: ReadOnlyListProperty<ItemTag> = SimpleListProperty(observableArrayList(initialTags))
+    private fun syncTags() = tags.setAll(_tags)
+
+    private val tagNodes = TransformedList(_tags) { tag ->
+        tagNodeFactory(tag).apply { onRemovedProperty.set({
+            this@Thumbnail._tags.remove(tag)
+            syncTags()
+        }) }
     }
     private val tagInput = FittingTextField().apply {
         font = Font(14.0)
@@ -36,11 +47,14 @@ class Thumbnail(
         visibleProperty().set(false)
         managedProperty().bind(visibleProperty())
         focusedProperty().addListener { _, _, new ->
-            if (new == false) { visibleProperty().set(false) }
+            if (new == false) {
+                visibleProperty().set(false)
+                syncTags()
+            }
         }
         onAction = EventHandler {
             when (text) { null, "" -> return@EventHandler }
-            this@Thumbnail.tags.add(tagParser(text))
+            this@Thumbnail._tags.add(tagParser(text))
             text = ""
         }
     }

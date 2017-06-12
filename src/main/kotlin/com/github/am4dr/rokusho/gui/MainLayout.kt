@@ -9,22 +9,16 @@ import javafx.scene.control.Label
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
 
-class MainScene(
-        onAddLibraryClicked: () -> Unit,
-        onSaveClicked: () -> Unit,
-        val filer: ImageFiler, val directorySelectorPane: Node) : BorderPane() {
+class MainLayout(saveButton: Button, addLibraryButton: Button, filerLayout: FilerLayout, directorySelectorPane: Node) : BorderPane() {
     val librariesNotSelectedProperty: BooleanProperty = SimpleBooleanProperty(true)
     init {
         centerProperty().bind(
                 When(librariesNotSelectedProperty)
                         .then<Node>(directorySelectorPane)
-                        .otherwise(filer))
+                        .otherwise(filerLayout))
         top = HBox(
                 Label("[仮実装]"),
-                Button("保存").apply {
-                    setOnAction { onSaveClicked() }
-                    disableProperty().bind(librariesNotSelectedProperty)
-                },
-                Button("追加").apply { setOnAction { onAddLibraryClicked() } })
+                saveButton.apply { disableProperty().bind(librariesNotSelectedProperty) },
+                addLibraryButton)
     }
 }

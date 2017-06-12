@@ -10,10 +10,9 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 
-class ImageFiler(
-        filterInputNode: Node,
-        listNode: ListNode,
-        thumbnailNode: ThumbnailNode) : VBox() {
+class FilerLayout(filterInputNode: Node,
+                  listNode: Node,
+                  thumbnailNode: Node) : VBox() {
     private val selectedView = SimpleObjectProperty<Node>().apply { set(thumbnailNode) }
     private val currentNode: Node = BorderPane().apply {
         VBox.setVgrow(this, Priority.ALWAYS)
@@ -24,10 +23,9 @@ class ImageFiler(
                 HBox(
                         Button("リスト").apply { setOnAction {
                             selectedView.set(listNode)
-                            listNode.refresh()
                         } },
                         Button("サムネイル").apply { setOnAction { selectedView.set(thumbnailNode) } },
-                        Label("フィルター", filterInputNode).apply { contentDisplay = ContentDisplay.RIGHT}),
+                        Label("フィルター", filterInputNode).apply { contentDisplay = ContentDisplay.RIGHT }),
                 currentNode)
     }
 }
