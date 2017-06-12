@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.gui2
+package com.github.am4dr.rokusho.gui
 
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.Node
@@ -25,7 +25,7 @@ class FilerLayout(filterInputNode: Node,
                             selectedView.set(listNode)
                         } },
                         Button("サムネイル").apply { setOnAction { selectedView.set(thumbnailNode) } },
-                        Label("フィルター", filterInputNode).apply { contentDisplay = ContentDisplay.RIGHT}),
+                        Label("フィルター", filterInputNode).apply { contentDisplay = ContentDisplay.RIGHT }),
                 currentNode)
     }
 }

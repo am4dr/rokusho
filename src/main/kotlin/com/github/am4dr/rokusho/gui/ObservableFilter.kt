@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.gui2
+package com.github.am4dr.rokusho.gui
 
 import javafx.beans.binding.ObjectBinding
 import javafx.beans.property.ObjectProperty

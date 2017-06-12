@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.gui2
+package com.github.am4dr.rokusho.gui
 
 import javafx.beans.binding.When
 import javafx.beans.property.BooleanProperty

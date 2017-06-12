@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.gui2
+package com.github.am4dr.rokusho.gui
 
 import com.github.am4dr.rokusho.util.TransformedList
 import javafx.beans.binding.Bindings
@@ -17,7 +17,7 @@ import javafx.scene.layout.FlowPane
 
 class ThumbnailLayout(
         initialThumbnails: List<Thumbnail> = listOf(),
-        filter: ObservableObjectValue<(Thumbnail)->Boolean> = ReadOnlyObjectWrapper({ _ -> true })) : ScrollPane() {
+        filter: ObservableObjectValue<(Thumbnail) -> Boolean> = ReadOnlyObjectWrapper({ _ -> true })) : ScrollPane() {
 
     private val vValueHeightProperty = SimpleDoubleProperty()
     private val margin = SimpleDoubleProperty(2000.0)
@@ -39,7 +39,7 @@ class ThumbnailLayout(
     }
     init {
         fitToWidthProperty().set(true)
-        hbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
+        hbarPolicy = ScrollBarPolicy.NEVER
         content = FlowPane(10.0, 10.0).apply {
             padding = Insets(25.0, 0.0, 25.0, 0.0)
             alignment = Pos.CENTER

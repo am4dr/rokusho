@@ -1,8 +1,6 @@
-package com.github.am4dr.rokusho.gui2
+package com.github.am4dr.rokusho.gui
 
 import com.github.am4dr.rokusho.core.library.ItemTag
-import com.github.am4dr.rokusho.gui.FittingTextField
-import com.github.am4dr.rokusho.gui.TagNode
 import com.github.am4dr.rokusho.util.ConcatenatedList
 import com.github.am4dr.rokusho.util.TransformedList
 import javafx.beans.binding.Bindings

@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.gui2
+package com.github.am4dr.rokusho.gui
 
 import com.github.am4dr.rokusho.app.Rokusho
 import javafx.application.Application

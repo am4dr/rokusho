@@ -1,13 +1,10 @@
-package com.github.am4dr.rokusho.gui2
+package com.github.am4dr.rokusho.gui
 
 import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.Rokusho
 import com.github.am4dr.rokusho.core.library.Item
 import com.github.am4dr.rokusho.core.library.ItemSet
 import com.github.am4dr.rokusho.core.library.ItemTag
-import com.github.am4dr.rokusho.gui.ImageOverlay
-import com.github.am4dr.rokusho.gui.TextTagNode
-import com.github.am4dr.rokusho.gui.UrlImageLoader
 import com.github.am4dr.rokusho.util.ConcatenatedList
 import com.github.am4dr.rokusho.util.TransformedList
 import javafx.beans.binding.Bindings
