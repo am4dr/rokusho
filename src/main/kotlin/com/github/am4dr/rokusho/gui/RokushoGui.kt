@@ -9,6 +9,7 @@ import com.github.am4dr.rokusho.util.ConcatenatedList
 import com.github.am4dr.rokusho.util.TransformedList
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.Bindings.createObjectBinding
+import javafx.beans.binding.Bindings.size
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.value.ObservableObjectValue
 import javafx.collections.ListChangeListener
@@ -73,7 +74,7 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
             }
         }
         thumbnailFilter.inputProperty.bind(filterInput.textProperty())
-        return FilerLayout(filterInput, listNode, createThumbnailNode(items, thumbnailFilter.filterProperty))
+        return FilerLayout(filterInput, listNode, createThumbnailNode(items, thumbnailFilter.filterProperty), Bindings.size(items), Bindings.size(filteredItems))
     }
     // TODO ThumbnailNode クラスに切り出し
     private fun createThumbnailNode(items: ObservableList<Item<ImageUrl>>, filter: ObservableObjectValue<(Thumbnail) -> Boolean>): Node {

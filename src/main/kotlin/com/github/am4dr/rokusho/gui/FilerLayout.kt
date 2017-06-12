@@ -1,6 +1,8 @@
 package com.github.am4dr.rokusho.gui
 
+import javafx.beans.binding.Bindings
 import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.value.ObservableIntegerValue
 import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.ContentDisplay
@@ -12,7 +14,9 @@ import javafx.scene.layout.VBox
 
 class FilerLayout(filterInputNode: Node,
                   listNode: Node,
-                  thumbnailNode: Node) : VBox() {
+                  thumbnailNode: Node,
+                  totalCount: ObservableIntegerValue,
+                  filteredCount: ObservableIntegerValue) : VBox() {
     private val selectedView = SimpleObjectProperty<Node>().apply { set(thumbnailNode) }
     private val currentNode: Node = BorderPane().apply {
         VBox.setVgrow(this, Priority.ALWAYS)
@@ -25,7 +29,9 @@ class FilerLayout(filterInputNode: Node,
                             selectedView.set(listNode)
                         } },
                         Button("サムネイル").apply { setOnAction { selectedView.set(thumbnailNode) } },
-                        Label("フィルター", filterInputNode).apply { contentDisplay = ContentDisplay.RIGHT }),
+                        Label("フィルター", filterInputNode).apply { contentDisplay = ContentDisplay.RIGHT },
+                        Label().apply { textProperty().bind(Bindings.concat("[", filteredCount,  " / ", totalCount, "]")) }
+                ),
                 currentNode)
     }
 }
