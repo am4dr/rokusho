@@ -1,13 +1,14 @@
-package com.github.am4dr.rokusho.gui
+package com.github.am4dr.rokusho.gui2
 
-import com.github.am4dr.rokusho.core.Tag
+import com.github.am4dr.rokusho.core.library.ItemTag
+import com.github.am4dr.rokusho.gui.FittingTextField
+import com.github.am4dr.rokusho.gui.TagNode
 import com.github.am4dr.rokusho.util.ConcatenatedList
 import com.github.am4dr.rokusho.util.TransformedList
 import javafx.beans.binding.Bindings
 import javafx.beans.property.ReadOnlyBooleanProperty
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.collections.FXCollections
-import javafx.collections.FXCollections.observableArrayList
 import javafx.collections.ObservableList
 import javafx.event.EventHandler
 import javafx.geometry.Insets
@@ -18,15 +19,19 @@ import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.scene.text.Font
 
+// TODO 続けてタグを入力するときに入力を終了するまで外部に変更を通知しないようにする
 class Thumbnail(
         val image: Image,
-        initialTags: List<Tag>,
-        private val tagParser: (String) -> Tag,
-        private val tagNodeFactory: (Tag) -> TagNode) : StackPane() {
+        initialTags: List<ItemTag>,
+        private val tagParser: (String) -> ItemTag,
+        private val tagNodeFactory: (ItemTag) -> TagNode) : StackPane() {
+
     val imageLoadedProperty: ReadOnlyBooleanProperty = SimpleBooleanProperty(false).apply {
         bind(image.widthProperty().isNotEqualTo(0).and(image.heightProperty().isNotEqualTo(0)))
     }
-    val tags: ObservableList<Tag> = observableArrayList(initialTags)
+    val inputModeProperty: ReadOnlyBooleanProperty
+
+    val tags: ObservableList<ItemTag> = FXCollections.observableArrayList(initialTags)
     private val tagNodes = TransformedList(this.tags) { tag ->
         tagNodeFactory(tag).apply { onRemovedProperty.set({ this@Thumbnail.tags.remove(tag) }) }
     }
@@ -56,6 +61,9 @@ class Thumbnail(
         }
     }
     init {
+        inputModeProperty = SimpleBooleanProperty().apply {
+            bind(tagInput.focusedProperty())
+        }
         maxWidthProperty().bind(image.widthProperty())
         maxHeightProperty().bind(image.heightProperty())
         val imageView = ImageView(image)

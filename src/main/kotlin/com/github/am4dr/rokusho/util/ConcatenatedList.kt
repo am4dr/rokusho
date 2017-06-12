@@ -5,7 +5,7 @@ import javafx.collections.FXCollections.observableArrayList
 import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
 
-class ConcatenatedList<T>(vararg lists: ObservableList<out T> = arrayOf()) : ObservableList<T> by ReadOnlyListWrapper(observableArrayList()) {
+class ConcatenatedList<T>(vararg lists: ObservableList<out T> = arrayOf()) : ObservableList<T> by ReadOnlyListWrapper(observableArrayList<T>()) {
     private val lists: MutableList<ObservableList<out T>> = lists.toMutableList()
     init {
         lists.forEachIndexed { index, list ->
