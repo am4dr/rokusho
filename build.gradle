@@ -21,7 +21,7 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-mainClassName = 'com.github.am4dr.rokusho.gui.MainKt'
+mainClassName = 'com.github.am4dr.rokusho.gui.Launcher'
 
 repositories {
     jcenter()
