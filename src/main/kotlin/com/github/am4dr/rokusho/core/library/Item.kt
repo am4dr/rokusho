@@ -5,4 +5,4 @@ package com.github.am4dr.rokusho.core.library
  *
  * [Library]がそれに付与している[ItemTag]のリストを持つ。
  */
-data class Item<out T>(val value: T, val itemTags: List<ItemTag>)
+data class Item<out T>(val key: T, val itemTags: List<ItemTag>)

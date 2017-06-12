@@ -37,6 +37,6 @@ class Rokusho {
 
     fun updateItemTags(item: Item<ImageUrl>, itemTags: List<ItemTag>) {
         val itemSet = _itemSets.find { it.items.contains(item) } ?: return
-        itemSet.library.updateItemTags(item.value, itemTags)
+        itemSet.library.updateItemTags(item.key, itemTags)
     }
 }

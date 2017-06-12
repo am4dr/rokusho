@@ -13,31 +13,33 @@ class DefaultLibrary<T>(
         private val tags: MutableList<Tag> = mutableListOf(),
         private val itemTagDB: ItemTagDB<T> = SimpleItemTagDB()) : Library<T> {
 
-    private val items = observableHashMap<T, Item<T>>()
+    private val itemCache = observableHashMap<T, Item<T>>()
+    private fun cacheItem(item: Item<T>) {
+        itemCache[item.key] = item
+    }
 
     override fun getItemSet(list: Iterable<T>): ItemSet<T> {
-        val itemSet = DefaultLibraryItemSet(this, list.mapTo(observableArrayList(), this::getOrCreateItemOf))
-        items.addListener(WeakMapChangeListener(itemSet))
+        val itemSet = DefaultLibraryItemSet(this, list.mapTo(observableArrayList(), this::getOrCreateEmptyItemOf))
+        itemCache.addListener(WeakMapChangeListener(itemSet))
         return itemSet
     }
 
-    override fun getItemOf(value: T): Item<T>?          = items[value]
-    override fun getOrCreateItemOf(value: T): Item<T>   = getItemOf(value) ?: (Item(value, itemTagDB.get(value)).also { addItem(it) })
-    override fun addItem(item: Item<T>): Boolean        = updateItem(item).let { true }
-    override fun removeItem(item: Item<T>): Boolean     = items.remove(item.value, item)
-
-    private  fun updateItem(item: Item<T>) {
-        updateItemTags(item.value, item.itemTags)
+    private  fun createItem(key: T, tags: Iterable<ItemTag>): Item<T>? = Item(key, tags.toList()).apply(this::cacheItem)
+    override fun getItem(key: T): Item<T>?                  = itemCache[key] ?: itemTagDB.get(key).takeIf { it.isNotEmpty() }?.let { createItem(key, it) }
+    override fun getOrCreateEmptyItemOf(key: T): Item<T>    = getItem(key) ?: createItem(key, listOf())!!
+    override fun addItem(key: T, tags: Iterable<ItemTag>)   = updateItemTags(key, tags)
+    override fun removeItem(key: T) {
+        itemTagDB.remove(key)
+        itemCache.remove(key)
     }
-
-    override fun updateItemTags(itemValue: T, itemTags: List<ItemTag>) {
-        itemTagDB.set(itemValue, itemTags)
-        items.put(itemValue, Item(itemValue, itemTags))
+    override fun updateItemTags(key: T, tags: Iterable<ItemTag>) {
+        itemTagDB.set(key, tags.toList())
+        createItem(key, tags.toList())
     }
 }
 class DefaultLibraryItemSet<T>(override val library: Library<T>, target: ObservableList<Item<T>>) : ItemSet<T>, MapChangeListener<T, Item<T>> {
 
-    private val values = target.map(Item<T>::value)
+    private val values = target.map(Item<T>::key)
     private val _items = observableArrayList(target)
     override val items: ReadOnlyListProperty<Item<T>> = ReadOnlyListWrapper(_items).readOnlyProperty
 
