@@ -10,7 +10,6 @@ import com.github.am4dr.rokusho.util.ConcatenatedList
 import com.github.am4dr.rokusho.util.TransformedList
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.Bindings.createObjectBinding
-import javafx.beans.binding.Bindings.size
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.value.ObservableObjectValue
 import javafx.collections.ListChangeListener
