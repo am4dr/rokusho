@@ -5,6 +5,7 @@ import com.github.am4dr.rokusho.app.Rokusho
 import com.github.am4dr.rokusho.core.library.Item
 import com.github.am4dr.rokusho.core.library.ItemSet
 import com.github.am4dr.rokusho.core.library.ItemTag
+import com.github.am4dr.rokusho.core.library.Library
 import com.github.am4dr.rokusho.util.ConcatenatedList
 import com.github.am4dr.rokusho.util.TransformedList
 import javafx.beans.binding.Bindings
@@ -85,11 +86,16 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
         }
         val layout = ThumbnailLayout(listOf(), filter)
         val imageLoader = UrlImageLoader()
-        // TODO Libraryの内容を反映するようなparserとtagNodeFactoryを実装する
+        // TODO Libraryの内容を反映するようなparserを実装する
         val parser = { text: String -> ItemTag(text, text) }
-        val tagNodeFactory = { tag: ItemTag -> TextTagNode(tag.name) }
+        val defaultTagNodeFactory = { tag: ItemTag -> TextTagNode(tag.name) }
+        val libToTagNodeFactory = mutableMapOf<Library<ImageUrl>, TagNodeFactory>()
         val thumbnails = TransformedList(items) { item ->
             val image = imageLoader.getImage(item.key.url, 500.0, 200.0, true)
+
+            val tagNodeFactory = rokusho.itemSets.find { it.items.contains(item) }?.let {
+                libToTagNodeFactory.getOrPut(it.library, { TagNodeFactory(it.library.getTags()) })::createTagNode
+            } ?: defaultTagNodeFactory
 
             Thumbnail(image, item.itemTags, parser, tagNodeFactory).apply {
                 tags.addListener({ _, _, new -> rokusho.updateItemTags(item, new) })
