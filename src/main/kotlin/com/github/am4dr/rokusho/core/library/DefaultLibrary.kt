@@ -3,6 +3,8 @@ package com.github.am4dr.rokusho.core.library
 import com.github.am4dr.rokusho.app.savefile.Tag
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyListWrapper
+import javafx.beans.property.ReadOnlyMapProperty
+import javafx.beans.property.ReadOnlyMapWrapper
 import javafx.collections.FXCollections.observableArrayList
 import javafx.collections.FXCollections.observableHashMap
 import javafx.collections.MapChangeListener
@@ -10,8 +12,13 @@ import javafx.collections.ObservableList
 import javafx.collections.WeakMapChangeListener
 
 class DefaultLibrary<T>(
-        private val tags: MutableList<Tag> = mutableListOf(),
+        tags: MutableList<Tag> = mutableListOf(),
         private val itemTagDB: ItemTagDB<T> = SimpleItemTagDB()) : Library<T> {
+
+    private val _tags = ReadOnlyMapWrapper<String, Tag>(observableHashMap()).apply {
+        tags.map { it.id to it }.toMap(this)
+    }
+    override fun getTags(): ReadOnlyMapProperty<String, Tag> = _tags.readOnlyProperty
 
     private val watchedItems = observableHashMap<T, Item<T>>()
     private fun watchIfNotWatched(item: Item<T>) {
