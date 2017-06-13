@@ -19,32 +19,22 @@ class DefaultLibrary<T>(
     }
 
     override fun getItemSet(list: Iterable<T>): ItemSet<T> {
-        val items = list.mapTo(observableArrayList(), this::getOrCreateEmptyItemOf)
+        val items = list.mapTo(observableArrayList(), this::getItem)
         items.forEach(this::watchIfNotWatched)
         val itemSet = DefaultLibraryItemSet(this, items)
         watchedItems.addListener(WeakMapChangeListener(itemSet))
         return itemSet
     }
+
+    override fun getItem(key: T): Item<T> = watchedItems[key] ?: Item(key, itemTagDB.get(key))
+
+    override fun updateItemTags(key: T, tags: Iterable<ItemTag>) {
+        updateItem(Item(key, tags.toList()))
+    }
     private fun updateItem(item: Item<T>) {
         itemTagDB.set(item.key, item.itemTags)
         watchedItems[item.key]?.takeIf { it != item }
                 ?.let{ watchedItems[item.key] = item }
-    }
-
-    override fun getItem(key: T): Item<T>?                  = watchedItems[key] ?: itemTagDB.get(key).takeIf { it.isNotEmpty() }?.let { Item(key, it) }
-    override fun getOrCreateEmptyItemOf(key: T): Item<T>    = getItem(key) ?: Item(key, listOf())
-    // TODO どう実装すべきか、あるいは削除するべきか
-    override fun addItem(key: T, tags: Iterable<ItemTag>) {
-        throw NotImplementedError()
-        updateItemTags(key, tags)
-    }
-    override fun removeItem(key: T) {
-        throw NotImplementedError()
-        itemTagDB.remove(key)
-        watchedItems.remove(key)
-    }
-    override fun updateItemTags(key: T, tags: Iterable<ItemTag>) {
-        updateItem(Item(key, tags.toList()))
     }
 }
 class DefaultLibraryItemSet<T>(override val library: Library<T>, target: ObservableList<Item<T>>) : ItemSet<T>, MapChangeListener<T, Item<T>> {
