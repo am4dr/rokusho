@@ -26,6 +26,7 @@ class ThumbnailLayout(
     val thumbnails: ListProperty<Thumbnail> = SimpleListProperty(observableArrayList(initialThumbnails))
     private val configuredThumbnails: ObservableList<Thumbnail> = TransformedList(thumbnails) { th ->
         th.apply {
+            layoutY = -500.0
             val filterPassedProperty = object : BooleanBinding() {
                 init { super.bind(filter) }
                 override fun computeValue(): Boolean = filter.value.invoke(this@apply)
