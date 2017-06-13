@@ -1,6 +1,5 @@
 package com.github.am4dr.rokusho.core.library
 
-import com.github.am4dr.rokusho.app.savefile.Tag
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyListWrapper
 import javafx.beans.property.ReadOnlyMapProperty

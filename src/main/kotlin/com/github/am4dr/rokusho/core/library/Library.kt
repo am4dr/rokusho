@@ -1,6 +1,5 @@
 package com.github.am4dr.rokusho.core.library
 
-import com.github.am4dr.rokusho.app.savefile.Tag    // TODO パッケージ再編 app.savefile.Tag をここで参照したくない
 import javafx.beans.property.ReadOnlyMapProperty
 
 /**

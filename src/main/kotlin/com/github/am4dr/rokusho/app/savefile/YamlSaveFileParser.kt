@@ -1,5 +1,8 @@
 package com.github.am4dr.rokusho.app.savefile
 
+import com.github.am4dr.rokusho.core.library.SimpleTag
+import com.github.am4dr.rokusho.core.library.Tag
+import com.github.am4dr.rokusho.core.library.TagType
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.nio.file.Path
