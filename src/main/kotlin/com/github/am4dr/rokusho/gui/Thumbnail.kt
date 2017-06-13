@@ -16,6 +16,8 @@ import javafx.geometry.Insets
 import javafx.scene.control.Button
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
+import javafx.scene.input.KeyCode
+import javafx.scene.input.KeyEvent
 import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.scene.text.Font
@@ -52,8 +54,20 @@ class Thumbnail(
                 syncTags()
             }
         }
+        setOnKeyReleased {
+            if (it.code == KeyCode.ESCAPE) {
+                text = ""
+                it.consume()
+                this@Thumbnail.requestFocus()
+            }
+        }
         onAction = EventHandler {
-            when (text) { null, "" -> return@EventHandler }
+            when (text) {
+                null, "" -> {
+                    this@Thumbnail.requestFocus()
+                    return@EventHandler
+                }
+            }
             this@Thumbnail._tags.add(tagParser(text))
             text = ""
         }
