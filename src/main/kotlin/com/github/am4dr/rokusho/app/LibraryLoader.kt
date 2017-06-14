@@ -8,41 +8,61 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.util.stream.Collectors
 
+// TODO test
 class LibraryLoader {
-    private data class LoadedLibrary (val library: Library<ImageUrl>, val libraryRoot: Path, val savefileDir: Path)
 
     private val savefileLoader = SaveFileLoader()
     private val loadedLibraries: MutableList<LoadedLibrary> = mutableListOf()
 
-    // TODO test
-    fun loadDirectory(directory: Path): Library<ImageUrl> {
-        val loadedLibrary = findLibrary(directory)
-        val savefileLocation = savefileLoader.locateSaveFilePath(directory)?.normalize()
-
-        if (loadedLibrary == null && savefileLocation == null) return createLibrary(directory).library
-
-        val loadedLibraryNameCount = loadedLibrary?.libraryRoot?.nameCount ?: 0
-        val savefileLocationNameCount = savefileLocation?.nameCount ?: 0
-
-        return if (loadedLibraryNameCount >= savefileLocationNameCount) {
-            loadedLibrary!!
+    private inner class LoadedLibrary (val library: Library<ImageUrl>, savefilePath: Path) {
+        val savefilePath: Path = savefilePath.normalize()
+        init {
+            loadedLibraries.add(this)
         }
-        else {
-            LoadedLibrary(savefileLoader.load(savefileLocation!!), savefileLocation.parent, savefileLocation.parent).also { loadedLibraries.add(it) }
-        }.library
     }
+
+    fun loadDirectory(directory: Path) {
+        val savefilePath = getSavefilePathFor(directory)
+        if (findLibraryBySavefilePath(savefilePath) == null) {
+            if (Files.exists(savefilePath)) {
+                LoadedLibrary(savefileLoader.load(savefilePath), savefilePath)
+            }
+            else {
+                createLibrary(savefilePath)
+            }
+        }
+    }
+
+    private fun createLibrary(savefilePath: Path): LoadedLibrary =
+            LoadedLibrary(DefaultLibrary(), savefilePath.normalize())
+
+    private fun getSavefilePathFor(directory: Path): Path {
+        val loaded: LoadedLibrary? = findLibrariesContains(directory).maxBy { it.savefilePath.nameCount }
+        val savefilePath = savefileLoader.locateSaveFilePath(directory)?.normalize()
+
+        return when (compareValues(loaded?.savefilePath?.nameCount, savefilePath?.nameCount)) {
+            0  -> loaded?.savefilePath ?: directory.normalize().resolve(SaveFileLoader.SAVEFILE_NAME)
+            1  -> loaded!!.savefilePath
+            else -> savefilePath!!
+        }
+    }
+
+    private fun findLibrariesContains(directory: Path): List<LoadedLibrary> =
+            loadedLibraries.filter { directory.normalize().startsWith(it.savefilePath.parent) }
+
+    private fun findLibraryByDirectory(directory: Path): LoadedLibrary? =
+            findLibraryBySavefilePath(getSavefilePathFor(directory))
+
+    private fun findLibraryBySavefilePath(savefilePath: Path): LoadedLibrary? =
+            loadedLibraries.find { savefilePath == it.savefilePath }
+
 
     @Deprecated("一時的な実装")
     fun getItemSet(directory: Path, depth: Int): ItemSet<ImageUrl> {
-        return (findLibrary(directory) ?:createLibrary(directory)).library.getItemSet(collectImageUrls(directory, depth))
+        return getOrCreateLibrary(directory).library.getItemSet(collectImageUrls(directory, depth))
     }
-
-    private fun findLibrary(directory: Path): LoadedLibrary? =
-            loadedLibraries.filter { directory.normalize().startsWith(it.libraryRoot) }
-                    .maxBy { it.libraryRoot.nameCount }
-
-    private fun createLibrary(directory: Path): LoadedLibrary =
-            LoadedLibrary(DefaultLibrary(), directory.normalize(), directory.normalize()).also { loadedLibraries.add(it) }
+    private fun getOrCreateLibrary(directory: Path): LoadedLibrary
+            = findLibraryByDirectory(directory) ?: createLibrary(directory.resolve(SaveFileLoader.SAVEFILE_NAME))
 
     // TODO 移動
     private fun collectImageUrls(directory: Path, depth: Int): List<ImageUrl> =
