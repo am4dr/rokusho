@@ -30,7 +30,8 @@ class Rokusho {
      * 指定のディレクトリを含むライブラリが存在しない場合は、そのディレクトリをルートとしてライブラリを作成し追加する。
      */
     fun addDirectory(directory: Path, depth: Int) {
-        val itemSet = libraryLoader.loadDirectory(directory, depth)
+        libraryLoader.loadDirectory(directory)
+        val itemSet = libraryLoader.getItemSet(directory, depth)
         _libraries.add(itemSet.library)
         _itemSets.add(itemSet)
     }
