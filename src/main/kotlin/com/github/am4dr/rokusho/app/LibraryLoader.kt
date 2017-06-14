@@ -56,6 +56,6 @@ class LibraryLoader {
     private fun findLibraryBySavefilePath(savefilePath: Path): LoadedLibrary? =
             loadedLibraries.find { savefilePath == it.savefilePath }
 
-    fun getOrCreateLibrary(directory: Path): Library<ImageUrl>
-            = (findLibraryByDirectory(directory) ?: createLibrary(directory.resolve(SaveFileLoader.SAVEFILE_NAME))).library
+    fun getOrCreateLibrary(directory: Path): Library<ImageUrl> =
+            (findLibraryByDirectory(directory) ?: createLibrary(directory.resolve(SaveFileLoader.SAVEFILE_NAME))).library
 }
