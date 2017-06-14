@@ -56,18 +56,6 @@ class LibraryLoader {
     private fun findLibraryBySavefilePath(savefilePath: Path): LoadedLibrary? =
             loadedLibraries.find { savefilePath == it.savefilePath }
 
-
-    @Deprecated("一時的な実装")
-    fun getItemSet(directory: Path, depth: Int): ItemSet<ImageUrl> {
-        return getOrCreateLibrary(directory).library.getItemSet(collectImageUrls(directory, depth))
-    }
-    private fun getOrCreateLibrary(directory: Path): LoadedLibrary
-            = findLibraryByDirectory(directory) ?: createLibrary(directory.resolve(SaveFileLoader.SAVEFILE_NAME))
-
-    // TODO 移動
-    private fun collectImageUrls(directory: Path, depth: Int): List<ImageUrl> =
-            Files.walk(directory, depth)
-                    .filter(Rokusho.Companion::isSupportedImageFile)
-                    .map { ImageUrl(it.toUri().toURL()) }
-                    .collect(Collectors.toList())
+    fun getOrCreateLibrary(directory: Path): Library<ImageUrl>
+            = (findLibraryByDirectory(directory) ?: createLibrary(directory.resolve(SaveFileLoader.SAVEFILE_NAME))).library
 }
