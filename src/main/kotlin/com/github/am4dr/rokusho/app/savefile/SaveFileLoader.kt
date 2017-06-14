@@ -5,6 +5,7 @@ import com.github.am4dr.rokusho.core.library.DefaultLibrary
 import com.github.am4dr.rokusho.core.library.ItemTag
 import com.github.am4dr.rokusho.core.library.Library
 import com.github.am4dr.rokusho.core.library.SimpleItemTagDB
+import java.nio.file.Files
 import java.nio.file.Path
 
 class SaveFileLoader {
@@ -21,4 +22,9 @@ class SaveFileLoader {
         }
         return DefaultLibrary(tags, SimpleItemTagDB(items.toMap()))
     }
+
+    fun locateSaveFilePath(directory: Path): Path? =
+            directory.resolve(SaveFileLoader.SAVEFILE_NAME).takeIf { Files.exists(it) }
+                    ?: directory.parent?.let { locateSaveFilePath(it) }
+
 }

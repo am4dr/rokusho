@@ -9,13 +9,14 @@ import java.nio.file.Path
 import java.util.stream.Collectors
 
 class LibraryLoader {
-    private data class LoadedLibrary(val library: Library<ImageUrl>, val savefileDir: Path)
+    private data class LoadedLibrary constructor(val library: Library<ImageUrl>, val libraryDir: Path, val savefileDir: Path)
 
+    private val savefileLoader = SaveFileLoader()
     private val loadedLibraries: MutableList<LoadedLibrary> = mutableListOf()
-
+    
     fun loadDirectory(directory: Path): Library<ImageUrl> {
         return (findLibrary(directory)
-                ?: locateSaveFilePath(directory)?.let { loadSaveFile(it) }
+                ?: savefileLoader.locateSaveFilePath(directory)?.let { LoadedLibrary(savefileLoader.load(it), directory, it.parent).also { loadedLibraries.add(it) } }
                 ?: createLibrary(directory)).library
     }
     @Deprecated("一時的な実装")
@@ -24,18 +25,13 @@ class LibraryLoader {
     }
 
     private fun findLibrary(directory: Path): LoadedLibrary? =
-            loadedLibraries.find { Files.isSameFile(it.savefileDir, directory) }
-
-    // TODO SaveFileLoaderにうつすか
-    private fun locateSaveFilePath(directory: Path): Path? =
-            directory.resolve(SaveFileLoader.SAVEFILE_NAME).takeIf { Files.exists(it) }
-                    ?: directory.parent?.let { locateSaveFilePath(it) }
-
-    private fun loadSaveFile(savefile: Path): LoadedLibrary =
-            LoadedLibrary(SaveFileLoader().load(savefile), savefile.parent).also { loadedLibraries.add(it) }
+            loadedLibraries.map { it.libraryDir.normalize() to it }
+                    .filter { (libDir, _) -> directory.normalize().startsWith(libDir) }
+                    .maxBy { (libDir, _) -> libDir.nameCount }
+                    ?.second
 
     private fun createLibrary(directory: Path): LoadedLibrary =
-            LoadedLibrary(DefaultLibrary(), directory).also { loadedLibraries.add(it) }
+            LoadedLibrary(DefaultLibrary(), directory, directory).also { loadedLibraries.add(it) }
 
     private fun collectImageUrls(directory: Path, depth: Int): List<ImageUrl> =
             Files.walk(directory, depth)
