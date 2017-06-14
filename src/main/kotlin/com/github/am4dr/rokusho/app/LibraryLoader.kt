@@ -21,7 +21,8 @@ class LibraryLoader {
     }
 
     private fun findLibrary(directory: Path): LoadedLibrary? =
-            loadedLibraries.find { Files.isSameFile(it.path, directory) }?.let { return it }
+            loadedLibraries.find { Files.isSameFile(it.path, directory) }
+
     // TODO SaveFileLoaderにうつすか
     private fun locateSaveFilePath(directory: Path): Path? =
             directory.resolve(SaveFileLoader.SAVEFILE_NAME).takeIf { Files.exists(it) }
