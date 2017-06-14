@@ -9,14 +9,14 @@ import java.nio.file.Path
 import java.util.stream.Collectors
 
 class LibraryLoader {
-    private data class LoadedLibrary(val library: Library<ImageUrl>, val path: Path, val depth: Int)
+    private data class LoadedLibrary(val library: Library<ImageUrl>, val path: Path)
 
     private val loadedLibraries: List<LoadedLibrary> = mutableListOf()
 
     fun loadDirectory(directory: Path, depth: Int): ItemSet<ImageUrl> {
         val lib = findLibrary(directory)
-                ?: locateSaveFilePath(directory)?.let { loadSaveFile(it, depth) }
-                ?: createLibrary(directory, depth)
+                ?: locateSaveFilePath(directory)?.let { loadSaveFile(it) }
+                ?: createLibrary(directory)
         return lib.library.getItemSet(collectImageUrls(directory, depth))
     }
 
@@ -28,11 +28,11 @@ class LibraryLoader {
             directory.resolve(SaveFileLoader.SAVEFILE_NAME).takeIf { Files.exists(it) }
                     ?: directory.parent?.let { locateSaveFilePath(it) }
 
-    private fun loadSaveFile(savefile: Path, depth: Int): LoadedLibrary =
-            LoadedLibrary(SaveFileLoader().load(savefile), savefile.parent, depth)
+    private fun loadSaveFile(savefile: Path): LoadedLibrary =
+            LoadedLibrary(SaveFileLoader().load(savefile), savefile.parent)
 
-    private fun createLibrary(directory: Path, depth: Int): LoadedLibrary =
-            LoadedLibrary(DefaultLibrary(), directory, depth)
+    private fun createLibrary(directory: Path): LoadedLibrary =
+            LoadedLibrary(DefaultLibrary(), directory)
 
     private fun collectImageUrls(directory: Path, depth: Int): List<ImageUrl> =
             Files.walk(directory, depth)
