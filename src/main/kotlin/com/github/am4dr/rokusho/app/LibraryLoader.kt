@@ -9,7 +9,7 @@ import java.nio.file.Path
 import java.util.stream.Collectors
 
 class LibraryLoader {
-    private data class LoadedLibrary(val library: Library<ImageUrl>, val path: Path)
+    private data class LoadedLibrary(val library: Library<ImageUrl>, val savefileDir: Path)
 
     private val loadedLibraries: List<LoadedLibrary> = mutableListOf()
 
@@ -21,7 +21,7 @@ class LibraryLoader {
     }
 
     private fun findLibrary(directory: Path): LoadedLibrary? =
-            loadedLibraries.find { Files.isSameFile(it.path, directory) }
+            loadedLibraries.find { Files.isSameFile(it.savefileDir, directory) }
 
     // TODO SaveFileLoaderにうつすか
     private fun locateSaveFilePath(directory: Path): Path? =
