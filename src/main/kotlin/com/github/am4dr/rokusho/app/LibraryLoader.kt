@@ -41,7 +41,7 @@ class LibraryLoader {
         val savefilePath = savefileLoader.locateSaveFilePath(directory)?.normalize()
 
         return when (compareValues(loaded?.savefilePath?.nameCount, savefilePath?.nameCount)) {
-            0  -> loaded?.savefilePath ?: getDefaultSavefilePath(directory)
+            0  -> loaded?.savefilePath ?: savefileLoader.getDefaultSavefilePath(directory)
             1  -> loaded!!.savefilePath
             else -> savefilePath!!
         }
@@ -57,8 +57,5 @@ class LibraryLoader {
             loadedLibraries.find { savefilePath == it.savefilePath }
 
     fun getOrCreateLibrary(directory: Path): Library<ImageUrl> =
-            (findLibraryByDirectory(directory) ?: createLibrary(getDefaultSavefilePath(directory))).library
-
-    // TODO delegate to other class
-    private fun getDefaultSavefilePath(directory: Path): Path = directory.normalize().resolve(SaveFileLoader.SAVEFILE_NAME)
+            (findLibraryByDirectory(directory) ?: createLibrary(savefileLoader.getDefaultSavefilePath(directory))).library
 }

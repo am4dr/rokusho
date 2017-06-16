@@ -10,7 +10,7 @@ import java.nio.file.Path
 
 class SaveFileLoader {
     companion object {
-        const val SAVEFILE_NAME = "rokusho.yaml"
+        const val DEFAULT_SAVEFILE_NAME = "rokusho.yaml"
     }
     fun load(savefilePath: Path): Library<ImageUrl> {
         val savefile = YamlSaveFileParser().parse(savefilePath)
@@ -24,7 +24,8 @@ class SaveFileLoader {
     }
 
     fun locateSaveFilePath(directory: Path): Path? =
-            directory.resolve(SaveFileLoader.SAVEFILE_NAME).takeIf { Files.exists(it) }
+            directory.resolve(SaveFileLoader.DEFAULT_SAVEFILE_NAME).takeIf { Files.exists(it) }
                     ?: directory.parent?.let { locateSaveFilePath(it) }
 
+    fun getDefaultSavefilePath(directory: Path): Path = directory.normalize().resolve(DEFAULT_SAVEFILE_NAME)
 }
