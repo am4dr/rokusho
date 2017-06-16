@@ -8,35 +8,57 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.util.stream.Collectors
 
+// TODO test
 class LibraryLoader {
-    private data class LoadedLibrary(val library: Library<ImageUrl>, val savefileDir: Path)
 
-    private val loadedLibraries: List<LoadedLibrary> = mutableListOf()
+    private val savefileLoader = SaveFileLoader()
+    private val loadedLibraries: MutableList<LoadedLibrary> = mutableListOf()
 
-    fun loadDirectory(directory: Path, depth: Int): ItemSet<ImageUrl> {
-        val lib = findLibrary(directory)
-                ?: locateSaveFilePath(directory)?.let { loadSaveFile(it) }
-                ?: createLibrary(directory)
-        return lib.library.getItemSet(collectImageUrls(directory, depth))
+    private inner class LoadedLibrary (val library: Library<ImageUrl>, savefilePath: Path) {
+        val savefilePath: Path = savefilePath.normalize()
+        init {
+            loadedLibraries.add(this)
+        }
     }
 
-    private fun findLibrary(directory: Path): LoadedLibrary? =
-            loadedLibraries.find { Files.isSameFile(it.savefileDir, directory) }
+    fun loadDirectory(directory: Path) {
+        val savefilePath = getSavefilePathFor(directory)
+        if (findLibraryBySavefilePath(savefilePath) == null) {
+            if (Files.exists(savefilePath)) {
+                LoadedLibrary(savefileLoader.load(savefilePath), savefilePath)
+            }
+            else {
+                createLibrary(savefilePath)
+            }
+        }
+    }
 
-    // TODO SaveFileLoaderにうつすか
-    private fun locateSaveFilePath(directory: Path): Path? =
-            directory.resolve(SaveFileLoader.SAVEFILE_NAME).takeIf { Files.exists(it) }
-                    ?: directory.parent?.let { locateSaveFilePath(it) }
+    private fun createLibrary(savefilePath: Path): LoadedLibrary =
+            LoadedLibrary(DefaultLibrary(), savefilePath.normalize())
 
-    private fun loadSaveFile(savefile: Path): LoadedLibrary =
-            LoadedLibrary(SaveFileLoader().load(savefile), savefile.parent)
+    private fun getSavefilePathFor(directory: Path): Path {
+        val loaded: LoadedLibrary? = findLibrariesContains(directory).maxBy { it.savefilePath.nameCount }
+        val savefilePath = savefileLoader.locateSaveFilePath(directory)?.normalize()
 
-    private fun createLibrary(directory: Path): LoadedLibrary =
-            LoadedLibrary(DefaultLibrary(), directory)
+        return when (compareValues(loaded?.savefilePath?.nameCount, savefilePath?.nameCount)) {
+            0  -> loaded?.savefilePath ?: getDefaultSavefilePath(directory)
+            1  -> loaded!!.savefilePath
+            else -> savefilePath!!
+        }
+    }
 
-    private fun collectImageUrls(directory: Path, depth: Int): List<ImageUrl> =
-            Files.walk(directory, depth)
-                    .filter(Rokusho.Companion::isSupportedImageFile)
-                    .map { ImageUrl(it.toUri().toURL()) }
-                    .collect(Collectors.toList())
+    private fun findLibrariesContains(directory: Path): List<LoadedLibrary> =
+            loadedLibraries.filter { directory.normalize().startsWith(it.savefilePath.parent) }
+
+    private fun findLibraryByDirectory(directory: Path): LoadedLibrary? =
+            findLibraryBySavefilePath(getSavefilePathFor(directory))
+
+    private fun findLibraryBySavefilePath(savefilePath: Path): LoadedLibrary? =
+            loadedLibraries.find { savefilePath == it.savefilePath }
+
+    fun getOrCreateLibrary(directory: Path): Library<ImageUrl> =
+            (findLibraryByDirectory(directory) ?: createLibrary(getDefaultSavefilePath(directory))).library
+
+    // TODO delegate to other class
+    private fun getDefaultSavefilePath(directory: Path): Path = directory.normalize().resolve(SaveFileLoader.SAVEFILE_NAME)
 }

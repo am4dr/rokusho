@@ -9,6 +9,7 @@ import javafx.beans.property.ReadOnlyListWrapper
 import javafx.collections.FXCollections.observableArrayList
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.stream.Collectors
 
 class Rokusho {
     companion object {
@@ -24,16 +25,22 @@ class Rokusho {
     private val _itemSets = observableArrayList<ItemSet<ImageUrl>>()
     val itemSets: ReadOnlyListProperty<ItemSet<ImageUrl>> = ReadOnlyListWrapper(_itemSets).readOnlyProperty
 
-    /**
-     * 指定のディレクトリを含むライブラリを作成し追加する。
-     *
-     * 指定のディレクトリを含むライブラリが存在しない場合は、そのディレクトリをルートとしてライブラリを作成し追加する。
-     */
     fun addDirectory(directory: Path, depth: Int) {
-        val itemSet = libraryLoader.loadDirectory(directory, depth)
+        libraryLoader.loadDirectory(directory)
+        val itemSet = getItemSet(directory, depth)
         _libraries.add(itemSet.library)
         _itemSets.add(itemSet)
     }
+
+    private fun getItemSet(directory: Path, depth: Int): ItemSet<ImageUrl> {
+        return libraryLoader.getOrCreateLibrary(directory).getItemSet(collectImageUrls(directory, depth))
+    }
+
+    private fun collectImageUrls(directory: Path, depth: Int): List<ImageUrl> =
+            Files.walk(directory, depth)
+                    .filter(Rokusho.Companion::isSupportedImageFile)
+                    .map { ImageUrl(it.toUri().toURL()) }
+                    .collect(Collectors.toList())
 
     fun updateItemTags(item: Item<ImageUrl>, itemTags: List<ItemTag>) {
         val itemSet = _itemSets.find { it.items.contains(item) } ?: return
