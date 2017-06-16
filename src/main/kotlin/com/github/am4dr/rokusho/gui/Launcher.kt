@@ -11,12 +11,11 @@ import org.slf4j.LoggerFactory
 import java.nio.file.Files
 import java.nio.file.Paths
 
-fun main(args: Array<String>) = Application.launch(Launcher::class.java, *args)
-
 class Launcher : Application() {
     private val rokusho = Rokusho()
 
     companion object {
+        @JvmStatic fun main(args: Array<String>) = Application.launch(Launcher::class.java, *args)
         private val log = LoggerFactory.getLogger(Launcher::class.java)
     }
 
