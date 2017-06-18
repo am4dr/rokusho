@@ -19,11 +19,11 @@ class Rokusho {
     }
     private val libraryLoader = LibraryLoader()
 
-    private val _libraries = observableArrayList<Library<ImageUrl>>()
-    val libraries: ReadOnlyListProperty<Library<ImageUrl>> = ReadOnlyListWrapper(_libraries).readOnlyProperty
+    private val _libraries = ReadOnlyListWrapper(observableArrayList<Library<ImageUrl>>())
+    val libraries: ReadOnlyListProperty<Library<ImageUrl>> = _libraries.readOnlyProperty
 
-    private val _itemSets = observableArrayList<ItemSet<ImageUrl>>()
-    val itemSets: ReadOnlyListProperty<ItemSet<ImageUrl>> = ReadOnlyListWrapper(_itemSets).readOnlyProperty
+    private val _itemSets = ReadOnlyListWrapper(observableArrayList<ItemSet<ImageUrl>>())
+    val itemSets: ReadOnlyListProperty<ItemSet<ImageUrl>> = _itemSets.readOnlyProperty
 
     fun addDirectory(directory: Path, depth: Int) {
         libraryLoader.loadDirectory(directory)
