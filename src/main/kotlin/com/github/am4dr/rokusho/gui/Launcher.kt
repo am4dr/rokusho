@@ -1,6 +1,7 @@
 package com.github.am4dr.rokusho.gui
 
 import com.github.am4dr.rokusho.app.Rokusho
+import com.github.am4dr.rokusho.dev.gui.RokushoViewer
 import javafx.application.Application
 import javafx.scene.Scene
 import javafx.stage.Stage
@@ -38,5 +39,11 @@ class Launcher : Application() {
             scene = Scene(RokushoGui(rokusho, stage).mainParent, 800.0, 500.0)
             show()
         }
+        RokushoViewer(rokusho).also { devViewer ->
+            devViewer.stage.apply {
+                x = stage.x - RokushoViewer.initialWidth - 2.0
+                y = stage.y
+            }
+        }.show()
     }
 }
