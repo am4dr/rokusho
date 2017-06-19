@@ -1,6 +1,6 @@
 package com.github.am4dr.rokusho.app
 
-import com.github.am4dr.rokusho.core.library.Item
+import com.github.am4dr.rokusho.core.library.Record
 import com.github.am4dr.rokusho.core.library.ItemSet
 import com.github.am4dr.rokusho.core.library.ItemTag
 import com.github.am4dr.rokusho.core.library.Library
@@ -42,8 +42,8 @@ class Rokusho {
                     .map { ImageUrl(it.toUri().toURL()) }
                     .collect(Collectors.toList())
 
-    fun updateItemTags(item: Item<ImageUrl>, itemTags: List<ItemTag>) {
-        val itemSet = _itemSets.find { it.items.contains(item) } ?: return
-        itemSet.library.updateItemTags(item.key, itemTags)
+    fun updateItemTags(record: Record<ImageUrl>, itemTags: List<ItemTag>) {
+        val itemSet = _itemSets.find { it.records.contains(record) } ?: return
+        itemSet.library.updateItemTags(record.key, itemTags)
     }
 }

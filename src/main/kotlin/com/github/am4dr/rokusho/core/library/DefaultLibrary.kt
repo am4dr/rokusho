@@ -19,38 +19,39 @@ class DefaultLibrary<T>(
     }
     override fun getTags(): ReadOnlyMapProperty<String, Tag> = _tags.readOnlyProperty
 
-    private val watchedItems = observableHashMap<T, Item<T>>()
-    private fun watchIfNotWatched(item: Item<T>) {
-        if (!watchedItems.containsKey(item.key)) { watchedItems[item.key] = item }
+    private val watchedItems = observableHashMap<T, Record<T>>()
+    private fun watchIfNotWatched(record: Record<T>) {
+        if (!watchedItems.containsKey(record.key)) { watchedItems[record.key] = record
+        }
     }
 
     override fun getItemSet(list: Iterable<T>): ItemSet<T> {
-        val items = list.mapTo(observableArrayList(), this::getItem)
+        val items = list.mapTo(observableArrayList(), this::getRecord)
         items.forEach(this::watchIfNotWatched)
         val itemSet = DefaultLibraryItemSet(this, items)
         watchedItems.addListener(WeakMapChangeListener(itemSet))
         return itemSet
     }
 
-    override fun getItem(key: T): Item<T> = watchedItems[key] ?: Item(key, itemTagDB.get(key))
+    override fun getRecord(key: T): Record<T> = watchedItems[key] ?: Record(key, itemTagDB.get(key))
 
     override fun updateItemTags(key: T, tags: Iterable<ItemTag>) {
-        updateItem(Item(key, tags.toList()))
+        updateItem(Record(key, tags.toList()))
     }
-    private fun updateItem(item: Item<T>) {
-        itemTagDB.set(item.key, item.itemTags)
-        watchedItems[item.key]?.takeIf { it != item }
-                ?.let{ watchedItems[item.key] = item }
+    private fun updateItem(record: Record<T>) {
+        itemTagDB.set(record.key, record.itemTags)
+        watchedItems[record.key]?.takeIf { it != record }
+                ?.let{ watchedItems[record.key] = record }
     }
 }
-class DefaultLibraryItemSet<T>(override val library: Library<T>, target: ObservableList<Item<T>>) : ItemSet<T>, MapChangeListener<T, Item<T>> {
+class DefaultLibraryItemSet<T>(override val library: Library<T>, target: ObservableList<Record<T>>) : ItemSet<T>, MapChangeListener<T, Record<T>> {
 
-    private val values = target.map(Item<T>::key)
+    private val values = target.map(Record<T>::key)
     private val _items = observableArrayList(target)
-    override val items: ReadOnlyListProperty<Item<T>> = ReadOnlyListWrapper(_items).readOnlyProperty
+    override val records: ReadOnlyListProperty<Record<T>> = ReadOnlyListWrapper(_items).readOnlyProperty
 
     // TODO 更新(つまり削除と追加が同時に行われるもの)ではなくただの削除に対応する
-    override fun onChanged(change: MapChangeListener.Change<out T, out Item<T>>?) {
+    override fun onChanged(change: MapChangeListener.Change<out T, out Record<T>>?) {
         change ?: return
         val idx = values.indexOf(change.key).takeIf { it >= 0 } ?: return
         if (change.wasRemoved()) {
