@@ -3,7 +3,7 @@ package com.github.am4dr.rokusho.gui
 import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.Rokusho
 import com.github.am4dr.rokusho.core.library.Record
-import com.github.am4dr.rokusho.core.library.ItemSet
+import com.github.am4dr.rokusho.core.library.ObservableRecordList
 import com.github.am4dr.rokusho.core.library.ItemTag
 import com.github.am4dr.rokusho.core.library.Library
 import com.github.am4dr.rokusho.util.ConcatenatedList
@@ -33,10 +33,10 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
     val mainParent: Parent = createMainScene()
 
     init {
-        rokusho.itemSets.addListener(ListChangeListener { c ->
+        rokusho.recordLists.addListener(ListChangeListener { c ->
             while (c.next()) {
                 if (c.wasAdded()) {
-                    c.addedSubList.map(ItemSet<ImageUrl>::records).forEach(allRecords::concat)
+                    c.addedSubList.map(ObservableRecordList<ImageUrl>::records).forEach(allRecords::concat)
                 }
             }
         })
@@ -92,7 +92,7 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
         val thumbnails = TransformedList(records) { item ->
             val image = imageLoader.getImage(item.key.url, 500.0, 200.0, true)
 
-            val tagNodeFactory = rokusho.itemSets.find { it.records.contains(item) }?.let {
+            val tagNodeFactory = rokusho.recordLists.find { it.records.contains(item) }?.let {
                 libToTagNodeFactory.getOrPut(it.library, { TagNodeFactory(it.library.getTags()) })::createTagNode
             } ?: defaultTagNodeFactory
 

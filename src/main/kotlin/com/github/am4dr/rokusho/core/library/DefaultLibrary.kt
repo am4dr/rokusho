@@ -25,10 +25,10 @@ class DefaultLibrary<T>(
         }
     }
 
-    override fun getItemSet(list: Iterable<T>): ItemSet<T> {
+    override fun getRecordList(list: Iterable<T>): ObservableRecordList<T> {
         val items = list.mapTo(observableArrayList(), this::getRecord)
         items.forEach(this::watchIfNotWatched)
-        val itemSet = DefaultLibraryItemSet(this, items)
+        val itemSet = DefaultLibraryObservableRecordList(this, items)
         watchedItems.addListener(WeakMapChangeListener(itemSet))
         return itemSet
     }
@@ -44,7 +44,7 @@ class DefaultLibrary<T>(
                 ?.let{ watchedItems[record.key] = record }
     }
 }
-class DefaultLibraryItemSet<T>(override val library: Library<T>, target: ObservableList<Record<T>>) : ItemSet<T>, MapChangeListener<T, Record<T>> {
+class DefaultLibraryObservableRecordList<T>(override val library: Library<T>, target: ObservableList<Record<T>>) : ObservableRecordList<T>, MapChangeListener<T, Record<T>> {
 
     private val values = target.map(Record<T>::key)
     private val _items = observableArrayList(target)

@@ -1,7 +1,7 @@
 package com.github.am4dr.rokusho.app
 
 import com.github.am4dr.rokusho.core.library.Record
-import com.github.am4dr.rokusho.core.library.ItemSet
+import com.github.am4dr.rokusho.core.library.ObservableRecordList
 import com.github.am4dr.rokusho.core.library.ItemTag
 import com.github.am4dr.rokusho.core.library.Library
 import javafx.beans.property.ReadOnlyListProperty
@@ -22,19 +22,18 @@ class Rokusho {
     private val _libraries = ReadOnlyListWrapper(observableArrayList<Library<ImageUrl>>())
     val libraries: ReadOnlyListProperty<Library<ImageUrl>> = _libraries.readOnlyProperty
 
-    private val _itemSets = ReadOnlyListWrapper(observableArrayList<ItemSet<ImageUrl>>())
-    val itemSets: ReadOnlyListProperty<ItemSet<ImageUrl>> = _itemSets.readOnlyProperty
+    private val _recordLists = ReadOnlyListWrapper(observableArrayList<ObservableRecordList<ImageUrl>>())
+    val recordLists: ReadOnlyListProperty<ObservableRecordList<ImageUrl>> = _recordLists.readOnlyProperty
 
     fun addDirectory(directory: Path, depth: Int) {
         libraryLoader.loadDirectory(directory)
-        val itemSet = getItemSet(directory, depth)
+        val itemSet = getRecordList(directory, depth)
         _libraries.add(itemSet.library)
-        _itemSets.add(itemSet)
+        _recordLists.add(itemSet)
     }
 
-    private fun getItemSet(directory: Path, depth: Int): ItemSet<ImageUrl> {
-        return libraryLoader.getOrCreateLibrary(directory).getItemSet(collectImageUrls(directory, depth))
-    }
+    private fun getRecordList(directory: Path, depth: Int): ObservableRecordList<ImageUrl> =
+            libraryLoader.getOrCreateLibrary(directory).getRecordList(collectImageUrls(directory, depth))
 
     private fun collectImageUrls(directory: Path, depth: Int): List<ImageUrl> =
             Files.walk(directory, depth)
@@ -42,8 +41,7 @@ class Rokusho {
                     .map { ImageUrl(it.toUri().toURL()) }
                     .collect(Collectors.toList())
 
-    fun updateItemTags(record: Record<ImageUrl>, itemTags: List<ItemTag>) {
-        val itemSet = _itemSets.find { it.records.contains(record) } ?: return
-        itemSet.library.updateItemTags(record.key, itemTags)
-    }
+    fun updateItemTags(record: Record<ImageUrl>, itemTags: List<ItemTag>) =
+            _recordLists.find { it.records.contains(record) }
+                    ?.apply { library.updateItemTags(record.key, itemTags) }
 }
