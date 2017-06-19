@@ -3,7 +3,7 @@ package com.github.am4dr.rokusho.app
 import com.github.am4dr.rokusho.core.library.Record
 import com.github.am4dr.rokusho.core.library.ObservableRecordList
 import com.github.am4dr.rokusho.core.library.ItemTag
-import com.github.am4dr.rokusho.core.library.Library
+import com.github.am4dr.rokusho.core.library.MetaDataRegistry
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyListWrapper
 import javafx.collections.FXCollections.observableArrayList
@@ -19,8 +19,8 @@ class Rokusho {
     }
     private val libraryLoader = LibraryLoader()
 
-    private val _libraries = ReadOnlyListWrapper(observableArrayList<Library<ImageUrl>>())
-    val libraries: ReadOnlyListProperty<Library<ImageUrl>> = _libraries.readOnlyProperty
+    private val _metaDataRegistries = ReadOnlyListWrapper(observableArrayList<MetaDataRegistry<ImageUrl>>())
+    val metaDataRegistries: ReadOnlyListProperty<MetaDataRegistry<ImageUrl>> = _metaDataRegistries.readOnlyProperty
 
     private val _recordLists = ReadOnlyListWrapper(observableArrayList<ObservableRecordList<ImageUrl>>())
     val recordLists: ReadOnlyListProperty<ObservableRecordList<ImageUrl>> = _recordLists.readOnlyProperty
@@ -28,7 +28,7 @@ class Rokusho {
     fun addDirectory(directory: Path, depth: Int) {
         libraryLoader.loadDirectory(directory)
         val itemSet = getRecordList(directory, depth)
-        _libraries.add(itemSet.library)
+        _metaDataRegistries.add(itemSet.metaDataRegistry)
         _recordLists.add(itemSet)
     }
 
@@ -43,5 +43,5 @@ class Rokusho {
 
     fun updateItemTags(record: Record<ImageUrl>, itemTags: List<ItemTag>) =
             _recordLists.find { it.records.contains(record) }
-                    ?.apply { library.updateItemTags(record.key, itemTags) }
+                    ?.apply { metaDataRegistry.updateItemTags(record.key, itemTags) }
 }

@@ -10,9 +10,9 @@ import javafx.collections.MapChangeListener
 import javafx.collections.ObservableList
 import javafx.collections.WeakMapChangeListener
 
-class DefaultLibrary<T>(
+class DefaultMetaDataRegistry<T>(
         tags: MutableList<Tag> = mutableListOf(),
-        private val itemTagDB: ItemTagDB<T> = SimpleItemTagDB()) : Library<T> {
+        private val itemTagDB: ItemTagDB<T> = SimpleItemTagDB()) : MetaDataRegistry<T> {
 
     private val _tags = ReadOnlyMapWrapper<String, Tag>(observableHashMap()).apply {
         tags.map { it.id to it }.toMap(this)
@@ -44,7 +44,7 @@ class DefaultLibrary<T>(
                 ?.let{ watchedItems[record.key] = record }
     }
 }
-class DefaultLibraryObservableRecordList<T>(override val library: Library<T>, target: ObservableList<Record<T>>) : ObservableRecordList<T>, MapChangeListener<T, Record<T>> {
+class DefaultLibraryObservableRecordList<T>(override val metaDataRegistry: MetaDataRegistry<T>, target: ObservableList<Record<T>>) : ObservableRecordList<T>, MapChangeListener<T, Record<T>> {
 
     private val values = target.map(Record<T>::key)
     private val _items = observableArrayList(target)

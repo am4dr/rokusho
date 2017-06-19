@@ -1,8 +1,8 @@
 package com.github.am4dr.rokusho.app
 
 import com.github.am4dr.rokusho.app.savefile.SaveFileLoader
-import com.github.am4dr.rokusho.core.library.DefaultLibrary
-import com.github.am4dr.rokusho.core.library.Library
+import com.github.am4dr.rokusho.core.library.DefaultMetaDataRegistry
+import com.github.am4dr.rokusho.core.library.MetaDataRegistry
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -12,7 +12,7 @@ class LibraryLoader {
     private val savefileLoader = SaveFileLoader()
     private val loadedLibraries: MutableList<LoadedLibrary> = mutableListOf()
 
-    private inner class LoadedLibrary (val library: Library<ImageUrl>, savefilePath: Path) {
+    private inner class LoadedLibrary (val metaDataRegistry: MetaDataRegistry<ImageUrl>, savefilePath: Path) {
         val savefilePath: Path = savefilePath.normalize()
         init {
             loadedLibraries.add(this)
@@ -32,7 +32,7 @@ class LibraryLoader {
     }
 
     private fun createLibrary(savefilePath: Path): LoadedLibrary =
-            LoadedLibrary(DefaultLibrary(), savefilePath.normalize())
+            LoadedLibrary(DefaultMetaDataRegistry(), savefilePath.normalize())
 
     private fun getSavefilePathFor(directory: Path): Path {
         val loaded: LoadedLibrary? = findLibrariesContains(directory).maxBy { it.savefilePath.nameCount }
@@ -54,6 +54,6 @@ class LibraryLoader {
     private fun findLibraryBySavefilePath(savefilePath: Path): LoadedLibrary? =
             loadedLibraries.find { savefilePath == it.savefilePath }
 
-    fun getOrCreateLibrary(directory: Path): Library<ImageUrl> =
-            (findLibraryByDirectory(directory) ?: createLibrary(savefileLoader.getDefaultSavefilePath(directory))).library
+    fun getOrCreateLibrary(directory: Path): MetaDataRegistry<ImageUrl> =
+            (findLibraryByDirectory(directory) ?: createLibrary(savefileLoader.getDefaultSavefilePath(directory))).metaDataRegistry
 }

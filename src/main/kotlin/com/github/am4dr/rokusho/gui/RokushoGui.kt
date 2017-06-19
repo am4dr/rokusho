@@ -5,7 +5,7 @@ import com.github.am4dr.rokusho.app.Rokusho
 import com.github.am4dr.rokusho.core.library.Record
 import com.github.am4dr.rokusho.core.library.ObservableRecordList
 import com.github.am4dr.rokusho.core.library.ItemTag
-import com.github.am4dr.rokusho.core.library.Library
+import com.github.am4dr.rokusho.core.library.MetaDataRegistry
 import com.github.am4dr.rokusho.util.ConcatenatedList
 import com.github.am4dr.rokusho.util.TransformedList
 import javafx.beans.binding.Bindings
@@ -56,15 +56,15 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
     // TODO ImageFilerNode クラスに切り出し
     private fun createImageFiler(records: ObservableList<Record<ImageUrl>>): FilerLayout {
         val filterInput = TextField()
-        val itemFilter = SimpleObservableFilter<String, Record<ImageUrl>> { input ->
+        val recordFilter = SimpleObservableFilter<String, Record<ImageUrl>> { input ->
             { item ->
                 if (input == null || input == "") true
                 else item.itemTags.any { it.name.contains(input) }
             }
         }
-        itemFilter.inputProperty.bind(filterInput.textProperty())
+        recordFilter.inputProperty.bind(filterInput.textProperty())
         val filteredItems = FilteredList(records).apply {
-            predicateProperty().bind(createObjectBinding({ Predicate(itemFilter.filterProperty.value) }, arrayOf(itemFilter.filterProperty)))
+            predicateProperty().bind(createObjectBinding({ Predicate(recordFilter.filterProperty.value) }, arrayOf(recordFilter.filterProperty)))
         }
         val listNode = ListView(filteredItems)
         val thumbnailFilter = SimpleObservableFilter<String, Thumbnail> { input ->
@@ -88,12 +88,12 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
         // TODO Libraryの内容を反映するようなparserを実装する
         val parser = { text: String -> ItemTag(text, text) }
         val defaultTagNodeFactory = { tag: ItemTag -> TextTagNode(tag.name) }
-        val libToTagNodeFactory = mutableMapOf<Library<ImageUrl>, TagNodeFactory>()
+        val registryToTagNodeFactory = mutableMapOf<MetaDataRegistry<ImageUrl>, TagNodeFactory>()
         val thumbnails = TransformedList(records) { item ->
             val image = imageLoader.getImage(item.key.url, 500.0, 200.0, true)
 
             val tagNodeFactory = rokusho.recordLists.find { it.records.contains(item) }?.let {
-                libToTagNodeFactory.getOrPut(it.library, { TagNodeFactory(it.library.getTags()) })::createTagNode
+                registryToTagNodeFactory.getOrPut(it.metaDataRegistry, { TagNodeFactory(it.metaDataRegistry.getTags()) })::createTagNode
             } ?: defaultTagNodeFactory
 
             Thumbnail(image, item.itemTags, parser, tagNodeFactory).apply {
