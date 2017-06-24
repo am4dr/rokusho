@@ -1,9 +1,9 @@
 package com.github.am4dr.rokusho.app.savefile
 
 import com.github.am4dr.rokusho.app.ImageUrl
-import com.github.am4dr.rokusho.core.library.DefaultLibrary
+import com.github.am4dr.rokusho.core.library.DefaultMetaDataRegistry
 import com.github.am4dr.rokusho.core.library.ItemTag
-import com.github.am4dr.rokusho.core.library.Library
+import com.github.am4dr.rokusho.core.library.MetaDataRegistry
 import com.github.am4dr.rokusho.core.library.SimpleItemTagDB
 import java.nio.file.Files
 import java.nio.file.Path
@@ -12,7 +12,8 @@ class SaveFileLoader {
     companion object {
         const val DEFAULT_SAVEFILE_NAME = "rokusho.yaml"
     }
-    fun load(savefilePath: Path): Library<ImageUrl> {
+    // TODO SavefileLoaderはSaveFileを返すべき
+    fun load(savefilePath: Path): MetaDataRegistry<ImageUrl> {
         val savefile = YamlSaveFileParser().parse(savefilePath)
         val tags = savefile.tags.values.toMutableList()
         val items = savefile.metaData.map { (path, imageMetaData) ->
@@ -20,7 +21,7 @@ class SaveFileLoader {
             val itemTags = imageMetaData.tags.map { ItemTag(it.id, it.data["value"]?.toString() ?: it.id) }
             url to itemTags
         }
-        return DefaultLibrary(tags, SimpleItemTagDB(items.toMap()))
+        return DefaultMetaDataRegistry(tags, SimpleItemTagDB(items.toMap()))
     }
 
     fun locateSaveFilePath(directory: Path): Path? =

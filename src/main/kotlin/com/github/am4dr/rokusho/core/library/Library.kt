@@ -1,10 +1,10 @@
 package com.github.am4dr.rokusho.core.library
 
-import javafx.beans.property.ReadOnlyMapProperty
+import javafx.beans.property.ReadOnlyListProperty
 
 interface Library<T> {
-    fun getItem(key: T): Item<T>
-    fun getItemSet(list: Iterable<T>): ItemSet<T>
-    fun getTags(): ReadOnlyMapProperty<String, Tag>
-    fun updateItemTags(key: T, tags: Iterable<ItemTag>)
+    val metaDataRegistry: MetaDataRegistry<T>
+    val recordLists: ReadOnlyListProperty<ObservableRecordList<T>>
+
+    fun createRecordList(list: Iterable<T>): ObservableRecordList<T>
 }

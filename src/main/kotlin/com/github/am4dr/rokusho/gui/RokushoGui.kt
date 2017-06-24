@@ -2,10 +2,10 @@ package com.github.am4dr.rokusho.gui
 
 import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.Rokusho
-import com.github.am4dr.rokusho.core.library.Item
-import com.github.am4dr.rokusho.core.library.ItemSet
+import com.github.am4dr.rokusho.core.library.Record
+import com.github.am4dr.rokusho.core.library.ObservableRecordList
 import com.github.am4dr.rokusho.core.library.ItemTag
-import com.github.am4dr.rokusho.core.library.Library
+import com.github.am4dr.rokusho.core.library.MetaDataRegistry
 import com.github.am4dr.rokusho.util.ConcatenatedList
 import com.github.am4dr.rokusho.util.TransformedList
 import javafx.beans.binding.Bindings
@@ -29,14 +29,14 @@ import java.io.File
 import java.util.function.Predicate
 
 class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
-    private val allItems: ConcatenatedList<Item<ImageUrl>> = ConcatenatedList()
+    private val allRecords: ConcatenatedList<Record<ImageUrl>> = ConcatenatedList()
     val mainParent: Parent = createMainScene()
 
     init {
-        rokusho.itemSets.addListener(ListChangeListener { c ->
+        rokusho.recordLists.addListener(ListChangeListener { c ->
             while (c.next()) {
                 if (c.wasAdded()) {
-                    c.addedSubList.map(ItemSet<ImageUrl>::items).forEach(allItems::concat)
+                    c.addedSubList.map(ObservableRecordList<ImageUrl>::records).forEach(allRecords::concat)
                 }
             }
         })
@@ -48,23 +48,23 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
         val addLibraryButton = Button("追加").apply {
             setOnAction { selectLibraryDirectory(stage) }
         }
-        val filer = createImageFiler(allItems)
+        val filer = createImageFiler(allRecords)
         return MainLayout(saveButton, addLibraryButton, filer, makeDirectorySelectorPane(stage)).apply {
-            librariesNotSelectedProperty.bind(Bindings.isEmpty(allItems))
+            librariesNotSelectedProperty.bind(Bindings.isEmpty(allRecords))
         }
     }
     // TODO ImageFilerNode クラスに切り出し
-    private fun createImageFiler(items: ObservableList<Item<ImageUrl>>): FilerLayout {
+    private fun createImageFiler(records: ObservableList<Record<ImageUrl>>): FilerLayout {
         val filterInput = TextField()
-        val itemFilter = SimpleObservableFilter<String, Item<ImageUrl>> { input ->
+        val recordFilter = SimpleObservableFilter<String, Record<ImageUrl>> { input ->
             { item ->
                 if (input == null || input == "") true
                 else item.itemTags.any { it.name.contains(input) }
             }
         }
-        itemFilter.inputProperty.bind(filterInput.textProperty())
-        val filteredItems = FilteredList(items).apply {
-            predicateProperty().bind(createObjectBinding({ Predicate(itemFilter.filterProperty.value) }, arrayOf(itemFilter.filterProperty)))
+        recordFilter.inputProperty.bind(filterInput.textProperty())
+        val filteredItems = FilteredList(records).apply {
+            predicateProperty().bind(createObjectBinding({ Predicate(recordFilter.filterProperty.value) }, arrayOf(recordFilter.filterProperty)))
         }
         val listNode = ListView(filteredItems)
         val thumbnailFilter = SimpleObservableFilter<String, Thumbnail> { input ->
@@ -74,10 +74,10 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
             }
         }
         thumbnailFilter.inputProperty.bind(filterInput.textProperty())
-        return FilerLayout(filterInput, listNode, createThumbnailNode(items, thumbnailFilter.filterProperty), Bindings.size(items), Bindings.size(filteredItems))
+        return FilerLayout(filterInput, listNode, createThumbnailNode(records, thumbnailFilter.filterProperty), Bindings.size(records), Bindings.size(filteredItems))
     }
     // TODO ThumbnailNode クラスに切り出し
-    private fun createThumbnailNode(items: ObservableList<Item<ImageUrl>>, filter: ObservableObjectValue<(Thumbnail) -> Boolean>): Node {
+    private fun createThumbnailNode(records: ObservableList<Record<ImageUrl>>, filter: ObservableObjectValue<(Thumbnail) -> Boolean>): Node {
         val overlay = ImageOverlay().apply {
             isVisible = false
             onMouseClicked = EventHandler { isVisible = false }
@@ -88,12 +88,12 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
         // TODO Libraryの内容を反映するようなparserを実装する
         val parser = { text: String -> ItemTag(text, text) }
         val defaultTagNodeFactory = { tag: ItemTag -> TextTagNode(tag.name) }
-        val libToTagNodeFactory = mutableMapOf<Library<ImageUrl>, TagNodeFactory>()
-        val thumbnails = TransformedList(items) { item ->
+        val registryToTagNodeFactory = mutableMapOf<MetaDataRegistry<ImageUrl>, TagNodeFactory>()
+        val thumbnails = TransformedList(records) { item ->
             val image = imageLoader.getImage(item.key.url, 500.0, 200.0, true)
 
-            val tagNodeFactory = rokusho.itemSets.find { it.items.contains(item) }?.let {
-                libToTagNodeFactory.getOrPut(it.library, { TagNodeFactory(it.library.getTags()) })::createTagNode
+            val tagNodeFactory = rokusho.recordLists.find { it.records.contains(item) }?.let {
+                registryToTagNodeFactory.getOrPut(it.metaDataRegistry, { TagNodeFactory(it.metaDataRegistry.getTags()) })::createTagNode
             } ?: defaultTagNodeFactory
 
             Thumbnail(image, item.itemTags, parser, tagNodeFactory).apply {
