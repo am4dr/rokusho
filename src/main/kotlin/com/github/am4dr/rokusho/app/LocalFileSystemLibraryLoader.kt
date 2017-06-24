@@ -30,7 +30,7 @@ class LocalFileSystemLibraryLoader {
             findLibraryByDirectory(directory) ?: createLibrary(savefileLoader.getDefaultSavefilePath(directory))
 
     private fun createLibrary(savefilePath: Path, registry: MetaDataRegistry<ImageUrl> = DefaultMetaDataRegistry()): LocalFileSystemLibrary =
-            LocalFileSystemLibrary(savefilePath.normalize(), registry).also { _loadedLibraries.add(it) }
+            LocalFileSystemLibrary(savefilePath, registry).also { _loadedLibraries.add(it) }
 
     private fun getSavefilePathFor(directory: Path): Path {
         val loaded: LocalFileSystemLibrary? = findLibrariesContains(directory).maxBy { it.savefilePath.nameCount }

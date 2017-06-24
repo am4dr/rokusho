@@ -8,8 +8,9 @@ import javafx.beans.property.ReadOnlyListWrapper
 import javafx.collections.FXCollections.observableArrayList
 import java.nio.file.Path
 
-class LocalFileSystemLibrary(val savefilePath: Path,
+class LocalFileSystemLibrary(savefilePath: Path,
                              override val metaDataRegistry: MetaDataRegistry<ImageUrl>) : Library<ImageUrl> {
+    val savefilePath: Path = savefilePath.toAbsolutePath()
     private val _recordLists = ReadOnlyListWrapper(observableArrayList<ObservableRecordList<ImageUrl>>())
     override val recordLists: ReadOnlyListProperty<ObservableRecordList<ImageUrl>> = _recordLists.readOnlyProperty
     override fun createRecordList(list: Iterable<ImageUrl>): ObservableRecordList<ImageUrl> =
