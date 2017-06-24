@@ -45,12 +45,8 @@ class Rokusho {
     }
 
     fun addDirectory(directory: Path, depth: Int) {
-        libraryLoader.loadDirectory(directory) // TODO この呼び出しが必要なのは複雑すぎるので消せるように再構成
-        getRecordList(directory, depth)
+        libraryLoader.getOrLoadLibrary(directory).createRecordList(collectImageUrls(directory, depth))
     }
-
-    private fun getRecordList(directory: Path, depth: Int): ObservableRecordList<ImageUrl> =
-            libraryLoader.getOrCreateLibrary(directory).createRecordList(collectImageUrls(directory, depth))
 
     private fun collectImageUrls(directory: Path, depth: Int): List<ImageUrl> =
             Files.walk(directory, depth)
