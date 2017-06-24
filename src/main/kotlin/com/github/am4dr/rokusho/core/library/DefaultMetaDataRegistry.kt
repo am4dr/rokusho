@@ -36,9 +36,9 @@ class DefaultMetaDataRegistry<T>(
     override fun getRecord(key: T): Record<T> = watchedItems[key] ?: Record(key, itemTagDB.get(key))
 
     override fun updateItemTags(key: T, tags: Iterable<ItemTag>) {
-        updateItem(Record(key, tags.toList()))
+        updateMetaData(Record(key, tags.toList()))
     }
-    private fun updateItem(record: Record<T>) {
+    private fun updateMetaData(record: Record<T>) {
         itemTagDB.set(record.key, record.itemTags)
         watchedItems[record.key]?.takeIf { it != record }
                 ?.let{ watchedItems[record.key] = record }
