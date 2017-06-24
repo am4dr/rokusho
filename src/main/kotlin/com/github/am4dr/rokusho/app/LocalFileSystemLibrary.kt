@@ -12,5 +12,6 @@ class LocalFileSystemLibrary(val savefilePath: Path,
                              override val metaDataRegistry: MetaDataRegistry<ImageUrl>) : Library<ImageUrl> {
     private val _recordLists = ReadOnlyListWrapper(observableArrayList<ObservableRecordList<ImageUrl>>())
     override val recordLists: ReadOnlyListProperty<ObservableRecordList<ImageUrl>> = _recordLists.readOnlyProperty
-
+    override fun createRecordList(list: Iterable<ImageUrl>): ObservableRecordList<ImageUrl> =
+            metaDataRegistry.getRecordList(list).also { _recordLists.add(it) }
 }

@@ -5,6 +5,8 @@ import com.github.am4dr.rokusho.util.TransformedList
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyListWrapper
 import javafx.collections.FXCollections.observableArrayList
+import javafx.collections.ListChangeListener
+import javafx.collections.ObservableList
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.stream.Collectors
@@ -17,21 +19,38 @@ class Rokusho {
     }
     private val libraryLoader = LocalFileSystemLibraryLoader()
 
+    private val configuredLibraries: ObservableList<Library<*>>
+
     val metaDataRegistries: ReadOnlyListProperty<MetaDataRegistry<ImageUrl>> =
             ReadOnlyListWrapper(TransformedList(libraryLoader.loadedLibraries, Library<ImageUrl>::metaDataRegistry)).readOnlyProperty
 
-    private val _recordLists = ReadOnlyListWrapper(observableArrayList<ObservableRecordList<ImageUrl>>())
-    val recordLists: ReadOnlyListProperty<ObservableRecordList<ImageUrl>> = _recordLists.readOnlyProperty
+    val recordLists: ReadOnlyListProperty<ObservableRecordList<ImageUrl>>
+
+    init {
+        val allLists = ReadOnlyListWrapper(observableArrayList<ObservableRecordList<ImageUrl>>())
+        configuredLibraries = TransformedList(libraryLoader.loadedLibraries) { libs ->
+            libs.recordLists.addListener(ListChangeListener { c ->
+                while (c.next()) {
+                    if (c.wasRemoved()) {
+                        allLists.removeAll(c.removed)
+                    }
+                    if (c.wasAdded()) {
+                        allLists.addAll(c.addedSubList)
+                    }
+                }
+            })
+            return@TransformedList libs
+        }
+        recordLists = allLists.readOnlyProperty
+    }
 
     fun addDirectory(directory: Path, depth: Int) {
         libraryLoader.loadDirectory(directory) // TODO この呼び出しが必要なのは複雑すぎるので消せるように再構成
-        val itemSet = getRecordList(directory, depth)
-        _recordLists.add(itemSet)
+        getRecordList(directory, depth)
     }
 
-    // TODO remove chain
     private fun getRecordList(directory: Path, depth: Int): ObservableRecordList<ImageUrl> =
-            libraryLoader.getOrCreateLibrary(directory).metaDataRegistry.getRecordList(collectImageUrls(directory, depth))
+            libraryLoader.getOrCreateLibrary(directory).createRecordList(collectImageUrls(directory, depth))
 
     private fun collectImageUrls(directory: Path, depth: Int): List<ImageUrl> =
             Files.walk(directory, depth)
@@ -40,6 +59,6 @@ class Rokusho {
                     .collect(Collectors.toList())
 
     fun updateItemTags(record: Record<ImageUrl>, itemTags: List<ItemTag>) =
-            _recordLists.find { it.records.contains(record) }
+            recordLists.find { it.records.contains(record) }
                     ?.apply { metaDataRegistry.updateItemTags(record.key, itemTags) }
 }
