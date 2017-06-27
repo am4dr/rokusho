@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 
 class ConcatenatedListTest {
     @Nested
-    class ValuesAreBoundToTheElementsOfTheLists {
+    inner class ValuesAreBoundToTheElementsOfTheLists {
         @Test
         fun consistsOfOnlyOneObservableList() {
             val list = observableArrayList(1,2,3,4,5)
@@ -22,7 +22,7 @@ class ConcatenatedListTest {
     }
 
     @Nested
-    class BindableFromOthers {
+    inner class BindableFromOthers {
         @Test
         fun AddElementsToAListInTheLists() {
             val list = observableArrayList<Int>()
@@ -85,7 +85,7 @@ class ConcatenatedListTest {
         }
     }
     @Nested
-    class FXCollectionsConcat {
+    inner class FXCollectionsConcat {
         @Test
         fun fxConcatIsNotBoundedToOriginalLists() {
             val expected = listOf(1,2,3,10,20,30,100,200,300)
