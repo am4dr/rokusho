@@ -9,7 +9,6 @@ import javafx.collections.WeakListChangeListener
 import javafx.collections.transformation.TransformationList
 
 class ConcatenatedList<E>(lists: ObservableList<ObservableList<E>>) : TransformationList<E, ObservableList<E>>(lists) {
-    constructor() : this(observableArrayList())
 
     companion object {
         @JvmStatic
