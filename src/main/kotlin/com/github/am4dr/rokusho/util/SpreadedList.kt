@@ -11,25 +11,34 @@ import javafx.collections.transformation.TransformationList
 class SpreadedList<E>(lists: ObservableList<ObservableList<E>>) : TransformationList<E, ObservableList<E>>(lists) {
     constructor() : this(observableArrayList())
 
+    companion object {
+        @JvmStatic
+        fun <T> concat(vararg lists: ObservableList<T>): SpreadedList<T> = SpreadedList(observableArrayList<ObservableList<T>>(*lists))
+    }
+
     private val _lists = ReadOnlyListWrapper<ObservableList<E>>(lists)
     val lists: ReadOnlyListProperty<ObservableList<E>> = _lists.readOnlyProperty
 
     private val listeners: MutableMap<ObservableList<E>, WeakListChangeListener<E>> = mutableMapOf()
+    private val listenerHolder = mutableMapOf<WeakListChangeListener<E>, ListChangeListener<E>>()
 
     init {
-        _lists.forEach(this::addChangeListener)
+        lists.forEach(this::addChangeListener)
     }
 
     private fun addChangeListener(list: ObservableList<E>) {
         val listener = createListChangeListener(list)
-        list.addListener(listener)
-        listeners[list] = listener
+        val weak = WeakListChangeListener(listener)
+        list.addListener(weak)
+        listeners[list] = weak
+        listenerHolder[weak] = listener
     }
     private fun removeChangeListener(list: ObservableList<E>) {
-        val listener = listeners.remove(list)
-        list.removeListener(listener)
+        val weak = listeners.remove(list)
+        list.removeListener(weak)
+        listenerHolder.remove(weak)
     }
-    private fun createListChangeListener(list: ObservableList<E>): WeakListChangeListener<E> = WeakListChangeListener<E> { c ->
+    private fun createListChangeListener(list: ObservableList<E>): ListChangeListener<E> = ListChangeListener { c ->
         val offset = getListOffset(list)
         beginChange()
         while (c.next()) {
