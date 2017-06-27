@@ -1,7 +1,7 @@
 package com.github.am4dr.rokusho.gui
 
 import com.github.am4dr.rokusho.core.library.ItemTag
-import com.github.am4dr.rokusho.util.SpreadedList
+import com.github.am4dr.rokusho.util.ConcatenatedList
 import com.github.am4dr.rokusho.util.TransformedList
 import javafx.beans.binding.Bindings
 import javafx.beans.property.ReadOnlyBooleanProperty
@@ -81,7 +81,7 @@ class Thumbnail(
             tagInput.requestFocus()
         }
     }
-    private val overlayContents = SpreadedList.concat(tagNodes, observableArrayList<Node>(tagInput, addTagButton))
+    private val overlayContents = ConcatenatedList.concat(tagNodes, observableArrayList<Node>(tagInput, addTagButton))
     init {
         maxWidthProperty().bind(image.widthProperty())
         maxHeightProperty().bind(image.heightProperty())

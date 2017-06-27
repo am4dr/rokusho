@@ -6,14 +6,12 @@ import com.github.am4dr.rokusho.core.library.ItemTag
 import com.github.am4dr.rokusho.core.library.MetaDataRegistry
 import com.github.am4dr.rokusho.core.library.ObservableRecordList
 import com.github.am4dr.rokusho.core.library.Record
-import com.github.am4dr.rokusho.util.SpreadedList
+import com.github.am4dr.rokusho.util.ConcatenatedList
 import com.github.am4dr.rokusho.util.TransformedList
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.Bindings.createObjectBinding
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.value.ObservableObjectValue
-import javafx.collections.FXCollections.observableArrayList
-import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
 import javafx.collections.transformation.FilteredList
 import javafx.event.EventHandler
@@ -31,7 +29,7 @@ import java.util.function.Predicate
 
 class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
     private val recordLists = SimpleListProperty(rokusho.recordLists)
-    private val allRecords = SpreadedList<Record<ImageUrl>>(TransformedList(recordLists, ObservableRecordList<ImageUrl>::records))
+    private val allRecords = ConcatenatedList<Record<ImageUrl>>(TransformedList(recordLists, ObservableRecordList<ImageUrl>::records))
     val mainParent: Parent = createMainScene()
 
     private fun createMainScene(): MainLayout {
