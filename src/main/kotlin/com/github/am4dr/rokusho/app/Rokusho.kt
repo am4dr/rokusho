@@ -1,6 +1,7 @@
 package com.github.am4dr.rokusho.app
 
 import com.github.am4dr.rokusho.core.library.*
+import com.github.am4dr.rokusho.util.ConcatenatedList
 import com.github.am4dr.rokusho.util.TransformedList
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyListWrapper
@@ -19,34 +20,18 @@ class Rokusho {
     }
     private val libraryLoader = LocalFileSystemLibraryLoader()
 
-    private val configuredLibraries: ObservableList<Library<*>>
-
     val metaDataRegistries: ReadOnlyListProperty<MetaDataRegistry<ImageUrl>> =
             ReadOnlyListWrapper(TransformedList(libraryLoader.loadedLibraries, Library<ImageUrl>::metaDataRegistry)).readOnlyProperty
 
     val recordLists: ReadOnlyListProperty<ObservableRecordList<ImageUrl>>
-
     init {
-        val allLists = ReadOnlyListWrapper(observableArrayList<ObservableRecordList<ImageUrl>>())
-        configuredLibraries = TransformedList(libraryLoader.loadedLibraries) { libs ->
-            libs.recordLists.addListener(ListChangeListener { c ->
-                while (c.next()) {
-                    if (c.wasRemoved()) {
-                        allLists.removeAll(c.removed)
-                    }
-                    if (c.wasAdded()) {
-                        allLists.addAll(c.addedSubList)
-                    }
-                }
-            })
-            return@TransformedList libs
-        }
-        recordLists = allLists.readOnlyProperty
+        val listOfRecordLists: ObservableList<ObservableList<ObservableRecordList<ImageUrl>>> =
+                TransformedList(libraryLoader.loadedLibraries, Library<ImageUrl>::recordLists)
+        recordLists = ReadOnlyListWrapper(ConcatenatedList(listOfRecordLists)).readOnlyProperty
     }
 
-    fun addDirectory(directory: Path, depth: Int) {
-        libraryLoader.getOrLoadLibrary(directory).createRecordList(collectImageUrls(directory, depth))
-    }
+    fun addDirectory(directory: Path, depth: Int) =
+            libraryLoader.getOrLoadLibrary(directory).createRecordList(collectImageUrls(directory, depth))
 
     private fun collectImageUrls(directory: Path, depth: Int): List<ImageUrl> =
             Files.walk(directory, depth)
