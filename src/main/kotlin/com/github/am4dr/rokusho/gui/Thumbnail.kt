@@ -8,16 +8,15 @@ import javafx.beans.property.ReadOnlyBooleanProperty
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleListProperty
-import javafx.collections.FXCollections
 import javafx.collections.FXCollections.observableArrayList
 import javafx.collections.ObservableList
 import javafx.event.EventHandler
 import javafx.geometry.Insets
+import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.input.KeyCode
-import javafx.scene.input.KeyEvent
 import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.scene.text.Font
@@ -36,7 +35,7 @@ class Thumbnail(
     val tags: ReadOnlyListProperty<ItemTag> = SimpleListProperty(observableArrayList(initialTags))
     private fun syncTags() = tags.setAll(_tags)
 
-    private val tagNodes = TransformedList(_tags) { tag ->
+    private val tagNodes: ObservableList<Node> = TransformedList(_tags) { tag ->
         tagNodeFactory(tag).apply { onRemovedProperty.set({
             this@Thumbnail._tags.remove(tag)
             syncTags()
@@ -82,6 +81,7 @@ class Thumbnail(
             tagInput.requestFocus()
         }
     }
+    private val overlayContents = ConcatenatedList.concat(tagNodes, observableArrayList<Node>(tagInput, addTagButton))
     init {
         maxWidthProperty().bind(image.widthProperty())
         maxHeightProperty().bind(image.heightProperty())
@@ -89,7 +89,7 @@ class Thumbnail(
         val overlay = FlowPane(7.5, 5.0).apply {
             padding = Insets(10.0)
             background = Background(BackgroundFill(Color.rgb(0, 0, 0, 0.5), null, null))
-            Bindings.bindContent(children, ConcatenatedList(tagNodes, FXCollections.observableList(listOf(tagInput, addTagButton))))
+            Bindings.bindContent(children, overlayContents)
             visibleProperty().bind(this@Thumbnail.hoverProperty().or(tagInput.focusedProperty()))
         }
         children.setAll(imageView, overlay)

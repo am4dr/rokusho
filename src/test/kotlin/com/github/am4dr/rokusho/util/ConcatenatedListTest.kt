@@ -1,108 +1,87 @@
 package com.github.am4dr.rokusho.util
 
+import javafx.beans.binding.Bindings
 import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections
-import javafx.collections.FXCollections.*
+import javafx.collections.FXCollections.observableArrayList
 import javafx.collections.ObservableList
 import org.junit.jupiter.api.Assertions.assertIterableEquals
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class ConcatenatedListTest {
     @Nested
-    class ListAndListConcatenationTest {
-        private var left: ObservableList<Int> = emptyObservableList()
-        private var right: ObservableList<Int> = emptyObservableList()
-        private var concat: ObservableList<Int> = emptyObservableList()
-
-        @BeforeEach
-        fun beforeEach() {
-            left = observableList(mutableListOf(1, 2, 3))
-            right = observableList(mutableListOf(100, 200, 300))
-            concat = ConcatenatedList(left, right)
-        }
-
+    class ValuesAreBoundToTheElementsOfTheLists {
         @Test
-        fun simpleListAndListConcatenation() {
-            assertIterableEquals(listOf(1,2,3,100,200,300), concat)
-        }
-        @Test
-        fun modifyLeft() {
-            left[1] = 0
-            assertIterableEquals(listOf(1,0,3,100,200,300), concat)
-        }
-        @Test
-        fun modifyRight() {
-            right[1] = 0
-            assertIterableEquals(listOf(1,2,3,100,0,300), concat)
-        }
-        @Test
-        fun resizeLeft() {
-            left.add(-1)
-            assertIterableEquals(listOf(1,2,3,-1,100,200,300), concat)
-            left.clear()
-            assertIterableEquals(listOf(100,200,300), concat)
-        }
-        @Test
-        fun resizeRight() {
-            right.add(-1)
-            assertIterableEquals(listOf(1,2,3,100,200,300,-1), concat)
-            right.clear()
-            assertIterableEquals(listOf(1,2,3), concat)
-        }
-        @Test
-        fun resizeLeftAndRight() {
-            left.removeAt(0)
-            right.removeAt(0)
-            assertIterableEquals(listOf(2,3,200,300), concat)
-        }
-        @Test
-        fun isObservable() {
-            val listProperty = SimpleListProperty(observableList(mutableListOf<Int>())).apply { bindContent(concat) }
-            left[1] = 0
-            assertIterableEquals(listOf(1,0,3,100,200,300), listProperty)
-            right[1] = 0
-            assertIterableEquals(listOf(1,0,3,100,0,300), listProperty)
-            left.clear()
-            assertIterableEquals(listOf(100,0,300), concat)
+        fun consistsOfOnlyOneObservableList() {
+            val list = observableArrayList(1,2,3,4,5)
+            val lists = observableArrayList<ObservableList<Int>>(list)
+            val spreadedList = ConcatenatedList(lists)
+            assertIterableEquals(list, spreadedList)
         }
     }
+
     @Nested
-    class MultipleListConcatenationTest {
-        private var left = observableList(mutableListOf(1, 2, 3))
-        private var middle = observableList(mutableListOf(0))
-        private var right = observableList(mutableListOf(100, 200, 300))
-        var concat = ConcatenatedList(left, middle, right)
-        @BeforeEach
-        fun beforeEach() {
-            left = observableList(mutableListOf(1, 2, 3))
-            middle = observableList(mutableListOf(0))
-            right = observableList(mutableListOf(100, 200, 300))
-            concat = ConcatenatedList(left, middle, right)
+    class BindableFromOthers {
+        @Test
+        fun AddElementsToAListInTheLists() {
+            val list = observableArrayList<Int>()
+            val lists = observableArrayList<ObservableList<Int>>(list)
+            val spreaded = ConcatenatedList(lists)
+            val binder = SimpleListProperty<Int>(observableArrayList())
+            binder.bindContent(spreaded)
+
+            list.addAll(1,2,3,4,5)
+
+            assertIterableEquals(list, binder)
         }
         @Test
-        fun threeListsConcatenation() {
-            assertIterableEquals(listOf(1,2,3,0,100,200,300), concat)
+        fun RemoveElementsFromAListInTheLists() {
+            val list = observableArrayList(1,2,3,4,5)
+            val lists = observableArrayList<ObservableList<Int>>(list)
+            val spreaded = ConcatenatedList(lists)
+            val binder = SimpleListProperty<Int>(observableArrayList())
+            binder.bindContent(spreaded)
+
+            list.remove(2,4)
+
+            assertIterableEquals(list, binder)
         }
         @Test
-        fun modifyTheMiddleOfThreeListsConcatenation() {
-            middle.addAll(0, 0)
-            assertIterableEquals(listOf(1,2,3,0,0,0,100,200,300), concat)
+        fun RemoveElementsFromAListInTheListsWithBindingsBindContent() {
+            val list = observableArrayList(1,2,3,4,5)
+            val lists = observableArrayList<ObservableList<Int>>(list)
+            val spreaded = ConcatenatedList(lists)
+            val binder = SimpleListProperty<Int>(observableArrayList())
+            Bindings.bindContent(binder, spreaded)
+
+            list.remove(2,4)
+
+            assertIterableEquals(list, binder)
         }
-    }
-    @Nested
-    class ConcatTest {
         @Test
-        fun concatMethod() {
-            val concat = ConcatenatedList<Int>()
-            val mid = observableList(mutableListOf(10,20,30))
-            concat.concat(observableList(listOf(1,2,3)))
-            concat.concat(mid)
-            concat.concat(observableList(listOf(100,200,300)))
-            assertIterableEquals(listOf(1,2,3,10,20,30,100,200,300), concat)
-            mid.clear()
-            assertIterableEquals(listOf(1,2,3,100,200,300), concat)
+        fun AddAListToTheLists() {
+            val list = observableArrayList(1,2,3,4,5)
+            val lists = observableArrayList<ObservableList<Int>>()
+            val spreaded = ConcatenatedList(lists)
+            val binder = SimpleListProperty<Int>(observableArrayList())
+            binder.bindContent(spreaded)
+
+            lists.add(list)
+
+            assertIterableEquals(list, binder)
+        }
+        @Test
+        fun RemoveAListFromTheLists() {
+            val list = observableArrayList(1,2,3,4,5)
+            val lists = observableArrayList<ObservableList<Int>>(list)
+            val spreaded = ConcatenatedList(lists)
+            val binder = SimpleListProperty<Int>(observableArrayList())
+            binder.bindContent(spreaded)
+
+            lists.remove(list)
+
+            assertIterableEquals(listOf<Int>(), binder)
         }
     }
     @Nested
@@ -110,7 +89,7 @@ class ConcatenatedListTest {
         @Test
         fun fxConcatIsNotBoundedToOriginalLists() {
             val expected = listOf(1,2,3,10,20,30,100,200,300)
-            val mid = observableList(mutableListOf(10,20,30))
+            val mid = FXCollections.observableList(mutableListOf(10, 20, 30))
             val concat = FXCollections.concat(observableArrayList(1,2,3), mid, observableArrayList(100,200,300))
             assertIterableEquals(expected, concat, "before the mid cleared")
             mid.clear()
