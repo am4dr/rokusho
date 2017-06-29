@@ -1,14 +1,13 @@
 package com.github.am4dr.rokusho.core.library
 
+import com.github.am4dr.rokusho.util.ObservableSubMap
+import com.github.am4dr.rokusho.util.toObservableList
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyListWrapper
 import javafx.beans.property.ReadOnlyMapProperty
 import javafx.beans.property.ReadOnlyMapWrapper
-import javafx.collections.FXCollections.observableArrayList
 import javafx.collections.FXCollections.observableHashMap
-import javafx.collections.MapChangeListener
-import javafx.collections.ObservableList
-import javafx.collections.WeakMapChangeListener
+import javafx.collections.transformation.SortedList
 
 class DefaultMetaDataRegistry<T>(
         tags: MutableList<Tag> = mutableListOf(),
@@ -26,11 +25,8 @@ class DefaultMetaDataRegistry<T>(
     }
 
     override fun getRecordList(list: Iterable<T>): ObservableRecordList<T> {
-        val items = list.mapTo(observableArrayList(), this::getRecord)
-        items.forEach(this::watchIfNotWatched)
-        val itemSet = DefaultLibraryObservableRecordList(this, items)
-        watchedItems.addListener(WeakMapChangeListener(itemSet))
-        return itemSet
+        list.map(this::getRecord).forEach(this::watchIfNotWatched)
+        return DefaultMetaDataRegistryObservableRecordList(list.toList())
     }
 
     override fun getRecord(key: T): Record<T> = watchedItems[key] ?: Record(key, itemTagDB.get(key))
@@ -43,22 +39,15 @@ class DefaultMetaDataRegistry<T>(
         watchedItems[record.key]?.takeIf { it != record }
                 ?.let{ watchedItems[record.key] = record }
     }
-}
-class DefaultLibraryObservableRecordList<T>(override val metaDataRegistry: MetaDataRegistry<T>, target: ObservableList<Record<T>>) : ObservableRecordList<T>, MapChangeListener<T, Record<T>> {
 
-    private val values = target.map(Record<T>::key)
-    private val _items = observableArrayList(target)
-    override val records: ReadOnlyListProperty<Record<T>> = ReadOnlyListWrapper(_items).readOnlyProperty
+    private inner class DefaultMetaDataRegistryObservableRecordList(keys: List<T>) : ObservableRecordList<T> {
+        override val metaDataRegistry: MetaDataRegistry<T> = this@DefaultMetaDataRegistry
 
-    // TODO 更新(つまり削除と追加が同時に行われるもの)ではなくただの削除に対応する
-    override fun onChanged(change: MapChangeListener.Change<out T, out Record<T>>?) {
-        change ?: return
-        val idx = values.indexOf(change.key).takeIf { it >= 0 } ?: return
-        if (change.wasRemoved()) {
-            _items.removeAt(idx)
-        }
-        if (change.wasAdded()) {
-            _items.add(idx, change.valueAdded)
+        override val records: ReadOnlyListProperty<Record<T>>
+        init {
+            val subMap = ObservableSubMap(watchedItems, keys)
+            val list = SortedList(toObservableList(subMap), compareBy { it.key as? Comparable<*> ?: it.key.toString() })
+            records = ReadOnlyListWrapper(list).readOnlyProperty
         }
     }
 }
