@@ -1,7 +1,8 @@
-package com.github.am4dr.rokusho.gui
+package com.github.am4dr.rokusho.launcher
 
 import com.github.am4dr.rokusho.app.Rokusho
 import com.github.am4dr.rokusho.dev.gui.RokushoViewer
+import com.github.am4dr.rokusho.gui.RokushoGui
 import javafx.application.Application
 import javafx.scene.Scene
 import javafx.stage.Stage
