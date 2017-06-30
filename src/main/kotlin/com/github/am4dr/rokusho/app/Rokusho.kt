@@ -1,12 +1,10 @@
 package com.github.am4dr.rokusho.app
 
 import com.github.am4dr.rokusho.core.library.*
-import com.github.am4dr.rokusho.util.ConcatenatedList
-import com.github.am4dr.rokusho.util.TransformedList
+import com.github.am4dr.rokusho.javafx.collection.ConcatenatedList
+import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyListWrapper
-import javafx.collections.FXCollections.observableArrayList
-import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
 import java.nio.file.Files
 import java.nio.file.Path

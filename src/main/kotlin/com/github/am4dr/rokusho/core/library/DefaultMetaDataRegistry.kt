@@ -1,7 +1,7 @@
 package com.github.am4dr.rokusho.core.library
 
-import com.github.am4dr.rokusho.util.ObservableSubMap
-import com.github.am4dr.rokusho.util.toObservableList
+import com.github.am4dr.rokusho.javafx.collection.ObservableSubMap
+import com.github.am4dr.rokusho.javafx.collection.toObservableList
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyListWrapper
 import javafx.beans.property.ReadOnlyMapProperty

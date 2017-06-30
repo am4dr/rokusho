@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.util
+package com.github.am4dr.rokusho.javafx.collection
 
 import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections

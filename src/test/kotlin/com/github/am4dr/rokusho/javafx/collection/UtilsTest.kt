@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.util
+package com.github.am4dr.rokusho.javafx.collection
 
 import javafx.collections.FXCollections
 import org.junit.jupiter.api.Assertions.assertEquals
