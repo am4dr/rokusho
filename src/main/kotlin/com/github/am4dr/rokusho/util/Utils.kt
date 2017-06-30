@@ -1,12 +1,7 @@
 package com.github.am4dr.rokusho.util
 
-import javafx.beans.property.ListProperty
-import javafx.beans.property.SimpleListProperty
 import javafx.collections.*
 import javafx.collections.FXCollections.observableArrayList
-
-fun <T> createEmptyListProperty(): ListProperty<T> =
-        SimpleListProperty(FXCollections.observableList(mutableListOf<T>()))
 
 fun <T> toObservableList(observableSet: ObservableSet<T>): ObservableList<T> {
     val list = object : ObservableList<T> by FXCollections.observableArrayList<T>(observableSet), SetChangeListener<T> {
