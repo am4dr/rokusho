@@ -6,8 +6,8 @@ import com.github.am4dr.rokusho.core.library.ItemTag
 import com.github.am4dr.rokusho.core.library.MetaDataRegistry
 import com.github.am4dr.rokusho.core.library.ObservableRecordList
 import com.github.am4dr.rokusho.core.library.Record
-import com.github.am4dr.rokusho.util.ConcatenatedList
-import com.github.am4dr.rokusho.util.TransformedList
+import com.github.am4dr.rokusho.javafx.collection.ConcatenatedList
+import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.Bindings.createObjectBinding
 import javafx.beans.property.SimpleListProperty

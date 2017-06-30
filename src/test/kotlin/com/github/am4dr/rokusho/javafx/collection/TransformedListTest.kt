@@ -1,5 +1,6 @@
-package com.github.am4dr.rokusho.util
+package com.github.am4dr.rokusho.javafx.collection
 
+import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -58,10 +59,10 @@ class TransformedListTest {
     }
     @Test
     fun bindingTest() {
-        val source = FXCollections.observableList(mutableListOf<Int>())
+        val source = FXCollections.observableArrayList<Int>()
         val transformed = TransformedList(source, Int::toString)
         source.addAll(0, 1, 2)
-        val listProperty = createEmptyListProperty<String>()
+        val listProperty = SimpleListProperty(FXCollections.observableArrayList<String>())
         listProperty.bindContent(transformed)
         assertEquals(3, listProperty.size)
         source.add(100)

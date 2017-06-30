@@ -1,20 +1,15 @@
-package com.github.am4dr.rokusho.util
+package com.github.am4dr.rokusho.javafx.collection
 
-import javafx.beans.property.ListProperty
-import javafx.beans.property.SimpleListProperty
 import javafx.collections.*
 import javafx.collections.FXCollections.observableArrayList
 
-fun <T> createEmptyListProperty(): ListProperty<T> =
-        SimpleListProperty(FXCollections.observableList(mutableListOf<T>()))
-
 fun <T> toObservableList(observableSet: ObservableSet<T>): ObservableList<T> {
-    val list = object : ObservableList<T> by FXCollections.observableList(mutableListOf()), SetChangeListener<T> {
+    val list = object : ObservableList<T> by FXCollections.observableArrayList<T>(observableSet), SetChangeListener<T> {
+        val source = observableSet
         override fun onChanged(change: SetChangeListener.Change<out T>?) {
-            change?.run {
-                remove(elementRemoved)
-                add(elementAdded)
-            }
+            change ?: return
+            if (change.wasRemoved()) remove(change.elementRemoved)
+            if (change.wasAdded()) add(change.elementAdded)
         }
     }
     observableSet.addListener(WeakSetChangeListener(list))
@@ -23,7 +18,7 @@ fun <T> toObservableList(observableSet: ObservableSet<T>): ObservableList<T> {
 
 fun <K, V> toObservableList(map: ObservableMap<K, V>): ObservableList<V> {
     val list = object : ObservableList<V> by observableArrayList<V>(), MapChangeListener<K, V> {
-        val mapReference = map
+        val source = map
         val index: MutableMap<K, Int> = mutableMapOf()
         init {
             map.toList().forEachIndexed { i, (k, v) ->
