@@ -3,6 +3,7 @@ package com.github.am4dr.rokusho.gui
 import com.github.am4dr.rokusho.core.library.ItemTag
 import com.github.am4dr.rokusho.javafx.collection.ConcatenatedList
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
+import com.github.am4dr.rokusho.javafx.control.FittingTextField
 import javafx.beans.binding.Bindings
 import javafx.beans.property.ReadOnlyBooleanProperty
 import javafx.beans.property.ReadOnlyListProperty
