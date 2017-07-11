@@ -22,7 +22,8 @@ class YamlSaveFileParser : SaveFileParser {
             val version = parseVersion(yaml["version"])
             val tags = parseTagInfo(yaml["tags"])
             val metaData = parseMetaData(yaml["metaData"])
-            return SaveData(version, tags, metaData)
+            // TODO select suitable SaveData.Version for the savefile version
+            return SaveData(SaveData.Version.VERSION_1, tags, metaData)
         }
         private fun parseVersion(data: Any?): String {
             data ?: throw VersionNotSpecifiedException()
