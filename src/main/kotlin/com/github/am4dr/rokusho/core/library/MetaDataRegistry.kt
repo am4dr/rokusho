@@ -6,5 +6,6 @@ interface MetaDataRegistry<T> {
     fun getRecord(key: T): Record<T>
     fun getRecordList(list: Iterable<T>): ObservableRecordList<T>
     fun getTags(): ReadOnlyMapProperty<String, Tag>
+    fun getAllItems(): Set<Record<T>>
     fun updateItemTags(key: T, tags: Iterable<ItemTag>)
 }

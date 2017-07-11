@@ -1,5 +1,7 @@
 package com.github.am4dr.rokusho.app
 
+import com.github.am4dr.rokusho.app.savefile.SaveDataSerializer
+import com.github.am4dr.rokusho.app.savefile.SaveFile
 import com.github.am4dr.rokusho.core.library.DefaultMetaDataRegistry
 import com.github.am4dr.rokusho.core.library.Library
 import com.github.am4dr.rokusho.core.library.MetaDataRegistry
@@ -7,6 +9,7 @@ import com.github.am4dr.rokusho.core.library.ObservableRecordList
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyListWrapper
 import javafx.collections.FXCollections.observableArrayList
+import java.nio.file.Files
 import java.nio.file.Path
 
 class LocalFileSystemLibrary(savefilePath: Path,
@@ -16,4 +19,10 @@ class LocalFileSystemLibrary(savefilePath: Path,
     override val recordLists: ReadOnlyListProperty<ObservableRecordList<ImageUrl>> = _recordLists.readOnlyProperty
     override fun createRecordList(list: Iterable<ImageUrl>): ObservableRecordList<ImageUrl> =
             metaDataRegistry.getRecordList(list).also { _recordLists.add(it) }
+
+    fun save(serializer: SaveDataSerializer) {
+        val savefile = SaveFile.fromMetaDataRegistry(savefilePath, metaDataRegistry)
+        val serialized = serializer.serialize(savefile.data)
+        Files.write(savefilePath, serialized.split("\n"))
+    }
 }

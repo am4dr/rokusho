@@ -21,12 +21,12 @@ class YamlSaveDataSerializer : SaveDataSerializer {
                             val name = it.key
                             val info = it.value
                             Pair(name, info.data)
-                        }.toMap(),
+                        }.toMap().toMutableMap(),
                         "metaData" to metaData.map {
                             val path = it.key.joinToString(pathSeparator)
                             val data = it.value
                             Pair(path, data.toDumpStructure())
-                        }.toMap())
+                        }.toMap().toMutableMap())
     }
 
     override fun serialize(data: SaveData): String = Yaml().dump(data.toDumpStructure())
