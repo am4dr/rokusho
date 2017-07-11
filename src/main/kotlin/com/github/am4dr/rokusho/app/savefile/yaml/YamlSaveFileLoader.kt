@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.app.savefile
+package com.github.am4dr.rokusho.app.savefile.yaml
 
 import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.core.library.DefaultMetaDataRegistry
@@ -8,7 +8,7 @@ import com.github.am4dr.rokusho.core.library.SimpleItemTagDB
 import java.nio.file.Files
 import java.nio.file.Path
 
-class SaveFileLoader {
+class YamlSaveFileLoader {
     companion object {
         const val DEFAULT_SAVEFILE_NAME = "rokusho.yaml"
     }
@@ -25,7 +25,7 @@ class SaveFileLoader {
     }
 
     fun locateSaveFilePath(directory: Path): Path? =
-            directory.resolve(SaveFileLoader.DEFAULT_SAVEFILE_NAME).takeIf { Files.exists(it) }
+            directory.resolve(DEFAULT_SAVEFILE_NAME).takeIf { Files.exists(it) }
                     ?: directory.parent?.let { locateSaveFilePath(it) }
 
     fun getDefaultSavefilePath(directory: Path): Path = directory.normalize().resolve(DEFAULT_SAVEFILE_NAME)

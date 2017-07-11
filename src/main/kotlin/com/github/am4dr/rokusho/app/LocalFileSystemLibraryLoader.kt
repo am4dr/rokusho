@@ -1,6 +1,6 @@
 package com.github.am4dr.rokusho.app
 
-import com.github.am4dr.rokusho.app.savefile.SaveFileLoader
+import com.github.am4dr.rokusho.app.savefile.yaml.YamlSaveFileLoader
 import com.github.am4dr.rokusho.core.library.DefaultMetaDataRegistry
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyListWrapper
@@ -9,7 +9,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 class LocalFileSystemLibraryLoader {
-    private val savefileLoader = SaveFileLoader()
+    private val savefileLoader = YamlSaveFileLoader()
     private val _loadedLibraries = ReadOnlyListWrapper(observableArrayList<LocalFileSystemLibrary>())
     val loadedLibraries: ReadOnlyListProperty<LocalFileSystemLibrary> = _loadedLibraries.readOnlyProperty
 
