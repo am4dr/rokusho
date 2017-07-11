@@ -2,6 +2,7 @@ package com.github.am4dr.rokusho.app.savefile.yaml
 
 import com.github.am4dr.rokusho.app.savefile.ImageMetaData
 import com.github.am4dr.rokusho.app.savefile.SaveData
+import com.github.am4dr.rokusho.app.savefile.SaveFile
 import com.github.am4dr.rokusho.app.savefile.SaveFileParser
 import com.github.am4dr.rokusho.app.savefile.SaveFileParser.IllegalSaveFormatException
 import com.github.am4dr.rokusho.app.savefile.SaveFileParser.VersionNotSpecifiedException
@@ -74,5 +75,5 @@ class YamlSaveFileParser : SaveFileParser {
         }
     }
 
-    override fun parse(path: Path): SaveData = parse(path.toFile().readText())
+    override fun parse(path: Path): SaveFile = SaveFile(path, parse(path.toFile().readText()))
 }
