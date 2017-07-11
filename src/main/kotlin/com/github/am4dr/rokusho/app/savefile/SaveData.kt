@@ -5,12 +5,12 @@ import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.nio.file.Path
 
-data class SaveFile(
+data class SaveData(
         val version: String,
         val tags: Map<String, Tag>,
         val metaData: Map<Path, ImageMetaData>) {
     companion object {
-        private val log = LoggerFactory.getLogger(SaveFile::class.java)
+        private val log = LoggerFactory.getLogger(SaveData::class.java)
         const val pathSeparator: String = "/"
     }
     fun toTextFormat(): String =

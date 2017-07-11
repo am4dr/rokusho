@@ -13,13 +13,13 @@ import java.nio.file.Paths
 class YamlSaveFileParser : SaveFileParser {
     companion object {
         private val log = LoggerFactory.getLogger(YamlSaveFileParser::class.java)
-        fun parse(string: String): SaveFile {
+        fun parse(string: String): SaveData {
             val yaml = Yaml().load(string)
             if (yaml == null || yaml !is Map<*,*>) { throw IllegalSaveFormatException("top level of save file must be a Map") }
             val version = parseVersion(yaml["version"])
             val tags = parseTagInfo(yaml["tags"])
             val metaData = parseMetaData(yaml["metaData"])
-            return SaveFile(version, tags, metaData)
+            return SaveData(version, tags, metaData)
         }
         private fun parseVersion(data: Any?): String {
             data ?: throw VersionNotSpecifiedException()
@@ -70,5 +70,5 @@ class YamlSaveFileParser : SaveFileParser {
         }
     }
 
-    override fun parse(path: Path): SaveFile = parse(path.toFile().readText())
+    override fun parse(path: Path): SaveData = parse(path.toFile().readText())
 }
