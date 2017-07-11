@@ -2,8 +2,8 @@ package com.github.am4dr.rokusho.dev.gui
 
 import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.Rokusho
-import com.github.am4dr.rokusho.core.library.ObservableRecordList
 import com.github.am4dr.rokusho.core.library.MetaDataRegistry
+import com.github.am4dr.rokusho.core.library.ObservableRecordList
 import javafx.scene.Scene
 import javafx.scene.control.ListView
 import javafx.scene.layout.VBox

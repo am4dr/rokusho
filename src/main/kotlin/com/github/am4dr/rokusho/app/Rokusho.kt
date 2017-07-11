@@ -1,5 +1,6 @@
 package com.github.am4dr.rokusho.app
 
+import com.github.am4dr.rokusho.app.savefile.yaml.YamlSaveDataSerializer
 import com.github.am4dr.rokusho.core.library.*
 import com.github.am4dr.rokusho.javafx.collection.ConcatenatedList
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
@@ -40,4 +41,9 @@ class Rokusho {
     fun updateItemTags(record: Record<ImageUrl>, itemTags: List<ItemTag>) =
             recordLists.find { it.records.contains(record) }
                     ?.apply { metaDataRegistry.updateItemTags(record.key, itemTags) }
+
+    fun save() {
+        val serializer = YamlSaveDataSerializer()
+        libraryLoader.loadedLibraries.forEach { it.save(serializer) }
+    }
 }

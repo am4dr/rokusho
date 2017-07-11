@@ -1,8 +1,8 @@
 package com.github.am4dr.rokusho.gui
 
+import com.github.am4dr.rokusho.core.library.ItemTag
 import com.github.am4dr.rokusho.core.library.Tag
 import com.github.am4dr.rokusho.core.library.TagType
-import com.github.am4dr.rokusho.core.library.ItemTag
 import javafx.beans.binding.StringBinding
 import javafx.beans.property.ReadOnlyMapProperty
 

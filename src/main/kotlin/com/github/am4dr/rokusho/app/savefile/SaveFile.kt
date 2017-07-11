@@ -1,34 +1,38 @@
 package com.github.am4dr.rokusho.app.savefile
 
-import com.github.am4dr.rokusho.core.library.Tag
-import org.slf4j.LoggerFactory
-import org.yaml.snakeyaml.Yaml
+import com.github.am4dr.rokusho.app.ImageUrl
+import com.github.am4dr.rokusho.core.library.*
 import java.nio.file.Path
+import java.nio.file.Paths
 
-data class SaveFile(
-        val version: String,
-        val tags: Map<String, Tag>,
-        val metaData: Map<Path, ImageMetaData>) {
+class SaveFile(val savefilePath: Path, val data: SaveData) {
+
     companion object {
-        private val log = LoggerFactory.getLogger(SaveFile::class.java)
-        const val pathSeparator: String = "/"
+        fun fromMetaDataRegistry(savefilePath: Path, registry: MetaDataRegistry<ImageUrl>): SaveFile {
+            val registeredTags = registry.getTags()
+            val dummyTag = SimpleTag("dummy", TagType.TEXT)
+            val metaData = registry.getAllItems().map {
+                val path = savefilePath.parent.relativize(Paths.get(it.key.url.toURI()))
+                val tags = it.itemTags.map {
+                    val tag = registeredTags[it.name] ?: dummyTag
+                    val tagData = tag.data.toMutableMap()
+                    tagData["value"] = it.value
+                    SimpleTag(it.name, tag.type, tagData)
+                }
+                path to ImageMetaData(tags)
+            }.toMap()
+            val data = SaveData(SaveData.Version.VERSION_1, registry.getTags(), metaData)
+            return SaveFile(savefilePath, data)
+        }
     }
-    fun toTextFormat(): String =
-        Yaml().dump(toDumpStructure())
-    fun toDumpStructure(): Map<String, Any> =
-        mapOf(
-                "version" to version,
-                "tags" to tags.map {
-                    val name = it.key
-                    val info = it.value
-                    Pair(name, info.data)
-                }.toMap(),
-                "metaData" to metaData.map {
-                    val path = it.key.joinToString(pathSeparator)
-                    val data = it.value
-                    Pair(path, data.toDumpStructure())
-                }.toMap())
-}
-open class IllegalSaveFormatException(message: String = "") : RuntimeException(message)
-class VersionNotSpecifiedException(message: String = ""): IllegalSaveFormatException(message)
 
+    fun toMetaDataRegistry(): MetaDataRegistry<ImageUrl> {
+        val tags = data.tags.values.toMutableList()
+        val items = data.metaData.map { (path, imageMetaData) ->
+            val url = ImageUrl(savefilePath.parent.resolve(path).toUri().toURL())
+            val itemTags = imageMetaData.tags.map { ItemTag(it.id, it.data["value"]?.toString() ?: it.id) }
+            url to itemTags
+        }
+        return DefaultMetaDataRegistry(tags, SimpleItemTagDB(items.toMap()))
+    }
+}

@@ -1,8 +1,8 @@
 package com.github.am4dr.rokusho.core;
 
-import com.github.am4dr.rokusho.app.savefile.IllegalSaveFormatException
-import com.github.am4dr.rokusho.app.savefile.VersionNotSpecifiedException
-import com.github.am4dr.rokusho.app.savefile.YamlSaveFileParser
+import com.github.am4dr.rokusho.app.savefile.SaveFileParser.IllegalSaveFormatException
+import com.github.am4dr.rokusho.app.savefile.SaveFileParser.VersionNotSpecifiedException
+import com.github.am4dr.rokusho.app.savefile.yaml.YamlSaveFileParser
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.nio.file.Paths
@@ -175,16 +175,5 @@ class YamlSaveFileParserTest {
             |metaData: { path/to/image: { tags: { tagA: { opt: null } } } }
             |""".trimMargin())
         }
-    }
-    @Test
-    fun dumpAndParseTest() {
-        val original = YamlSaveFileParser.parse("""
-            |version: "1"
-            |tags: { tagA: { type: "selection" }, tagB: { type: "text" }, tagC: {} }
-            |metaData: { path/to/image: { tags: { tagA: {}, tagB: null } } }
-            |""".trimMargin())
-        val dumped = YamlSaveFileParser.parse(original.toTextFormat())
-        assertEquals(original, dumped)
-        println(original.toTextFormat())
     }
 }

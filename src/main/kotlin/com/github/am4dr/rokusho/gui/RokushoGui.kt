@@ -34,7 +34,7 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
 
     private fun createMainScene(): MainLayout {
         val saveButton = Button("保存").apply {
-            setOnAction { /* TODO onSaveClicked() */ }
+            setOnAction { rokusho.save() }
         }
         val addLibraryButton = Button("追加").apply {
             setOnAction { selectLibraryDirectory(stage) }

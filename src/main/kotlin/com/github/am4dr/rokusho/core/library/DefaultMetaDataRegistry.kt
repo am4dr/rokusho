@@ -17,6 +17,7 @@ class DefaultMetaDataRegistry<T>(
         tags.map { it.id to it }.toMap(this)
     }
     override fun getTags(): ReadOnlyMapProperty<String, Tag> = _tags.readOnlyProperty
+    override fun getAllItems(): Set<Record<T>> = itemTagDB.getKeys().map(this::getRecord).toSet()
 
     private val watchedItems = observableHashMap<T, Record<T>>()
     private fun watchIfNotWatched(record: Record<T>) {
