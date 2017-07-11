@@ -1,7 +1,7 @@
 package com.github.am4dr.rokusho.core;
 
-import com.github.am4dr.rokusho.app.savefile.IllegalSaveFormatException
-import com.github.am4dr.rokusho.app.savefile.VersionNotSpecifiedException
+import com.github.am4dr.rokusho.app.savefile.SaveFileParser.IllegalSaveFormatException
+import com.github.am4dr.rokusho.app.savefile.SaveFileParser.VersionNotSpecifiedException
 import com.github.am4dr.rokusho.app.savefile.YamlSaveFileParser
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test

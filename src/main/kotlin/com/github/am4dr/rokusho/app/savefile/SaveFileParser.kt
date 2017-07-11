@@ -4,4 +4,7 @@ import java.nio.file.Path
 
 interface SaveFileParser {
     fun parse(path: Path): SaveFile
+
+    open class IllegalSaveFormatException(message: String = "") : RuntimeException(message)
+    class VersionNotSpecifiedException(message: String = ""): IllegalSaveFormatException(message)
 }

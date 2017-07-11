@@ -29,6 +29,4 @@ data class SaveFile(
                     Pair(path, data.toDumpStructure())
                 }.toMap())
 }
-open class IllegalSaveFormatException(message: String = "") : RuntimeException(message)
-class VersionNotSpecifiedException(message: String = ""): IllegalSaveFormatException(message)
 

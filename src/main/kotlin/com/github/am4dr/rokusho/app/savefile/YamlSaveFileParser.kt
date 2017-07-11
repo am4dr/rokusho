@@ -1,5 +1,7 @@
 package com.github.am4dr.rokusho.app.savefile
 
+import com.github.am4dr.rokusho.app.savefile.SaveFileParser.IllegalSaveFormatException
+import com.github.am4dr.rokusho.app.savefile.SaveFileParser.VersionNotSpecifiedException
 import com.github.am4dr.rokusho.core.library.SimpleTag
 import com.github.am4dr.rokusho.core.library.Tag
 import com.github.am4dr.rokusho.core.library.TagType
