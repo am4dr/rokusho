@@ -2,15 +2,17 @@ package com.github.am4dr.rokusho.dev.gui
 
 import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.Rokusho
+import com.github.am4dr.rokusho.core.library.Library
 import com.github.am4dr.rokusho.core.library.MetaDataRegistry
 import com.github.am4dr.rokusho.core.library.ObservableRecordList
+import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import javafx.scene.Scene
 import javafx.scene.control.ListView
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
 
 class RokushoViewer(val rokusho: Rokusho) {
-    private val metaDataRegistries = rokusho.metaDataRegistries
+    private val metaDataRegistries = TransformedList(rokusho.libraries, Library<ImageUrl>::metaDataRegistry)
     private val recordLists = rokusho.recordLists
     companion object {
         const val initialWidth: Double  = 300.0
