@@ -32,11 +32,16 @@ class Rokusho {
         recordLists = ReadOnlyListWrapper(ConcatenatedList(listOfRecordLists)).readOnlyProperty
     }
 
+    private fun addDirectory(directory: Path): ObservableRecordList<ImageUrl>? =
+            libraryLoader.getOrLoadLibrary(directory).run {
+                collectImageUrls(directory, 1).takeIf(List<*>::isNotEmpty)?.let { createRecordList(it) }
+            }
+
     fun addDirectory(directory: Path, depth: Int): List<ObservableRecordList<ImageUrl>> =
-            Files.find(directory, depth, BiPredicate { p, a ->  a.isDirectory && !Files.isSameFile(directory, p) })
-                    .collect({ mutableListOf(libraryLoader.getOrLoadLibrary(directory).createRecordList(collectImageUrls(directory, 1))) },
-                            { acc, dir -> acc.addAll(addDirectory(dir, depth - 1)) },
-                            { l, r -> l.addAll(r) })
+            Files.find(directory, depth, BiPredicate { _, a ->  a.isDirectory })
+                    .map { addDirectory(it) }
+                    .filter { it != null }
+                    .collect(Collectors.toList<ObservableRecordList<ImageUrl>>())
 
     private fun collectImageUrls(directory: Path, depth: Int): List<ImageUrl> =
             Files.walk(directory, depth)
