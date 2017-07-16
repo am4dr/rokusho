@@ -12,6 +12,7 @@ import javafx.beans.property.ReadOnlyListWrapper
 import javafx.collections.ObservableList
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.function.BiPredicate
 import java.util.stream.Collectors
 
 class Rokusho {
@@ -31,8 +32,11 @@ class Rokusho {
         recordLists = ReadOnlyListWrapper(ConcatenatedList(listOfRecordLists)).readOnlyProperty
     }
 
-    fun addDirectory(directory: Path, depth: Int) =
-            libraryLoader.getOrLoadLibrary(directory).createRecordList(collectImageUrls(directory, depth))
+    fun addDirectory(directory: Path, depth: Int): List<ObservableRecordList<ImageUrl>> =
+            Files.find(directory, depth, BiPredicate { p, a ->  a.isDirectory && !Files.isSameFile(directory, p) })
+                    .collect({ mutableListOf(libraryLoader.getOrLoadLibrary(directory).createRecordList(collectImageUrls(directory, 1))) },
+                            { acc, dir -> acc.addAll(addDirectory(dir, depth - 1)) },
+                            { l, r -> l.addAll(r) })
 
     private fun collectImageUrls(directory: Path, depth: Int): List<ImageUrl> =
             Files.walk(directory, depth)
