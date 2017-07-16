@@ -7,7 +7,10 @@ import com.github.am4dr.rokusho.core.library.MetaDataRegistry
 import com.github.am4dr.rokusho.core.library.ObservableRecordList
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import javafx.scene.Scene
+import javafx.scene.control.Hyperlink
+import javafx.scene.control.Label
 import javafx.scene.control.ListView
+import javafx.scene.layout.FlowPane
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
 
@@ -28,7 +31,8 @@ class RokushoViewer(val rokusho: Rokusho) {
     }
     fun show() = stage.show()
     private fun createScene(w: Double, h: Double): Scene {
-        val libraryList = ListView<MetaDataRegistry<ImageUrl>>(metaDataRegistries)
+        val libraryList = ListView(rokusho.libraries)
+        val registryList = ListView(TransformedList(metaDataRegistries, ::MetaDataRegistryListCell))
         val itemSetList = ListView<ObservableRecordList<ImageUrl>>(recordLists).apply {
             setOnMouseClicked { e ->
                 if (e.clickCount == 2) {
@@ -38,7 +42,15 @@ class RokushoViewer(val rokusho: Rokusho) {
                 }
             }
         }
-        val vbox = VBox(libraryList, itemSetList)
-        return Scene(vbox, w, h)
+        return Scene(VBox(libraryList, registryList, itemSetList), w, h)
+    }
+    private class MetaDataRegistryListCell<T>(registry: MetaDataRegistry<T>) : FlowPane() {
+        init {
+            children.addAll(Hyperlink("show").apply {
+                setOnAction {
+                    MetaDataRegistryViewer(registry).show()
+                }
+            }, Label(registry.toString()))
+        }
     }
 }
