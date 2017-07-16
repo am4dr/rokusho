@@ -3,6 +3,7 @@ package com.github.am4dr.rokusho.app.savefile.yaml
 import com.github.am4dr.rokusho.app.savefile.ImageMetaData
 import com.github.am4dr.rokusho.app.savefile.SaveData
 import com.github.am4dr.rokusho.app.savefile.SaveDataSerializer
+import com.github.am4dr.rokusho.core.library.ItemTag
 import org.yaml.snakeyaml.Yaml
 
 class YamlSaveDataSerializer : SaveDataSerializer {
@@ -12,7 +13,9 @@ class YamlSaveDataSerializer : SaveDataSerializer {
         // Dump method of SnakeYAML converts same objects into a YAML anchor and references.
         // To avoid that, if the 'tags' is empty, create a new empty mutable map.
         private fun ImageMetaData.toDumpStructure(): Map<String, Any> =
-                mapOf("tags" to tags.map { it.id to it.data }.toMap(mutableMapOf()))
+                mapOf("tags" to tags.map { it.toDumpStructure() }.toMap(mutableMapOf()))
+
+        private fun ItemTag.toDumpStructure(): Pair<String, Any> = name to (value?.let { mapOf("value" to it) } ?: mutableMapOf())
 
         private fun SaveData.toDumpStructure(): Map<String, Any> =
                 mapOf(

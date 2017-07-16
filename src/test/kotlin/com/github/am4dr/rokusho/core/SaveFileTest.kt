@@ -159,7 +159,7 @@ class YamlSaveFileParserTest {
             |""".trimMargin())
         assertEquals(1, save.metaData.size)
         assert(save.metaData.containsKey(Paths.get("path/to/image")))
-        assert(save.metaData[Paths.get("path/to/image")]!!.tags.first().id == "tagA")
+        assert(save.metaData[Paths.get("path/to/image")]!!.tags.first().name == "tagA")
 
         val withOption = YamlSaveFileParser.parse("""
             |version: "1"
@@ -167,7 +167,7 @@ class YamlSaveFileParserTest {
             |""".trimMargin())
         assertEquals(1, withOption.metaData.size)
         assert(withOption.metaData.containsKey(Paths.get("path/to/image")))
-        assert(withOption.metaData[Paths.get("path/to/image")]!!.tags.first().id == "tagA")
+        assert(withOption.metaData[Paths.get("path/to/image")]!!.tags.first().name == "tagA")
 
         assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
             YamlSaveFileParser.parse("""

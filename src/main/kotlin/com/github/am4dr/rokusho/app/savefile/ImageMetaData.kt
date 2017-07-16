@@ -1,6 +1,5 @@
 package com.github.am4dr.rokusho.app.savefile
 
-import com.github.am4dr.rokusho.core.library.Tag
+import com.github.am4dr.rokusho.core.library.ItemTag
 
-data class ImageMetaData(val tags: List<Tag> = listOf()) {
-}
+data class ImageMetaData(val tags: List<ItemTag> = listOf())

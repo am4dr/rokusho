@@ -6,6 +6,7 @@ import com.github.am4dr.rokusho.app.savefile.SaveFile
 import com.github.am4dr.rokusho.app.savefile.SaveFileParser
 import com.github.am4dr.rokusho.app.savefile.SaveFileParser.IllegalSaveFormatException
 import com.github.am4dr.rokusho.app.savefile.SaveFileParser.VersionNotSpecifiedException
+import com.github.am4dr.rokusho.core.library.ItemTag
 import com.github.am4dr.rokusho.core.library.SimpleTag
 import com.github.am4dr.rokusho.core.library.Tag
 import com.github.am4dr.rokusho.core.library.TagType
@@ -57,7 +58,7 @@ class YamlSaveFileParser : SaveFileParser {
                 Pair(Paths.get(path), ImageMetaData(tags))
             }.toMap()
         }
-        private fun parseTagData(data: Any?): List<Tag> {
+        private fun parseTagData(data: Any?): List<ItemTag> {
             data ?: return listOf()
             val map = data as? Map<*, *> ?: throw IllegalSaveFormatException("tags in metaData must be a Map<String, Any>")
             return map.map { tag ->
@@ -69,8 +70,7 @@ class YamlSaveFileParser : SaveFileParser {
                 }
                 @Suppress("UNCHECKED_CAST")
                 ops as Map<String, Any>
-                val type = ops["type"].let { if (it is String) TagType.from(it) else TagType.TEXT }
-                SimpleTag(name, type, ops)
+                ItemTag(name, ops["value"]?.toString())
             }
         }
     }

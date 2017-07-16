@@ -20,8 +20,8 @@ class TagNodeFactory(val prototypes: ReadOnlyMapProperty<String, out Tag>) {
         prototypes[tag.name]?.let { pt ->
             when (pt.type) {
                 TagType.TEXT -> tag.value
-                TagType.VALUE     -> "${tag.name} | ${tag.value.takeIf { it.isNotBlank() } ?: "-" }"
-                TagType.SELECTION -> "${tag.name} | ${tag.value.takeIf { it.isNotBlank() } ?: "-" }"
+                TagType.VALUE     -> "${tag.name} | ${tag.value?.takeIf { it.isNotBlank() } ?: "-" }"
+                TagType.SELECTION -> "${tag.name} | ${tag.value?.takeIf { it.isNotBlank() } ?: "-" }"
                 TagType.OTHERS -> tag.name
             }
         } ?: tag.name
