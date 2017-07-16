@@ -1,5 +1,6 @@
 package com.github.am4dr.rokusho.core;
 
+import com.github.am4dr.rokusho.app.savefile.SaveData
 import com.github.am4dr.rokusho.app.savefile.SaveFileParser.IllegalSaveFormatException
 import com.github.am4dr.rokusho.app.savefile.SaveFileParser.VersionNotSpecifiedException
 import com.github.am4dr.rokusho.app.savefile.yaml.YamlSaveFileParser
@@ -17,7 +18,7 @@ class YamlSaveFileParserTest {
     @Test
     fun versionOnlyTest() {
         val save = YamlSaveFileParser.parse("version: \"1\"")
-        assertEquals("1", save.version)
+        assertEquals(SaveData.Version.VERSION_1, save.version)
         assertEquals(0, save.tags.size)
         assertEquals(0, save.metaData.size)
     }
@@ -42,7 +43,7 @@ class YamlSaveFileParserTest {
             |version: "1"
             |tags: {}
             |""".trimMargin())
-        assertEquals("1", save.version)
+        assertEquals(SaveData.Version.VERSION_1, save.version)
         assertEquals(0, save.tags.size)
         assertEquals(0, save.metaData.size)
     }
