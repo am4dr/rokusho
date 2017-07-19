@@ -2,15 +2,14 @@ package com.github.am4dr.rokusho.gui
 
 import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.Rokusho
-import com.github.am4dr.rokusho.core.library.ItemTag
-import com.github.am4dr.rokusho.core.library.MetaDataRegistry
-import com.github.am4dr.rokusho.core.library.ObservableRecordList
-import com.github.am4dr.rokusho.core.library.Record
+import com.github.am4dr.rokusho.core.library.*
 import com.github.am4dr.rokusho.javafx.collection.ConcatenatedList
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
+import com.github.am4dr.rokusho.javafx.collection.toObservableMap
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.Bindings.createObjectBinding
 import javafx.beans.property.SimpleListProperty
+import javafx.beans.property.SimpleMapProperty
 import javafx.beans.value.ObservableObjectValue
 import javafx.collections.ObservableList
 import javafx.collections.transformation.FilteredList
@@ -79,12 +78,14 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
         // TODO Libraryの内容を反映するようなparserを実装する
         val parser = { text: String -> ItemTag(text, text) }
         val defaultTagNodeFactory = { tag: ItemTag -> TextTagNode(tag.name) }
-        val registryToTagNodeFactory = mutableMapOf<MetaDataRegistry<ImageUrl>, TagNodeFactory>()
+        val libraryToTagNodeFactory = mutableMapOf<Library<ImageUrl>, TagNodeFactory>()
         val thumbnails = TransformedList(records) { item ->
             val image = imageLoader.getImage(item.key.url, 500.0, 200.0, true)
 
-            val tagNodeFactory = rokusho.recordLists.find { it.records.contains(item) }?.let {
-                registryToTagNodeFactory.getOrPut(it.metaDataRegistry, { TagNodeFactory(it.metaDataRegistry.getTags()) })::createTagNode
+            val tagNodeFactory = rokusho.recordLists.find { it.records.contains(item) }?.let { rs ->
+                rokusho.libraries.find { it.metaDataRegistry === rs.metaDataRegistry }?.let { lib ->
+                    libraryToTagNodeFactory.getOrPut(lib, { TagNodeFactory(SimpleMapProperty(toObservableMap(lib.tagRegistry.tags, Tag::id))) })::createTagNode
+                }
             } ?: defaultTagNodeFactory
 
             Thumbnail(image, item.itemTags, parser, tagNodeFactory).apply {

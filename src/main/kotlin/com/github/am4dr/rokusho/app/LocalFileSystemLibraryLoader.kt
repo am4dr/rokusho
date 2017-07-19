@@ -1,8 +1,8 @@
 package com.github.am4dr.rokusho.app
 
 import com.github.am4dr.rokusho.app.savefile.yaml.YamlSaveFileLoader
-import com.github.am4dr.rokusho.core.library.DefaultTagRegistry
 import com.github.am4dr.rokusho.core.library.DefaultItemTagDB
+import com.github.am4dr.rokusho.core.library.DefaultTagRegistry
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyListWrapper
 import javafx.collections.FXCollections.observableArrayList

@@ -50,8 +50,9 @@ class Rokusho {
                     .collect(Collectors.toList())
 
     fun updateItemTags(record: Record<ImageUrl>, itemTags: List<ItemTag>) =
-            recordLists.find { it.records.contains(record) }
-                    ?.apply { metaDataRegistry.updateItemTags(record.key, itemTags) }
+            recordLists.find { it.records.contains(record) }?.let { list ->
+                libraries.find { it.metaDataRegistry === list.metaDataRegistry }?.updateItemTags(record.key, itemTags)
+            }
 
     fun save() {
         val serializer = YamlSaveDataSerializer()

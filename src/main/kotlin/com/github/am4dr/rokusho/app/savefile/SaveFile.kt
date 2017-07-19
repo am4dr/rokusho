@@ -17,14 +17,6 @@ class SaveFile(val savefilePath: Path, val data: SaveData) {
             }.toMap()
             return SaveFile(savefilePath, SaveData(SaveData.Version.VERSION_1, toObservableMap(tags.tags, Tag::id), metaData))
         }
-        fun fromMetaDataRegistry(savefilePath: Path, registry: MetaDataRegistry<ImageUrl>): SaveFile {
-            val metaData = registry.getAllItems().map {
-                val path = savefilePath.parent.relativize(Paths.get(it.key.url.toURI()))
-                path to ImageMetaData(it.itemTags)
-            }.toMap()
-            val data = SaveData(SaveData.Version.VERSION_1, registry.getTags(), metaData)
-            return SaveFile(savefilePath, data)
-        }
     }
 
     fun toRegistries(): Pair<TagRegistry, ItemTagDB<ImageUrl>> {
