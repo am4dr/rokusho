@@ -17,9 +17,8 @@ class DefaultMetaDataRegistry<T>(
     override fun getAllRecords(): Set<Record<T>> = itemTags.keys.map(this::getRecord).toSet()
 
     private val watchedItems = observableHashMap<T, Record<T>>()
-    private fun watchIfNotWatched(record: Record<T>) {
-        if (!watchedItems.containsKey(record.key)) { watchedItems[record.key] = record
-        }
+    private fun watch(record: Record<T>) {
+        if (!watchedItems.containsKey(record.key)) { watchedItems[record.key] = record }
     }
 
     private val itemTagsListener = MapChangeListener<T, List<ItemTag>> { c ->
@@ -33,7 +32,7 @@ class DefaultMetaDataRegistry<T>(
     }
 
     override fun getRecordList(list: Iterable<T>): ObservableRecordList<T> {
-        list.map(this::getRecord).forEach(this::watchIfNotWatched)
+        list.map(this::getRecord).forEach(this::watch)
         return DefaultMetaDataRegistryObservableRecordList(list.toList())
     }
 
