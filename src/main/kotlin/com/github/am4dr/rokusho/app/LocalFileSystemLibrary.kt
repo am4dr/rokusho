@@ -29,6 +29,7 @@ class LocalFileSystemLibrary(savefilePath: Path,
     }
 
     override fun updateItemTags(key: ImageUrl, tags: Iterable<ItemTag>) {
+        tags.map(ItemTag::tag).filter { it !== tagRegistry.get(it.id) }.forEach(tagRegistry::put)
         itemTagDB.set(key, tags.toList())
     }
 }
