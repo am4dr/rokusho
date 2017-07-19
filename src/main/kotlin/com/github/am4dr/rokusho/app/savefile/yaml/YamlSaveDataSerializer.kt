@@ -15,7 +15,7 @@ class YamlSaveDataSerializer : SaveDataSerializer {
         private fun ImageMetaData.toDumpStructure(): Map<String, Any> =
                 mapOf("tags" to tags.map { it.toDumpStructure() }.toMap(mutableMapOf()))
 
-        private fun ItemTag.toDumpStructure(): Pair<String, Any> = name to (value?.let { mapOf("value" to it) } ?: mutableMapOf())
+        private fun ItemTag.toDumpStructure(): Pair<String, Any> = tag.id to (value?.let { mapOf("value" to it) } ?: mutableMapOf())
 
         private fun SaveData.toDumpStructure(): Map<String, Any> =
                 mapOf(

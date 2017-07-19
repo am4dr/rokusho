@@ -23,7 +23,7 @@ class YamlSaveFileParser : SaveFileParser {
             if (yaml == null || yaml !is Map<*,*>) { throw IllegalSaveFormatException("top level of save file must be a Map") }
             val version = parseVersion(yaml["version"])
             val tags = parseTagInfo(yaml["tags"])
-            val metaData = parseMetaData(yaml["metaData"])
+            val metaData = parseMetaData(yaml["metaData"], tags)
             // TODO select suitable SaveData.Version for the savefile version
             return SaveData(SaveData.Version.VERSION_1, tags, metaData)
         }
@@ -31,7 +31,7 @@ class YamlSaveFileParser : SaveFileParser {
             data ?: throw VersionNotSpecifiedException()
             return data as? String ?: throw IllegalSaveFormatException("version must be a String")
         }
-        private fun parseTagInfo(data: Any?): Map<String, Tag> {
+        private fun parseTagInfo(data: Any?): MutableMap<String, Tag> {
             data ?: return mutableMapOf() // do not use mapOf() to avoid Yaml reference
             val map = data as? Map<*, *> ?: throw IllegalSaveFormatException("tags must be a Map<String, Map<String, String>>")
             return map.map {
@@ -46,19 +46,19 @@ class YamlSaveFileParser : SaveFileParser {
                 @Suppress("UNCHECKED_CAST")
                 opts as Map<String, Any>
                 Pair(name, SimpleTag(name , TagType.from(type), opts))
-            }.toMap()
+            }.toMap(mutableMapOf())
         }
-        private fun parseMetaData(data: Any?): Map<Path, ImageMetaData> {
+        private fun parseMetaData(data: Any?, tagInfo: MutableMap<String, Tag>): Map<Path, ImageMetaData> {
             data ?: return mapOf()
             data as? Map<*, *> ?: throw IllegalSaveFormatException("metaData must be a Map")
             return data.map {
                 val path = it.key as? String ?: throw IllegalSaveFormatException("key of metaData must be a String")
                 val metaData = it.value as? Map<*, *> ?: throw IllegalSaveFormatException("value of metaData must be a Map")
-                val tags = parseTagData(metaData["tags"])
+                val tags = parseTagData(metaData["tags"], tagInfo)
                 Pair(Paths.get(path), ImageMetaData(tags))
             }.toMap()
         }
-        private fun parseTagData(data: Any?): List<ItemTag> {
+        private fun parseTagData(data: Any?, tagInfo: MutableMap<String, Tag>): List<ItemTag> {
             data ?: return listOf()
             val map = data as? Map<*, *> ?: throw IllegalSaveFormatException("tags in metaData must be a Map<String, Any>")
             return map.map { tag ->
@@ -70,7 +70,7 @@ class YamlSaveFileParser : SaveFileParser {
                 }
                 @Suppress("UNCHECKED_CAST")
                 ops as Map<String, Any>
-                ItemTag(name, ops["value"]?.toString())
+                ItemTag(tagInfo.getOrPut(name, { SimpleTag(name , TagType.TEXT, mapOf("value" to name)) }) , ops["value"]?.toString())
             }
         }
     }

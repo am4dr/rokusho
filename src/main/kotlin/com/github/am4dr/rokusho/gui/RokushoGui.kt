@@ -49,7 +49,7 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
         val recordFilter = SimpleObservableFilter<String, Record<ImageUrl>> { input ->
             { item ->
                 if (input == null || input == "") true
-                else item.itemTags.any { it.name.contains(input) }
+                else item.itemTags.any { it.tag.id.contains(input) }
             }
         }
         recordFilter.inputProperty.bind(filterInput.textProperty())
@@ -60,7 +60,7 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
         val thumbnailFilter = SimpleObservableFilter<String, Thumbnail> { input ->
             { t ->
                 if (input == null || input == "") true
-                else t.tags.any { it.name.contains(input) }
+                else t.tags.any { it.tag.id.contains(input) }
             }
         }
         thumbnailFilter.inputProperty.bind(filterInput.textProperty())
@@ -76,8 +76,8 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
         val layout = ThumbnailLayout(listOf(), filter)
         val imageLoader = UrlImageLoader()
         // TODO Libraryの内容を反映するようなparserを実装する
-        val parser = { text: String -> ItemTag(text, text) }
-        val defaultTagNodeFactory = { tag: ItemTag -> TextTagNode(tag.name) }
+        val parser = { text: String -> ItemTag(SimpleTag(text, TagType.TEXT, mapOf("value" to text)), null) }
+        val defaultTagNodeFactory = { tag: ItemTag -> TextTagNode(tag.tag.id) }
         val libraryToTagNodeFactory = mutableMapOf<Library<ImageUrl>, TagNodeFactory>()
         val thumbnails = TransformedList(records) { item ->
             val image = imageLoader.getImage(item.key.url, 500.0, 200.0, true)
