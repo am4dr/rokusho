@@ -6,16 +6,16 @@ import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyListWrapper
 import javafx.beans.property.ReadOnlyMapProperty
 import javafx.beans.property.ReadOnlyMapWrapper
+import javafx.collections.FXCollections
 import javafx.collections.FXCollections.observableHashMap
+import javafx.collections.ObservableMap
 import javafx.collections.transformation.SortedList
 
 class DefaultMetaDataRegistry<T>(
-        tags: MutableList<Tag> = mutableListOf(),
-        private val itemTagDB: ItemTagDB<T> = SimpleItemTagDB()) : MetaDataRegistry<T> {
+        tags: ObservableMap<String, Tag> = FXCollections.observableHashMap(),
+        private val itemTagDB: ItemTagDB<T> = DefaultItemTagDB()) : MetaDataRegistry<T> {
 
-    private val _tags = ReadOnlyMapWrapper<String, Tag>(observableHashMap()).apply {
-        tags.map { it.id to it }.toMap(this)
-    }
+    private val _tags = ReadOnlyMapWrapper<String, Tag>(tags)
     override fun getTags(): ReadOnlyMapProperty<String, Tag> = _tags.readOnlyProperty
     override fun getAllItems(): Set<Record<T>> = itemTagDB.getKeys().map(this::getRecord).toSet()
 
