@@ -10,7 +10,7 @@ import java.nio.file.Paths
 class SaveFile(val savefilePath: Path, val data: SaveData) {
 
     companion object {
-        fun fromRegistries(savefilePath: Path, tags: TagRegistry, itemTags: ItemTagDB<ImageUrl>): SaveFile {
+        fun fromRegistries(savefilePath: Path, tags: TagRegistry, itemTags: ItemTagRegistry<ImageUrl>): SaveFile {
             val metaData = itemTags.getKeys().map {
                 val path = savefilePath.parent.relativize(Paths.get(it.url.toURI()))
                 path to ImageMetaData(itemTags.get(it))
@@ -19,13 +19,13 @@ class SaveFile(val savefilePath: Path, val data: SaveData) {
         }
     }
 
-    fun toRegistries(): Pair<TagRegistry, ItemTagDB<ImageUrl>> {
+    fun toRegistries(): Pair<TagRegistry, ItemTagRegistry<ImageUrl>> {
         val tags = DefaultTagRegistry(FXCollections.observableSet(data.tags.values.toMutableSet()))
         val items = data.metaData.map { (path, imageMetaData) ->
             val url = ImageUrl(savefilePath.parent.resolve(path).toUri().toURL())
             url to imageMetaData.tags
         }
-        val itemTags = DefaultItemTagDB(items.toMap())
+        val itemTags = DefaultItemTagRegistry(items.toMap())
         return Pair(tags, itemTags)
     }
 }

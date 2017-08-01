@@ -11,11 +11,11 @@ import java.nio.file.Path
 
 class LocalFileSystemLibrary(savefilePath: Path,
                              private val tagRegistry: TagRegistry = DefaultTagRegistry(),
-                             private val itemTagDB: ItemTagDB<ImageUrl>) : Library<ImageUrl> {
+                             private val itemTagRegistry: ItemTagRegistry<ImageUrl>) : Library<ImageUrl> {
     override val tags: ReadOnlySetProperty<Tag> = tagRegistry.tags
-    override val itemTags: ReadOnlyMapProperty<ImageUrl, List<ItemTag>> = itemTagDB.itemTags
+    override val itemTags: ReadOnlyMapProperty<ImageUrl, List<ItemTag>> = itemTagRegistry.itemTags
 
-    private val recordRepository: RecordRepository<ImageUrl> = DefaultRecordRepository(SimpleMapProperty(toObservableMap(tagRegistry.tags, Tag::id)), itemTagDB.itemTags)
+    private val recordRepository: RecordRepository<ImageUrl> = DefaultRecordRepository(SimpleMapProperty(toObservableMap(tagRegistry.tags, Tag::id)), itemTagRegistry.itemTags)
     val savefilePath: Path = savefilePath.toAbsolutePath()
     private val _recordLists = ReadOnlyListWrapper(observableArrayList<ObservableRecordList<ImageUrl>>())
     override val recordLists: ReadOnlyListProperty<ObservableRecordList<ImageUrl>> = _recordLists.readOnlyProperty
@@ -23,13 +23,13 @@ class LocalFileSystemLibrary(savefilePath: Path,
             recordRepository.getRecordList(list).also { _recordLists.add(it) }
 
     fun save(serializer: SaveDataSerializer) {
-        val savefile = SaveFile.fromRegistries(savefilePath, tagRegistry, itemTagDB)
+        val savefile = SaveFile.fromRegistries(savefilePath, tagRegistry, itemTagRegistry)
         val serialized = serializer.serialize(savefile.data)
         Files.write(savefilePath, serialized.split("\n"))
     }
 
     override fun updateItemTags(key: ImageUrl, tags: Iterable<ItemTag>) {
         tags.map(ItemTag::tag).filter { it !== tagRegistry.get(it.id) }.forEach(tagRegistry::put)
-        itemTagDB.set(key, tags.toList())
+        itemTagRegistry.set(key, tags.toList())
     }
 }

@@ -4,7 +4,7 @@ import javafx.beans.property.ReadOnlyMapProperty
 import javafx.beans.property.ReadOnlyMapWrapper
 import javafx.collections.FXCollections
 
-class DefaultItemTagDB<T>(initial: Map<T, List<ItemTag>> = mapOf()) : ItemTagDB<T> {
+class DefaultItemTagRegistry<T>(initial: Map<T, List<ItemTag>> = mapOf()) : ItemTagRegistry<T> {
     private val _itemTags = ReadOnlyMapWrapper(FXCollections.observableMap(initial.toMutableMap()))
     override val itemTags: ReadOnlyMapProperty<T, List<ItemTag>> = _itemTags.readOnlyProperty
 
