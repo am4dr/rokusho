@@ -49,13 +49,15 @@ class Rokusho {
                     .map { ImageUrl(it.toUri().toURL()) }
                     .collect(Collectors.toList())
 
-    fun updateItemTags(record: Record<ImageUrl>, itemTags: List<ItemTag>) =
-            recordLists.find { it.records.contains(record) }?.let { list ->
-                libraries.find { it.metaDataRegistry === list.metaDataRegistry }?.updateItemTags(record.key, itemTags)
-            }
+    fun updateItemTags(record: Record<ImageUrl>, itemTags: List<ItemTag>) = getLibrary(record)?.updateItemTags(record.key, itemTags)
 
     fun save() {
         val serializer = YamlSaveDataSerializer()
         libraryLoader.loadedLibraries.forEach { it.save(serializer) }
     }
+
+    fun getLibrary(record: Record<ImageUrl>): Library<ImageUrl>? =
+            recordLists.find { it.records.contains(record) }?.let { list ->
+                libraries.find { it.recordLists.contains(list) }
+            }
 }

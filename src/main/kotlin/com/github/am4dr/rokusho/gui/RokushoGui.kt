@@ -82,10 +82,8 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
         val thumbnails = TransformedList(records) { item ->
             val image = imageLoader.getImage(item.key.url, 500.0, 200.0, true)
 
-            val tagNodeFactory = rokusho.recordLists.find { it.records.contains(item) }?.let { rs ->
-                rokusho.libraries.find { it.metaDataRegistry === rs.metaDataRegistry }?.let { lib ->
-                    libraryToTagNodeFactory.getOrPut(lib, { TagNodeFactory(SimpleMapProperty(toObservableMap(lib.tagRegistry.tags, Tag::id))) })::createTagNode
-                }
+            val tagNodeFactory = rokusho.getLibrary(item)?.let { lib ->
+                return@let libraryToTagNodeFactory.getOrPut(lib, { TagNodeFactory(SimpleMapProperty(toObservableMap(lib.tags, Tag::id))) })::createTagNode
             } ?: defaultTagNodeFactory
 
             Thumbnail(image, item.itemTags, parser, tagNodeFactory).apply {

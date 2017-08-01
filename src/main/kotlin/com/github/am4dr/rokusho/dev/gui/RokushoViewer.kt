@@ -14,7 +14,6 @@ import javafx.scene.layout.VBox
 import javafx.stage.Stage
 
 class RokushoViewer(val rokusho: Rokusho) {
-    private val metaDataRegistries = TransformedList(rokusho.libraries, Library<ImageUrl>::metaDataRegistry)
     private val recordLists = rokusho.recordLists
     companion object {
         const val initialWidth: Double  = 300.0

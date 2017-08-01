@@ -26,8 +26,8 @@ class LibraryViewer<T>(val library: Library<T>) {
     }
     fun show() = stage.show()
     private fun createScene(w: Double, h: Double): Scene {
-        val tags = library.tagRegistry.tags
-        val tagList = object : ObservableList<Tag> by FXCollections.observableArrayList(library.tagRegistry.tags), SetChangeListener<Tag> {
+        val tags = library.tags
+        val tagList = object : ObservableList<Tag> by FXCollections.observableArrayList(library.tags), SetChangeListener<Tag> {
             override fun onChanged(change: SetChangeListener.Change<out Tag>) {
                 when {
                     change.wasRemoved() && change.wasAdded() -> indexOf(change.elementRemoved).takeIf { it >= 0 }?.let { set(it, change.elementAdded) }

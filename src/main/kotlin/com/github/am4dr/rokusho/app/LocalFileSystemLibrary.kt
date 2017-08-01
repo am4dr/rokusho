@@ -4,18 +4,18 @@ import com.github.am4dr.rokusho.app.savefile.SaveDataSerializer
 import com.github.am4dr.rokusho.app.savefile.SaveFile
 import com.github.am4dr.rokusho.core.library.*
 import com.github.am4dr.rokusho.javafx.collection.toObservableMap
-import javafx.beans.property.ReadOnlyListProperty
-import javafx.beans.property.ReadOnlyListWrapper
-import javafx.beans.property.SimpleMapProperty
+import javafx.beans.property.*
 import javafx.collections.FXCollections.observableArrayList
 import java.nio.file.Files
 import java.nio.file.Path
 
 class LocalFileSystemLibrary(savefilePath: Path,
-                             override val tagRegistry: TagRegistry = DefaultTagRegistry(),
-                             override val itemTagDB: ItemTagDB<ImageUrl>) : Library<ImageUrl> {
+                             private val tagRegistry: TagRegistry = DefaultTagRegistry(),
+                             private val itemTagDB: ItemTagDB<ImageUrl>) : Library<ImageUrl> {
+    override val tags: ReadOnlySetProperty<Tag> = tagRegistry.tags
+    override val itemTags: ReadOnlyMapProperty<ImageUrl, List<ItemTag>> = itemTagDB.itemTags
 
-    override val metaDataRegistry: MetaDataRegistry<ImageUrl> = DefaultMetaDataRegistry(SimpleMapProperty(toObservableMap(tagRegistry.tags, Tag::id)), itemTagDB.itemTags)
+    private val metaDataRegistry: MetaDataRegistry<ImageUrl> = DefaultMetaDataRegistry(SimpleMapProperty(toObservableMap(tagRegistry.tags, Tag::id)), itemTagDB.itemTags)
     val savefilePath: Path = savefilePath.toAbsolutePath()
     private val _recordLists = ReadOnlyListWrapper(observableArrayList<ObservableRecordList<ImageUrl>>())
     override val recordLists: ReadOnlyListProperty<ObservableRecordList<ImageUrl>> = _recordLists.readOnlyProperty
