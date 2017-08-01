@@ -10,9 +10,9 @@ import javafx.collections.MapChangeListener
 import javafx.collections.WeakMapChangeListener
 import javafx.collections.transformation.SortedList
 
-class DefaultMetaDataRegistry<T>(
+class DefaultRecordRepository<T>(
         private val tags: ReadOnlyMapProperty<String, Tag>,
-        private val itemTags: ReadOnlyMapProperty<T, List<ItemTag>>) : MetaDataRegistry<T> {
+        private val itemTags: ReadOnlyMapProperty<T, List<ItemTag>>) : RecordRepository<T> {
 
     override fun getAllRecords(): Set<Record<T>> = itemTags.keys.map(this::getRecord).toSet()
 
@@ -39,7 +39,7 @@ class DefaultMetaDataRegistry<T>(
     override fun getRecord(key: T): Record<T> = watchedItems[key] ?: Record(key, itemTags[key] ?: listOf())
 
     private inner class DefaultMetaDataRegistryObservableRecordList(keys: List<T>) : ObservableRecordList<T> {
-        override val metaDataRegistry: MetaDataRegistry<T> = this@DefaultMetaDataRegistry
+        override val recordRepository: RecordRepository<T> = this@DefaultRecordRepository
 
         override val records: ReadOnlyListProperty<Record<T>>
         init {
