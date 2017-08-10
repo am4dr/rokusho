@@ -11,12 +11,12 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 class LocalFileSystemLibrary(savefilePath: Path,
-                             private val library: SimplifiedLibrary<ImageUrl, ImageUrl>) : RokushoLibrary<ImageUrl> {
-    constructor(savefilePath: Path, items: Iterable<ImageUrl>) : this (savefilePath, SimplifiedLibrary({ items.asSequence() }, { it }))
+                             private val library: Library<ImageUrl, ImageUrl>) : RokushoLibrary<ImageUrl> {
+    constructor(savefilePath: Path, items: Iterable<ImageUrl>) : this (savefilePath, Library({ items.asSequence() }, { it }))
 
     override val tags: ReadOnlyMapProperty<String, Tag> = library.tags
     override val itemTags: ReadOnlyMapProperty<ImageUrl, List<ItemTag>> = library.itemTags
-    val items: List<ImageUrl> get() = library.getItemSequence().toList()
+    val items: List<ImageUrl> get() = library.items
 
     private val recordRepository: RecordRepository<ImageUrl> = DefaultRecordRepository(tags, itemTags)
     val savefilePath: Path = savefilePath.toAbsolutePath()
