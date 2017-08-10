@@ -49,3 +49,19 @@ fun <K, V> toObservableList(map: ObservableMap<K, V>): ObservableList<V> {
     map.addListener(WeakMapChangeListener(list))
     return list
 }
+
+fun <T, K> toObservableMap(observableSet: ObservableSet<T>, keyExtractor: (T) -> K): ObservableMap<K, T> {
+    val set = object : ObservableMap<K, T> by FXCollections.observableHashMap(), SetChangeListener<T> {
+        init {
+            putAll(observableSet.map { keyExtractor(it) to it })
+        }
+        val source = observableSet
+        override fun onChanged(change: SetChangeListener.Change<out T>?) {
+            change ?: return
+            if (change.wasRemoved()) remove(keyExtractor(change.elementRemoved))
+            if (change.wasAdded()) change.elementAdded.let { put(keyExtractor(it), it) }
+        }
+    }
+    observableSet.addListener(WeakSetChangeListener(set))
+    return set
+}

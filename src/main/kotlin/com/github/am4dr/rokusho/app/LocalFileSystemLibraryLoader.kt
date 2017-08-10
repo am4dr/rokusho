@@ -1,12 +1,15 @@
 package com.github.am4dr.rokusho.app
 
 import com.github.am4dr.rokusho.app.savefile.yaml.YamlSaveFileLoader
-import com.github.am4dr.rokusho.core.library.DefaultMetaDataRegistry
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyListWrapper
 import javafx.collections.FXCollections.observableArrayList
+import java.io.IOException
+import java.nio.file.FileVisitResult
+import java.nio.file.FileVisitor
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.attribute.BasicFileAttributes
 
 class LocalFileSystemLibraryLoader {
     private val savefileLoader = YamlSaveFileLoader()
@@ -19,8 +22,27 @@ class LocalFileSystemLibraryLoader {
         val savefilePath = getSavefilePathFor(directory)
         findLibraryBySavefilePath(savefilePath)?.let { return it }
 
-        val registry = if (Files.exists(savefilePath)) savefileLoader.load(savefilePath).toMetaDataRegistry() else DefaultMetaDataRegistry()
-        return LocalFileSystemLibrary(savefilePath, registry).also { addLibrary(it) }
+        val (initTags, initItemTags) = if (Files.exists(savefilePath)) savefileLoader.load(savefilePath).toRegistries() else Pair(mapOf(), mapOf())
+        return LocalFileSystemLibrary(savefilePath, getAllItems(directory)).apply {
+            tags.putAll(initTags)
+            itemTags.putAll(initItemTags)
+            addLibrary(this)
+        }
+    }
+    private fun getAllItems(root: Path): List<ImageUrl> {
+        val rootSavefilePath = getSavefilePathFor(root)
+        val list = mutableListOf<ImageUrl>()
+        Files.walkFileTree(root, object : FileVisitor<Path> {
+            override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes?): FileVisitResult =
+                    if (Files.isSameFile(getSavefilePathFor(dir), rootSavefilePath)) FileVisitResult.CONTINUE else FileVisitResult.SKIP_SUBTREE
+            override fun visitFile(file: Path, attrs: BasicFileAttributes?): FileVisitResult {
+                if (Rokusho.isSupportedImageFile(file)) list.add(ImageUrl(file.toUri().toURL()))
+                return FileVisitResult.CONTINUE
+            }
+            override fun postVisitDirectory(dir: Path, exc: IOException?): FileVisitResult = FileVisitResult.CONTINUE
+            override fun visitFileFailed(file: Path, exc: IOException?): FileVisitResult = FileVisitResult.CONTINUE
+        })
+        return list
     }
 
     private fun getSavefilePathFor(directory: Path): Path {

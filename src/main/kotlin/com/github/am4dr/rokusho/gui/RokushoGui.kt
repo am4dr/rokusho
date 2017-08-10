@@ -2,15 +2,14 @@ package com.github.am4dr.rokusho.gui
 
 import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.Rokusho
-import com.github.am4dr.rokusho.core.library.ItemTag
-import com.github.am4dr.rokusho.core.library.MetaDataRegistry
-import com.github.am4dr.rokusho.core.library.ObservableRecordList
-import com.github.am4dr.rokusho.core.library.Record
+import com.github.am4dr.rokusho.app.RokushoLibrary
+import com.github.am4dr.rokusho.core.library.*
 import com.github.am4dr.rokusho.javafx.collection.ConcatenatedList
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.Bindings.createObjectBinding
 import javafx.beans.property.SimpleListProperty
+import javafx.beans.property.SimpleMapProperty
 import javafx.beans.value.ObservableObjectValue
 import javafx.collections.ObservableList
 import javafx.collections.transformation.FilteredList
@@ -50,7 +49,7 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
         val recordFilter = SimpleObservableFilter<String, Record<ImageUrl>> { input ->
             { item ->
                 if (input == null || input == "") true
-                else item.itemTags.any { it.name.contains(input) }
+                else item.itemTags.any { it.tag.id.contains(input) }
             }
         }
         recordFilter.inputProperty.bind(filterInput.textProperty())
@@ -61,7 +60,7 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
         val thumbnailFilter = SimpleObservableFilter<String, Thumbnail> { input ->
             { t ->
                 if (input == null || input == "") true
-                else t.tags.any { it.name.contains(input) }
+                else t.tags.any { it.tag.id.contains(input) }
             }
         }
         thumbnailFilter.inputProperty.bind(filterInput.textProperty())
@@ -77,14 +76,14 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
         val layout = ThumbnailLayout(listOf(), filter)
         val imageLoader = UrlImageLoader()
         // TODO Libraryの内容を反映するようなparserを実装する
-        val parser = { text: String -> ItemTag(text, text) }
-        val defaultTagNodeFactory = { tag: ItemTag -> TextTagNode(tag.name) }
-        val registryToTagNodeFactory = mutableMapOf<MetaDataRegistry<ImageUrl>, TagNodeFactory>()
+        val parser = { text: String -> ItemTag(SimpleTag(text, TagType.TEXT, mapOf("value" to text)), null) }
+        val defaultTagNodeFactory = { tag: ItemTag -> TextTagNode(tag.tag.id) }
+        val libraryToTagNodeFactory = mutableMapOf<RokushoLibrary<ImageUrl>, TagNodeFactory>()
         val thumbnails = TransformedList(records) { item ->
             val image = imageLoader.getImage(item.key.url, 500.0, 200.0, true)
 
-            val tagNodeFactory = rokusho.recordLists.find { it.records.contains(item) }?.let {
-                registryToTagNodeFactory.getOrPut(it.metaDataRegistry, { TagNodeFactory(it.metaDataRegistry.getTags()) })::createTagNode
+            val tagNodeFactory = rokusho.getLibrary(item)?.let { lib ->
+                return@let libraryToTagNodeFactory.getOrPut(lib, { TagNodeFactory(SimpleMapProperty(lib.tags)) })::createTagNode
             } ?: defaultTagNodeFactory
 
             Thumbnail(image, item.itemTags, parser, tagNodeFactory).apply {
@@ -104,7 +103,7 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
             initialDirectory = lastSelectedDirectory
             showDialog(window)?.let {
                 lastSelectedDirectory = it
-                rokusho.addDirectory(it.toPath(), Int.MAX_VALUE)
+                rokusho.addDirectory(it.toPath())
             }
         }
     }

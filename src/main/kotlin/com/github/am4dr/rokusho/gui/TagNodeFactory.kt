@@ -11,18 +11,18 @@ class TagNodeFactory(val prototypes: ReadOnlyMapProperty<String, out Tag>) {
         TextTagNode(object : StringBinding() {
             init {
                 super.bind(
-                        if (prototypes.containsKey(tag.name)) prototypes.valueAt(tag.name)
+                        if (prototypes.containsKey(tag.tag.id)) prototypes.valueAt(tag.tag.id)
                         else prototypes)
             }
             override fun computeValue(): String = toTextFormat(tag)
         })
     fun toTextFormat(tag: ItemTag): String =
-        prototypes[tag.name]?.let { pt ->
+        tag.tag.let { pt ->
             when (pt.type) {
                 TagType.TEXT -> tag.value
-                TagType.VALUE     -> "${tag.name} | ${tag.value?.takeIf { it.isNotBlank() } ?: "-" }"
-                TagType.SELECTION -> "${tag.name} | ${tag.value?.takeIf { it.isNotBlank() } ?: "-" }"
-                TagType.OTHERS -> tag.name
+                TagType.VALUE     -> "${tag.tag.id} | ${tag.value?.takeIf { it.isNotBlank() } ?: "-" }"
+                TagType.SELECTION -> "${tag.tag.id} | ${tag.value?.takeIf { it.isNotBlank() } ?: "-" }"
+                TagType.OTHERS -> tag.tag.id
             }
-        } ?: tag.name
+        } ?: tag.tag.id
 }

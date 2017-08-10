@@ -1,31 +1,28 @@
 package com.github.am4dr.rokusho.app.savefile
 
 import com.github.am4dr.rokusho.app.ImageUrl
-import com.github.am4dr.rokusho.core.library.DefaultMetaDataRegistry
-import com.github.am4dr.rokusho.core.library.MetaDataRegistry
-import com.github.am4dr.rokusho.core.library.SimpleItemTagDB
+import com.github.am4dr.rokusho.core.library.ItemTag
+import com.github.am4dr.rokusho.core.library.Tag
 import java.nio.file.Path
 import java.nio.file.Paths
 
 class SaveFile(val savefilePath: Path, val data: SaveData) {
 
     companion object {
-        fun fromMetaDataRegistry(savefilePath: Path, registry: MetaDataRegistry<ImageUrl>): SaveFile {
-            val metaData = registry.getAllItems().map {
-                val path = savefilePath.parent.relativize(Paths.get(it.key.url.toURI()))
-                path to ImageMetaData(it.itemTags)
+        fun fromRegistries(savefilePath: Path, tags: Map<String, Tag>, itemTags: Map<ImageUrl, List<ItemTag>>): SaveFile {
+            val metaData = itemTags.keys.map {
+                val path = savefilePath.parent.relativize(Paths.get(it.url.toURI()))
+                path to ImageMetaData(itemTags.getOrDefault(it, mutableListOf()))
             }.toMap()
-            val data = SaveData(SaveData.Version.VERSION_1, registry.getTags(), metaData)
-            return SaveFile(savefilePath, data)
+            return SaveFile(savefilePath, SaveData(SaveData.Version.VERSION_1, tags, metaData))
         }
     }
 
-    fun toMetaDataRegistry(): MetaDataRegistry<ImageUrl> {
-        val tags = data.tags.values.toMutableList()
+    fun toRegistries(): Pair<Map<String, Tag>, Map<ImageUrl, List<ItemTag>>> {
         val items = data.metaData.map { (path, imageMetaData) ->
             val url = ImageUrl(savefilePath.parent.resolve(path).toUri().toURL())
             url to imageMetaData.tags
         }
-        return DefaultMetaDataRegistry(tags, SimpleItemTagDB(items.toMap()))
+        return Pair(data.tags, items.toMap())
     }
 }
