@@ -1,6 +1,6 @@
 buildscript {
     ext.kotlin_version = '1.1.3-2'
-    ext.junit_milestone = '-M4'
+    ext.junit_milestone = '-RC2'
     repositories {
         jcenter()
     }
