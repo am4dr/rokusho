@@ -29,11 +29,7 @@ class Rokusho {
         recordLists = ReadOnlyListWrapper(ConcatenatedList(listOfRecordLists)).readOnlyProperty
     }
 
-    fun addDirectory(directory: Path): ObservableRecordList<ImageUrl>? =
-            libraryLoader.getOrLoadLibrary(directory).run {
-                createRecordList(items)
-                //collectImageUrls(directory, 1).takeIf(List<*>::isNotEmpty)?.let { createRecordList(it) }
-            }
+    fun addDirectory(directory: Path): ObservableRecordList<ImageUrl>? = libraryLoader.getOrLoadLibrary(directory).run { createRecordList(items) }
 
     fun updateItemTags(record: Record<ImageUrl>, itemTags: List<ItemTag>) = getLibrary(record)?.updateItemTags(record.key, itemTags)
 
