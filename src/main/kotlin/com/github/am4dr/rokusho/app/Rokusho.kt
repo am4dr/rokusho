@@ -12,8 +12,6 @@ import javafx.beans.property.ReadOnlyListWrapper
 import javafx.collections.ObservableList
 import java.nio.file.Files
 import java.nio.file.Path
-import java.util.function.BiPredicate
-import java.util.stream.Collectors
 
 class Rokusho {
     companion object {

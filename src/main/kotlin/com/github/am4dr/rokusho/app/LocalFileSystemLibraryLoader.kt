@@ -1,9 +1,6 @@
 package com.github.am4dr.rokusho.app
 
 import com.github.am4dr.rokusho.app.savefile.yaml.YamlSaveFileLoader
-import com.github.am4dr.rokusho.core.library.DefaultItemTagRegistry
-import com.github.am4dr.rokusho.core.library.DefaultTagRegistry
-import com.github.am4dr.rokusho.core.library.Tag
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyListWrapper
 import javafx.collections.FXCollections.observableArrayList
@@ -25,10 +22,10 @@ class LocalFileSystemLibraryLoader {
         val savefilePath = getSavefilePathFor(directory)
         findLibraryBySavefilePath(savefilePath)?.let { return it }
 
-        val registries = if (Files.exists(savefilePath)) savefileLoader.load(savefilePath).toRegistries() else Pair(DefaultTagRegistry(), DefaultItemTagRegistry())
+        val (initTags, initItemTags) = if (Files.exists(savefilePath)) savefileLoader.load(savefilePath).toRegistries() else Pair(mapOf(), mapOf())
         return LocalFileSystemLibrary(savefilePath, getAllItems(directory)).apply {
-            tags.putAll(registries.first.tags.associateBy(Tag::id))
-            itemTags.putAll(registries.second.itemTags)
+            tags.putAll(initTags)
+            itemTags.putAll(initItemTags)
             addLibrary(this)
         }
     }
