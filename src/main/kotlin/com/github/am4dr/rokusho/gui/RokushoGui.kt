@@ -2,6 +2,7 @@ package com.github.am4dr.rokusho.gui
 
 import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.Rokusho
+import com.github.am4dr.rokusho.app.RokushoLibrary
 import com.github.am4dr.rokusho.core.library.*
 import com.github.am4dr.rokusho.javafx.collection.ConcatenatedList
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
@@ -77,7 +78,7 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
         // TODO Libraryの内容を反映するようなparserを実装する
         val parser = { text: String -> ItemTag(SimpleTag(text, TagType.TEXT, mapOf("value" to text)), null) }
         val defaultTagNodeFactory = { tag: ItemTag -> TextTagNode(tag.tag.id) }
-        val libraryToTagNodeFactory = mutableMapOf<Library<ImageUrl>, TagNodeFactory>()
+        val libraryToTagNodeFactory = mutableMapOf<RokushoLibrary<ImageUrl>, TagNodeFactory>()
         val thumbnails = TransformedList(records) { item ->
             val image = imageLoader.getImage(item.key.url, 500.0, 200.0, true)
 

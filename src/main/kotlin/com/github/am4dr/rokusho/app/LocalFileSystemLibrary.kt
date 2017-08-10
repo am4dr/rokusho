@@ -11,7 +11,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 class LocalFileSystemLibrary(savefilePath: Path,
-                             private val library: SimplifiedLibrary<ImageUrl, ImageUrl>) : Library<ImageUrl> {
+                             private val library: SimplifiedLibrary<ImageUrl, ImageUrl>) : RokushoLibrary<ImageUrl> {
     constructor(savefilePath: Path, items: Iterable<ImageUrl>) : this (savefilePath, SimplifiedLibrary({ items.asSequence() }, { it }))
 
     override val tags: ReadOnlyMapProperty<String, Tag> = library.tags

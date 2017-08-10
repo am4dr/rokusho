@@ -2,7 +2,7 @@ package com.github.am4dr.rokusho.dev.gui
 
 import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.Rokusho
-import com.github.am4dr.rokusho.core.library.Library
+import com.github.am4dr.rokusho.app.RokushoLibrary
 import com.github.am4dr.rokusho.core.library.ObservableRecordList
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import javafx.scene.Scene
@@ -41,7 +41,7 @@ class RokushoViewer(val rokusho: Rokusho) {
         }
         return Scene(VBox(libraryList, itemSetList), w, h)
     }
-    private class LibraryListCell<T>(library: Library<T>) : FlowPane() {
+    private class LibraryListCell<T>(library: RokushoLibrary<T>) : FlowPane() {
         init {
             children.addAll(Hyperlink("show").apply {
                 setOnAction {

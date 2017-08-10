@@ -2,7 +2,6 @@ package com.github.am4dr.rokusho.app
 
 import com.github.am4dr.rokusho.app.savefile.yaml.YamlSaveDataSerializer
 import com.github.am4dr.rokusho.core.library.ItemTag
-import com.github.am4dr.rokusho.core.library.Library
 import com.github.am4dr.rokusho.core.library.ObservableRecordList
 import com.github.am4dr.rokusho.core.library.Record
 import com.github.am4dr.rokusho.javafx.collection.ConcatenatedList
@@ -21,12 +20,12 @@ class Rokusho {
     }
     private val libraryLoader = LocalFileSystemLibraryLoader()
 
-    val libraries: ReadOnlyListProperty<out Library<ImageUrl>> = libraryLoader.loadedLibraries
+    val libraries: ReadOnlyListProperty<out RokushoLibrary<ImageUrl>> = libraryLoader.loadedLibraries
 
     val recordLists: ReadOnlyListProperty<ObservableRecordList<ImageUrl>>
     init {
         val listOfRecordLists: ObservableList<ObservableList<ObservableRecordList<ImageUrl>>> =
-                TransformedList(libraryLoader.loadedLibraries, Library<ImageUrl>::recordLists)
+                TransformedList(libraryLoader.loadedLibraries, RokushoLibrary<ImageUrl>::recordLists)
         recordLists = ReadOnlyListWrapper(ConcatenatedList(listOfRecordLists)).readOnlyProperty
     }
 
@@ -43,7 +42,7 @@ class Rokusho {
         libraryLoader.loadedLibraries.forEach { it.save(serializer) }
     }
 
-    fun getLibrary(record: Record<ImageUrl>): Library<ImageUrl>? =
+    fun getLibrary(record: Record<ImageUrl>): RokushoLibrary<ImageUrl>? =
             recordLists.find { it.records.contains(record) }?.let { list ->
                 libraries.find { it.recordLists.contains(list) }
             }
