@@ -5,7 +5,6 @@ import com.github.am4dr.rokusho.app.Rokusho
 import com.github.am4dr.rokusho.core.library.*
 import com.github.am4dr.rokusho.javafx.collection.ConcatenatedList
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
-import com.github.am4dr.rokusho.javafx.collection.toObservableMap
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.Bindings.createObjectBinding
 import javafx.beans.property.SimpleListProperty
@@ -83,7 +82,7 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
             val image = imageLoader.getImage(item.key.url, 500.0, 200.0, true)
 
             val tagNodeFactory = rokusho.getLibrary(item)?.let { lib ->
-                return@let libraryToTagNodeFactory.getOrPut(lib, { TagNodeFactory(SimpleMapProperty(toObservableMap(lib.tags, Tag::id))) })::createTagNode
+                return@let libraryToTagNodeFactory.getOrPut(lib, { TagNodeFactory(SimpleMapProperty(lib.tags)) })::createTagNode
             } ?: defaultTagNodeFactory
 
             Thumbnail(image, item.itemTags, parser, tagNodeFactory).apply {
@@ -103,7 +102,7 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
             initialDirectory = lastSelectedDirectory
             showDialog(window)?.let {
                 lastSelectedDirectory = it
-                rokusho.addDirectory(it.toPath(), Int.MAX_VALUE)
+                rokusho.addDirectory(it.toPath())
             }
         }
     }

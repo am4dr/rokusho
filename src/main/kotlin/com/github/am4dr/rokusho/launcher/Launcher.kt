@@ -27,7 +27,7 @@ class Launcher : Application() {
         if (commandline.args.size == 1) {
             Paths.get(commandline.args[0])?.let { path ->
                 if (Files.isDirectory(path)) {
-                    rokusho.addDirectory(path, Int.MAX_VALUE)
+                    rokusho.addDirectory(path)
                 }
             }
         }

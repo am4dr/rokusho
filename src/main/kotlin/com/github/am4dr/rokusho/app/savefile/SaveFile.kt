@@ -2,7 +2,7 @@ package com.github.am4dr.rokusho.app.savefile
 
 import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.core.library.*
-import com.github.am4dr.rokusho.javafx.collection.toObservableMap
+import javafx.beans.property.ReadOnlyMapProperty
 import javafx.collections.FXCollections
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -10,12 +10,12 @@ import java.nio.file.Paths
 class SaveFile(val savefilePath: Path, val data: SaveData) {
 
     companion object {
-        fun fromRegistries(savefilePath: Path, tags: TagRegistry, itemTags: ItemTagRegistry<ImageUrl>): SaveFile {
-            val metaData = itemTags.getKeys().map {
+        fun fromRegistries(savefilePath: Path, tags: ReadOnlyMapProperty<String, Tag>, itemTags: ReadOnlyMapProperty<ImageUrl, List<ItemTag>>): SaveFile {
+            val metaData = itemTags.keys.map {
                 val path = savefilePath.parent.relativize(Paths.get(it.url.toURI()))
-                path to ImageMetaData(itemTags.get(it))
+                path to ImageMetaData(itemTags.getOrDefault(it, mutableListOf()))
             }.toMap()
-            return SaveFile(savefilePath, SaveData(SaveData.Version.VERSION_1, toObservableMap(tags.tags, Tag::id), metaData))
+            return SaveFile(savefilePath, SaveData(SaveData.Version.VERSION_1, tags, metaData))
         }
     }
 

@@ -32,22 +32,11 @@ class Rokusho {
         recordLists = ReadOnlyListWrapper(ConcatenatedList(listOfRecordLists)).readOnlyProperty
     }
 
-    private fun addDirectory(directory: Path): ObservableRecordList<ImageUrl>? =
+    fun addDirectory(directory: Path): ObservableRecordList<ImageUrl>? =
             libraryLoader.getOrLoadLibrary(directory).run {
-                collectImageUrls(directory, 1).takeIf(List<*>::isNotEmpty)?.let { createRecordList(it) }
+                createRecordList(items)
+                //collectImageUrls(directory, 1).takeIf(List<*>::isNotEmpty)?.let { createRecordList(it) }
             }
-
-    fun addDirectory(directory: Path, depth: Int): List<ObservableRecordList<ImageUrl>> =
-            Files.find(directory, depth, BiPredicate { _, a ->  a.isDirectory })
-                    .map { addDirectory(it) }
-                    .filter { it != null }
-                    .collect(Collectors.toList<ObservableRecordList<ImageUrl>>())
-
-    private fun collectImageUrls(directory: Path, depth: Int): List<ImageUrl> =
-            Files.walk(directory, depth)
-                    .filter(Rokusho.Companion::isSupportedImageFile)
-                    .map { ImageUrl(it.toUri().toURL()) }
-                    .collect(Collectors.toList())
 
     fun updateItemTags(record: Record<ImageUrl>, itemTags: List<ItemTag>) = getLibrary(record)?.updateItemTags(record.key, itemTags)
 
