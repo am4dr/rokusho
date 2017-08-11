@@ -32,7 +32,7 @@ class LibraryViewer<T>(val library: RokushoLibrary<T>) {
                 when {
                     change.wasRemoved() && change.wasAdded() -> indexOf(change.valueRemoved).takeIf { it >= 0 }?.let { set(it, change.valueAdded) }
                     change.wasRemoved() -> remove(change.valueRemoved)
-                    change.wasAdded() -> add(change.valueRemoved)
+                    change.wasAdded() -> add(change.valueAdded)
                 }
             }
         }
