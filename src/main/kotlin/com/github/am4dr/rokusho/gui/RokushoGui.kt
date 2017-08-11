@@ -28,7 +28,7 @@ import java.util.function.Predicate
 
 class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
     private val recordLists = SimpleListProperty(rokusho.recordLists)
-    private val allRecords = ConcatenatedList<Record<ImageUrl>>(TransformedList(recordLists, ObservableRecordList<ImageUrl>::records))
+    private val allRecords = ConcatenatedList<Record<ImageUrl>>(TransformedList(recordLists, RecordListWatcher<ImageUrl>.Records::records))
     val mainParent: Parent = createMainScene()
 
     private fun createMainScene(): MainLayout {

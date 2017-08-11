@@ -2,8 +2,8 @@ package com.github.am4dr.rokusho.app
 
 import com.github.am4dr.rokusho.app.savefile.yaml.YamlSaveDataSerializer
 import com.github.am4dr.rokusho.core.library.ItemTag
-import com.github.am4dr.rokusho.core.library.ObservableRecordList
 import com.github.am4dr.rokusho.core.library.Record
+import com.github.am4dr.rokusho.core.library.RecordListWatcher
 import com.github.am4dr.rokusho.javafx.collection.ConcatenatedList
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import javafx.beans.property.ReadOnlyListProperty
@@ -22,14 +22,17 @@ class Rokusho {
 
     val libraries: ReadOnlyListProperty<out RokushoLibrary<ImageUrl>> = libraryLoader.loadedLibraries
 
-    val recordLists: ReadOnlyListProperty<ObservableRecordList<ImageUrl>>
+    val recordLists: ReadOnlyListProperty<RecordListWatcher<ImageUrl>.Records>
     init {
-        val listOfRecordLists: ObservableList<ObservableList<ObservableRecordList<ImageUrl>>> =
+        val listOfRecordLists: ObservableList<ObservableList<RecordListWatcher<ImageUrl>.Records>> =
                 TransformedList(libraryLoader.loadedLibraries, RokushoLibrary<ImageUrl>::recordLists)
         recordLists = ReadOnlyListWrapper(ConcatenatedList(listOfRecordLists)).readOnlyProperty
     }
 
-    fun addDirectory(directory: Path): ObservableRecordList<ImageUrl>? = libraryLoader.getOrLoadLibrary(directory).run { createRecordList(items) }
+    fun addDirectory(directory: Path): RecordListWatcher<ImageUrl>.Records {
+        val library = libraryLoader.getOrLoadLibrary(directory)
+        return library.createRecordList(library.items)
+    }
 
     fun updateItemTags(record: Record<ImageUrl>, itemTags: List<ItemTag>) = getLibrary(record)?.updateItemTags(record.key, itemTags)
 

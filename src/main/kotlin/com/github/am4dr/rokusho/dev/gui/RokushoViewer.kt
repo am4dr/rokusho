@@ -3,7 +3,7 @@ package com.github.am4dr.rokusho.dev.gui
 import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.Rokusho
 import com.github.am4dr.rokusho.app.RokushoLibrary
-import com.github.am4dr.rokusho.core.library.ObservableRecordList
+import com.github.am4dr.rokusho.core.library.RecordListWatcher
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import javafx.scene.Scene
 import javafx.scene.control.Hyperlink
@@ -30,11 +30,11 @@ class RokushoViewer(val rokusho: Rokusho) {
     fun show() = stage.show()
     private fun createScene(w: Double, h: Double): Scene {
         val libraryList = ListView(TransformedList(rokusho.libraries, ::LibraryListCell))
-        val itemSetList = ListView<ObservableRecordList<ImageUrl>>(recordLists).apply {
+        val itemSetList = ListView<RecordListWatcher<ImageUrl>.Records>(recordLists).apply {
             setOnMouseClicked { e ->
                 if (e.clickCount == 2) {
                     selectionModel.selectedItems[0]?.let {
-                        // TODO open the view of selected ObservableRecordList
+                        // TODO open the view of selected `RecordListWatcher.Records`
                     }
                 }
             }
