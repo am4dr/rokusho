@@ -1,6 +1,7 @@
 package com.github.am4dr.rokusho.app
 
 import com.github.am4dr.rokusho.app.savefile.yaml.YamlSaveFileLoader
+import com.github.am4dr.rokusho.core.library.Library
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyListWrapper
 import javafx.collections.FXCollections.observableArrayList
@@ -16,18 +17,21 @@ class LocalFileSystemLibraryLoader {
     private val _loadedLibraries = ReadOnlyListWrapper(observableArrayList<LocalFileSystemLibrary>())
     val loadedLibraries: ReadOnlyListProperty<LocalFileSystemLibrary> = _loadedLibraries.readOnlyProperty
 
-    private fun addLibrary(library: LocalFileSystemLibrary) = _loadedLibraries.add(library)
+    private fun addLibrary(library: LocalFileSystemLibrary) { _loadedLibraries.add(library) }
 
     fun getOrLoadLibrary(directory: Path): LocalFileSystemLibrary {
         val savefilePath = getSavefilePathFor(directory)
         findLibraryBySavefilePath(savefilePath)?.let { return it }
 
-        val (initTags, initItemTags) = if (Files.exists(savefilePath)) savefileLoader.load(savefilePath).toRegistries() else Pair(mapOf(), mapOf())
-        return LocalFileSystemLibrary(savefilePath, getAllItems(directory)).apply {
-            tags.putAll(initTags)
-            itemTags.putAll(initItemTags)
-            addLibrary(this)
+        val items = getAllItems(directory)
+        val library = Library({ items.asSequence() }, { it }).apply {
+            if (Files.exists(savefilePath)) {
+                val (initTags, initItemTags) = savefileLoader.load(savefilePath).toRegistries()
+                tags.putAll(initTags)
+                itemTags.putAll(initItemTags)
+            }
         }
+        return LocalFileSystemLibrary(savefilePath, library).apply(this::addLibrary)
     }
     private fun getAllItems(root: Path): List<ImageUrl> {
         val rootSavefilePath = getSavefilePathFor(root)

@@ -9,6 +9,7 @@ import com.github.am4dr.rokusho.core.library.Tag
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyListWrapper
 import javafx.beans.property.ReadOnlyMapProperty
+import javafx.beans.property.ReadOnlyMapWrapper
 import javafx.collections.FXCollections.observableArrayList
 import java.nio.file.Files
 import java.nio.file.Path
@@ -17,8 +18,8 @@ class LocalFileSystemLibrary(savefilePath: Path,
                              private val library: Library<ImageUrl, ImageUrl>) : RokushoLibrary<ImageUrl> {
     constructor(savefilePath: Path, items: Iterable<ImageUrl>) : this (savefilePath, Library({ items.asSequence() }, { it }))
 
-    override val tags: ReadOnlyMapProperty<String, Tag> = library.tags
-    override val itemTags: ReadOnlyMapProperty<ImageUrl, List<ItemTag>> = library.itemTags
+    override val tags: ReadOnlyMapProperty<String, Tag> = ReadOnlyMapWrapper(library.tags).readOnlyProperty
+    override val itemTags: ReadOnlyMapProperty<ImageUrl, List<ItemTag>> = ReadOnlyMapWrapper(library.itemTags).readOnlyProperty
     val items: List<ImageUrl> get() = library.items
 
     val savefilePath: Path = savefilePath.toAbsolutePath()

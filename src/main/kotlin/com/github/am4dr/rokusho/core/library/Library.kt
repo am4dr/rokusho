@@ -1,14 +1,14 @@
 package com.github.am4dr.rokusho.core.library
 
-import javafx.beans.property.ReadOnlyMapProperty
+import javafx.beans.property.MapProperty
 import javafx.beans.property.SimpleMapProperty
 import javafx.collections.FXCollections
 
 class Library<E, K>(val getItemSequence: () -> Sequence<E>,
                     val idExtractor: (E) -> K) {
 
-    val tags: ReadOnlyMapProperty<String, Tag> = SimpleMapProperty(FXCollections.observableHashMap())
-    val itemTags: ReadOnlyMapProperty<K, List<ItemTag>> = SimpleMapProperty(FXCollections.observableHashMap())
+    val tags: MapProperty<String, Tag> = SimpleMapProperty(FXCollections.observableHashMap())
+    val itemTags: MapProperty<K, List<ItemTag>> = SimpleMapProperty(FXCollections.observableHashMap())
     val items: List<E> get() = getItemSequence().toList()
     val records: List<Record<K>> get() = items.map(this::getRecord)
 
