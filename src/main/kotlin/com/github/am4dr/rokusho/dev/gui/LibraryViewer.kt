@@ -30,7 +30,7 @@ class LibraryViewer<T>(val library: RokushoLibrary<T>) {
         val tagList = object : ObservableList<Tag> by FXCollections.observableArrayList(library.tags.values), MapChangeListener<String, Tag> {
             override fun onChanged(change: MapChangeListener.Change<out String, out Tag>) {
                 when {
-                    change.wasRemoved() && change.wasAdded() -> indexOf(change.valueRemoved).takeIf { it >= 0 }?.let { set(it, change.valueAdded) }
+                    change.wasRemoved() && change.wasAdded() -> indexOfFirst { it === change.valueRemoved }.takeIf { it >= 0 }?.let { set(it, change.valueAdded) }
                     change.wasRemoved() -> remove(change.valueRemoved)
                     change.wasAdded() -> add(change.valueAdded)
                 }

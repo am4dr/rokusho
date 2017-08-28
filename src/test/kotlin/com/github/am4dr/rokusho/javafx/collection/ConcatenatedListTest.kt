@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections
 import javafx.collections.FXCollections.observableArrayList
 import javafx.collections.ObservableList
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertIterableEquals
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -16,9 +17,24 @@ class ConcatenatedListTest {
         fun consistsOfOnlyOneObservableList() {
             val list = observableArrayList(1,2,3,4,5)
             val lists = observableArrayList<ObservableList<Int>>(list)
-            val spreadedList = ConcatenatedList(lists)
-            assertIterableEquals(list, spreadedList)
+            val spreadList = ConcatenatedList(lists)
+            assertIterableEquals(list, spreadList)
         }
+    }
+    @Test
+    fun UpdateListToSameToOtherList() {
+        val list1 = observableArrayList("hoge")
+        val list2 = observableArrayList("piyo")
+
+        val lists = observableArrayList<ObservableList<String>>(list1, list2)
+        val spread = ConcatenatedList(lists)
+        val binder = SimpleListProperty<String>(observableArrayList())
+        binder.bindContent(spread)
+
+        list2[0] = "hoge"
+        assertEquals(list1, list2)
+
+        assertIterableEquals(listOf("hoge", "hoge"), binder)
     }
 
     @Nested
@@ -27,9 +43,9 @@ class ConcatenatedListTest {
         fun AddElementsToAListInTheLists() {
             val list = observableArrayList<Int>()
             val lists = observableArrayList<ObservableList<Int>>(list)
-            val spreaded = ConcatenatedList(lists)
+            val spread = ConcatenatedList(lists)
             val binder = SimpleListProperty<Int>(observableArrayList())
-            binder.bindContent(spreaded)
+            binder.bindContent(spread)
 
             list.addAll(1,2,3,4,5)
 
@@ -39,9 +55,9 @@ class ConcatenatedListTest {
         fun RemoveElementsFromAListInTheLists() {
             val list = observableArrayList(1,2,3,4,5)
             val lists = observableArrayList<ObservableList<Int>>(list)
-            val spreaded = ConcatenatedList(lists)
+            val spread = ConcatenatedList(lists)
             val binder = SimpleListProperty<Int>(observableArrayList())
-            binder.bindContent(spreaded)
+            binder.bindContent(spread)
 
             list.remove(2,4)
 
@@ -51,9 +67,9 @@ class ConcatenatedListTest {
         fun RemoveElementsFromAListInTheListsWithBindingsBindContent() {
             val list = observableArrayList(1,2,3,4,5)
             val lists = observableArrayList<ObservableList<Int>>(list)
-            val spreaded = ConcatenatedList(lists)
+            val spread = ConcatenatedList(lists)
             val binder = SimpleListProperty<Int>(observableArrayList())
-            Bindings.bindContent(binder, spreaded)
+            Bindings.bindContent(binder, spread)
 
             list.remove(2,4)
 
@@ -63,9 +79,9 @@ class ConcatenatedListTest {
         fun AddAListToTheLists() {
             val list = observableArrayList(1,2,3,4,5)
             val lists = observableArrayList<ObservableList<Int>>()
-            val spreaded = ConcatenatedList(lists)
+            val spread = ConcatenatedList(lists)
             val binder = SimpleListProperty<Int>(observableArrayList())
-            binder.bindContent(spreaded)
+            binder.bindContent(spread)
 
             lists.add(list)
 
@@ -75,9 +91,9 @@ class ConcatenatedListTest {
         fun RemoveAListFromTheLists() {
             val list = observableArrayList(1,2,3,4,5)
             val lists = observableArrayList<ObservableList<Int>>(list)
-            val spreaded = ConcatenatedList(lists)
+            val spread = ConcatenatedList(lists)
             val binder = SimpleListProperty<Int>(observableArrayList())
-            binder.bindContent(spreaded)
+            binder.bindContent(spread)
 
             lists.remove(list)
 
