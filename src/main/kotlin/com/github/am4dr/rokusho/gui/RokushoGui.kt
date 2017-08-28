@@ -4,10 +4,15 @@ import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.Rokusho
 import com.github.am4dr.rokusho.app.RokushoLibrary
 import com.github.am4dr.rokusho.core.library.*
+import com.github.am4dr.rokusho.gui.thumbnail.DefaultThumbnail
+import com.github.am4dr.rokusho.gui.thumbnail.ThumbnailFlowPane
 import com.github.am4dr.rokusho.javafx.collection.ConcatenatedList
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import javafx.beans.binding.Bindings
+import javafx.beans.binding.Bindings.createBooleanBinding
 import javafx.beans.binding.Bindings.createObjectBinding
+import javafx.beans.binding.BooleanBinding
+import javafx.beans.property.ReadOnlyBooleanWrapper
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleMapProperty
 import javafx.beans.value.ObservableObjectValue
@@ -57,44 +62,45 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
             predicateProperty().bind(createObjectBinding({ Predicate(recordFilter.filterProperty.value) }, arrayOf(recordFilter.filterProperty)))
         }
         val listNode = ListView(filteredItems)
-        val thumbnailFilter = SimpleObservableFilter<String, Thumbnail> { input ->
-            { t ->
-                if (input == null || input == "") true
-                else t.tags.any { it.tag.id.contains(input) }
-            }
-        }
-        thumbnailFilter.inputProperty.bind(filterInput.textProperty())
-        return FilerLayout(filterInput, listNode, createThumbnailNode(records, thumbnailFilter.filterProperty), Bindings.size(records), Bindings.size(filteredItems))
+        return FilerLayout(filterInput, listNode, createThumbnailNode(records, recordFilter.filterProperty), Bindings.size(records), Bindings.size(filteredItems))
     }
     // TODO ThumbnailNode クラスに切り出し
-    private fun createThumbnailNode(records: ObservableList<Record<ImageUrl>>, filter: ObservableObjectValue<(Thumbnail) -> Boolean>): Node {
+    private fun createThumbnailNode(records: ObservableList<Record<ImageUrl>>, filter: ObservableObjectValue<(Record<ImageUrl>) -> Boolean>): Node {
         val overlay = ImageOverlay().apply {
             isVisible = false
             onMouseClicked = EventHandler { isVisible = false }
             background = Background(BackgroundFill(Color.rgb(30, 30, 30, 0.75), null, null))
         }
-        val layout = ThumbnailLayout(listOf(), filter)
+
         val imageLoader = UrlImageLoader()
         // TODO Libraryの内容を反映するようなparserを実装する
         val parser = { text: String -> ItemTag(SimpleTag(text, TagType.TEXT, mapOf("value" to text)), null) }
         val defaultTagNodeFactory = { tag: ItemTag -> TextTagNode(tag.tag.id) }
         val libraryToTagNodeFactory = mutableMapOf<RokushoLibrary<ImageUrl>, TagNodeFactory>()
-        val thumbnails = TransformedList(records) { item ->
-            val image = imageLoader.getImage(item.key.url, 500.0, 200.0, true)
+        val thumbnails = TransformedList(records) { record ->
+            val image = imageLoader.getImage(record.key.url, 500.0, 200.0, true)
 
-            val tagNodeFactory = rokusho.getLibrary(item)?.let { lib ->
+            val tagNodeFactory = rokusho.getLibrary(record)?.let { lib ->
                 return@let libraryToTagNodeFactory.getOrPut(lib, { TagNodeFactory(SimpleMapProperty(lib.tags)) })::createTagNode
             } ?: defaultTagNodeFactory
 
-            Thumbnail(image, item.itemTags, parser, tagNodeFactory).apply {
-                tags.addListener({ _, _, new -> rokusho.updateItemTags(item, new) })
-                onMouseClicked = EventHandler {
-                    overlay.imageProperty.value = imageLoader.getImage(item.key.url)
+            val filtered = ReadOnlyBooleanWrapper().apply {
+                bind(createBooleanBinding({ filter.value.invoke(record) }, arrayOf(filter)))
+            }.readOnlyProperty
+
+            DefaultThumbnail(image, parser, tagNodeFactory, filtered).apply {
+                addTags(record.itemTags)
+                tags.addListener({ _, _, new -> rokusho.updateItemTags(record, new) })
+                node.onMouseClicked = EventHandler {
+                    overlay.imageProperty.value = imageLoader.getImage(record.key.url)
                     overlay.isVisible = true
                 }
-            }
+            } as ThumbnailFlowPane.Thumbnail
         }
-        return StackPane(layout.also { it.thumbnails.bind(SimpleListProperty(thumbnails)) }, overlay)
+        val pane = ThumbnailFlowPane().also {
+            it.thumbnails.bind(SimpleListProperty(thumbnails))
+        }
+        return StackPane(pane, overlay)
     }
     private var lastSelectedDirectory: File? = null
     private fun selectLibraryDirectory(window: Window) {

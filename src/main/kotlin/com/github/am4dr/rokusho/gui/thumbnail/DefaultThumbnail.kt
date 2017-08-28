@@ -6,7 +6,10 @@ import com.github.am4dr.rokusho.javafx.collection.ConcatenatedList
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import com.github.am4dr.rokusho.javafx.control.FittingTextField
 import javafx.beans.binding.Bindings
-import javafx.beans.property.*
+import javafx.beans.property.ReadOnlyBooleanProperty
+import javafx.beans.property.ReadOnlyBooleanWrapper
+import javafx.beans.property.ReadOnlyListProperty
+import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.event.EventHandler
@@ -22,11 +25,12 @@ import javafx.scene.text.Font
 
 class DefaultThumbnail(val image: Image,
                        private val tagParser: (String) -> ItemTag,
-                       private val tagNodeFactory: (ItemTag) -> TagNode): ThumbnailPane.Thumbnail {
+                       private val tagNodeFactory: (ItemTag) -> TagNode,
+                       override val filteredProperty: ReadOnlyBooleanProperty): ThumbnailFlowPane.Thumbnail {
 
     private val pane = StackPane()
     override val node: Node = pane
-    override val loaded: ReadOnlyBooleanProperty = ReadOnlyBooleanWrapper(false).apply {
+    override val loadedProperty: ReadOnlyBooleanProperty = ReadOnlyBooleanWrapper(false).apply {
         bind(image.widthProperty().isNotEqualTo(0).and(image.heightProperty().isNotEqualTo(0)))
     }.readOnlyProperty
 
