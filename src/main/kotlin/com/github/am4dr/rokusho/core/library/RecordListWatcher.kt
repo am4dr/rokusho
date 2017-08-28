@@ -30,7 +30,7 @@ class RecordListWatcher<T>(
         private val itemTagsListener = MapChangeListener<T, List<ItemTag>> { c ->
             _records.filter { it.key == c.key }.forEach { recreateRecord(it) }
         }
-        private fun recreateRecord(record: Record<T>) = _records.set(_records.indexOf(record), record.copy(itemTags = itemTags[record.key] ?: listOf()))
+        private fun recreateRecord(record: Record<T>) = _records.set(_records.indexOfFirst { it === record }, record.copy(itemTags = itemTags[record.key] ?: listOf()))
 
         init {
             tags.addListener(WeakMapChangeListener(tagsListener))
