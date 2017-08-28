@@ -4,7 +4,7 @@ import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.Rokusho
 import com.github.am4dr.rokusho.app.RokushoLibrary
 import com.github.am4dr.rokusho.core.library.*
-import com.github.am4dr.rokusho.gui.thumbnail.DefaultThumbnail
+import com.github.am4dr.rokusho.gui.thumbnail.ImageThumbnail
 import com.github.am4dr.rokusho.gui.thumbnail.ThumbnailFlowPane
 import com.github.am4dr.rokusho.javafx.collection.ConcatenatedList
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
@@ -87,7 +87,7 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
                 bind(createBooleanBinding({ filter.value.invoke(record) }, arrayOf(filter)))
             }.readOnlyProperty
 
-            DefaultThumbnail(image, parser, tagNodeFactory).apply {
+            ImageThumbnail(image, parser, tagNodeFactory).apply {
                 addTags(record.itemTags)
                 tags.addListener({ _, _, new -> rokusho.updateItemTags(record, new) })
                 node.onMouseClicked = EventHandler {

@@ -23,12 +23,11 @@ import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.scene.text.Font
 
-class DefaultThumbnail(val image: Image,
-                       private val tagParser: (String) -> ItemTag,
-                       private val tagNodeFactory: (ItemTag) -> TagNode): ThumbnailFlowPane.Thumbnail {
+class ImageThumbnail(val image: Image,
+                     private val tagParser: (String) -> ItemTag,
+                     private val tagNodeFactory: (ItemTag) -> TagNode): ThumbnailFlowPane.Thumbnail {
 
-    private val pane = StackPane()
-    override val node: Node = pane
+    override val node: Node = StackPane()
     override val loadedProperty: ReadOnlyBooleanProperty = ReadOnlyBooleanWrapper(false).apply {
         bind(image.widthProperty().isNotEqualTo(0).and(image.heightProperty().isNotEqualTo(0)))
     }.readOnlyProperty
@@ -47,7 +46,7 @@ class DefaultThumbnail(val image: Image,
 
     private val tagNodes: ObservableList<Node> = TransformedList(_tags) { tag ->
         tagNodeFactory(tag).apply { onRemovedProperty.set({
-            this@DefaultThumbnail._tags.remove(tag)
+            this@ImageThumbnail._tags.remove(tag)
             syncTags()
         }) }
     }
@@ -55,6 +54,7 @@ class DefaultThumbnail(val image: Image,
         font = Font(14.0)
         background = Background(BackgroundFill(Color.WHITE, CornerRadii(2.0), null))
         padding = Insets(-1.0, 2.0, 0.0, 2.0)
+
         visibleProperty().set(false)
         managedProperty().bind(visibleProperty())
         focusedProperty().addListener { _, _, new ->
@@ -67,17 +67,17 @@ class DefaultThumbnail(val image: Image,
             if (it.code == KeyCode.ESCAPE) {
                 text = ""
                 it.consume()
-                pane.requestFocus()
+                parent.requestFocus()
             }
         }
         onAction = EventHandler {
             when (text) {
                 null, "" -> {
-                    pane.requestFocus()
+                    parent.requestFocus()
                     return@EventHandler
                 }
             }
-            this@DefaultThumbnail._tags.add(tagParser(text))
+            this@ImageThumbnail._tags.add(tagParser(text))
             text = ""
         }
     }
@@ -86,6 +86,7 @@ class DefaultThumbnail(val image: Image,
         padding = Insets(-1.0, 2.0, 0.0, 2.0)
         font = Font(14.0)
         background = Background(BackgroundFill(Color.BLACK, CornerRadii(2.0), null))
+
         onAction = EventHandler {
             tagInput.visibleProperty().set(true)
             tagInput.requestFocus()
@@ -93,7 +94,8 @@ class DefaultThumbnail(val image: Image,
     }
     private val overlayContents = ConcatenatedList.concat(tagNodes, FXCollections.observableArrayList<Node>(tagInput, addTagButton))
     init {
-        pane.apply {
+        node as StackPane
+        node.apply {
             maxWidthProperty().bind(image.widthProperty())
             maxHeightProperty().bind(image.heightProperty())
             val imageView = ImageView(image)
@@ -101,7 +103,7 @@ class DefaultThumbnail(val image: Image,
                 padding = Insets(10.0)
                 background = Background(BackgroundFill(Color.rgb(0, 0, 0, 0.5), null, null))
                 Bindings.bindContent(children, overlayContents)
-                visibleProperty().bind(pane.hoverProperty().or(tagInput.focusedProperty()))
+                visibleProperty().bind(node.hoverProperty().or(tagInput.focusedProperty()))
             }
             children.setAll(imageView, overlay)
         }
