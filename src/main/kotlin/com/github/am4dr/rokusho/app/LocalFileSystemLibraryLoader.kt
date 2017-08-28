@@ -34,11 +34,11 @@ class LocalFileSystemLibraryLoader {
         return LocalFileSystemLibrary(savefilePath, library).apply(this::addLibrary)
     }
     private fun getAllItems(root: Path): List<ImageUrl> {
-        val rootSavefilePath = getSavefilePathFor(root)
+        val rootSavefilePath = getSavefilePathFor(root).toAbsolutePath()
         val list = mutableListOf<ImageUrl>()
         Files.walkFileTree(root, object : FileVisitor<Path> {
             override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes?): FileVisitResult =
-                    if (Files.isSameFile(getSavefilePathFor(dir), rootSavefilePath)) FileVisitResult.CONTINUE else FileVisitResult.SKIP_SUBTREE
+                    if (getSavefilePathFor(dir).toAbsolutePath() == rootSavefilePath) FileVisitResult.CONTINUE else FileVisitResult.SKIP_SUBTREE
             override fun visitFile(file: Path, attrs: BasicFileAttributes?): FileVisitResult {
                 if (Rokusho.isSupportedImageFile(file)) list.add(ImageUrl(file.toUri().toURL()))
                 return FileVisitResult.CONTINUE
