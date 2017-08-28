@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections
 import javafx.collections.FXCollections.observableArrayList
 import javafx.collections.ObservableList
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertIterableEquals
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -19,6 +20,21 @@ class ConcatenatedListTest {
             val spreadedList = ConcatenatedList(lists)
             assertIterableEquals(list, spreadedList)
         }
+    }
+    @Test
+    fun UpdateListToSameToOtherList() {
+        val list1 = observableArrayList("hoge")
+        val list2 = observableArrayList("piyo")
+
+        val lists = observableArrayList<ObservableList<String>>(list1, list2)
+        val spreaded = ConcatenatedList(lists)
+        val binder = SimpleListProperty<String>(observableArrayList())
+        binder.bindContent(spreaded)
+
+        list2[0] = "hoge"
+        assertEquals(list1, list2)
+
+        assertIterableEquals(listOf("hoge", "hoge"), binder)
     }
 
     @Nested

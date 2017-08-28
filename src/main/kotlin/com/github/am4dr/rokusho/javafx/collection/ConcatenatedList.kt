@@ -55,7 +55,7 @@ class ConcatenatedList<E>(lists: ObservableList<ObservableList<E>>) : Transforma
         }
         endChange()
     }
-    private fun getListOffset(list: ObservableList<E>): Int = _lists.take(_lists.indexOf(list)).sumBy(List<E>::size)
+    private fun getListOffset(list: ObservableList<E>): Int = _lists.take(_lists.indexOfFirst { it === list }).sumBy(List<E>::size)
     private fun getListOffset(sourceIndex: Int): Int = _lists.take(sourceIndex).sumBy(List<E>::size)
 
     override val size: Int get() = lists.sumBy(List<E>::size)
