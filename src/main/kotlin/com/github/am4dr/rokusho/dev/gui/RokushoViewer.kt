@@ -1,6 +1,5 @@
 package com.github.am4dr.rokusho.dev.gui
 
-import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.Rokusho
 import com.github.am4dr.rokusho.app.RokushoLibrary
 import com.github.am4dr.rokusho.core.library.RecordListWatcher
@@ -30,16 +29,8 @@ class RokushoViewer(val rokusho: Rokusho) {
     fun show() = stage.show()
     private fun createScene(w: Double, h: Double): Scene {
         val libraryList = ListView(TransformedList(rokusho.libraries, ::LibraryListCell))
-        val itemSetList = ListView<RecordListWatcher<ImageUrl>.Records>(recordLists).apply {
-            setOnMouseClicked { e ->
-                if (e.clickCount == 2) {
-                    selectionModel.selectedItems[0]?.let {
-                        // TODO open the view of selected `RecordListWatcher.Records`
-                    }
-                }
-            }
-        }
-        return Scene(VBox(libraryList, itemSetList), w, h)
+        val recordsList = ListView(TransformedList(recordLists, ::RecordsCell))
+        return Scene(VBox(libraryList, recordsList), w, h)
     }
     private class LibraryListCell<T>(library: RokushoLibrary<T>) : FlowPane() {
         init {
@@ -48,6 +39,15 @@ class RokushoViewer(val rokusho: Rokusho) {
                     LibraryViewer(library).show()
                 }
             }, Label(library.toString()))
+        }
+    }
+    private class RecordsCell<T>(records: RecordListWatcher<T>.Records) : FlowPane() {
+        init {
+            children.addAll(Hyperlink("show").apply {
+                setOnAction {
+                    RecordsViewer(records).show()
+                }
+            }, Label(records.toString()))
         }
     }
 }
