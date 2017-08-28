@@ -25,8 +25,7 @@ import javafx.scene.text.Font
 
 class DefaultThumbnail(val image: Image,
                        private val tagParser: (String) -> ItemTag,
-                       private val tagNodeFactory: (ItemTag) -> TagNode,
-                       override val filteredProperty: ReadOnlyBooleanProperty): ThumbnailFlowPane.Thumbnail {
+                       private val tagNodeFactory: (ItemTag) -> TagNode): ThumbnailFlowPane.Thumbnail {
 
     private val pane = StackPane()
     override val node: Node = pane

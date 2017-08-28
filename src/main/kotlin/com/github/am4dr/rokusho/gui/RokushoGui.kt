@@ -11,7 +11,6 @@ import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.Bindings.createBooleanBinding
 import javafx.beans.binding.Bindings.createObjectBinding
-import javafx.beans.binding.BooleanBinding
 import javafx.beans.property.ReadOnlyBooleanWrapper
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleMapProperty
@@ -88,13 +87,15 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
                 bind(createBooleanBinding({ filter.value.invoke(record) }, arrayOf(filter)))
             }.readOnlyProperty
 
-            DefaultThumbnail(image, parser, tagNodeFactory, filtered).apply {
+            DefaultThumbnail(image, parser, tagNodeFactory).apply {
                 addTags(record.itemTags)
                 tags.addListener({ _, _, new -> rokusho.updateItemTags(record, new) })
                 node.onMouseClicked = EventHandler {
                     overlay.imageProperty.value = imageLoader.getImage(record.key.url)
                     overlay.isVisible = true
                 }
+                node.layoutY = - 500.0
+                node.managedProperty().bind(loadedProperty.and(filtered))
             } as ThumbnailFlowPane.Thumbnail
         }
         val pane = ThumbnailFlowPane().also {
