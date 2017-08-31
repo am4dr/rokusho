@@ -4,9 +4,7 @@ import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.Rokusho
 import com.github.am4dr.rokusho.app.RokushoLibrary
 import com.github.am4dr.rokusho.core.library.*
-import com.github.am4dr.rokusho.gui.sidemenu.SideMenuItem
-import com.github.am4dr.rokusho.gui.sidemenu.ExpandableSideMenu
-import com.github.am4dr.rokusho.gui.sidemenu.SideMenuPane
+import com.github.am4dr.rokusho.gui.sidemenu.*
 import com.github.am4dr.rokusho.gui.thumbnail.ImageThumbnail
 import com.github.am4dr.rokusho.gui.thumbnail.ThumbnailFlowPane
 import com.github.am4dr.rokusho.javafx.collection.ConcatenatedList
@@ -58,7 +56,8 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
         }
         val expansion = ListView(rokusho.libraries)
         return SideMenuPane().apply {
-            menu.items.add(SideMenuItem(icon, expansion))
+            items.add(SideMenuItem(icon, expansion))
+            showExpansion.value = false
         }
     }
     // TODO ImageFilerNode クラスに切り出し
