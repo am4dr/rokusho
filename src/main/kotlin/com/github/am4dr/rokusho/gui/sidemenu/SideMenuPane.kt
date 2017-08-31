@@ -2,6 +2,7 @@ package com.github.am4dr.rokusho.gui.sidemenu
 
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import javafx.beans.binding.Bindings
+import javafx.beans.binding.When
 import javafx.beans.property.*
 import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
@@ -69,7 +70,7 @@ class SideMenuPane : HBox() {
         }
 
         contentColumn.apply {
-            children.addAll(BorderPane().apply { centerProperty().bind(content) }, resizeHandleNode())
+            children.addAll(BorderPane().apply { centerProperty().bind(content) }, resizeHandleNode(6.0))
         }
         items.addListener(ListChangeListener{ c ->
             while (c.next()) {
@@ -92,38 +93,48 @@ class SideMenuPane : HBox() {
         showExpansion.value = true
     }
 
-    private fun resizeHandleNode(): Node {
-        return HBox().apply {
+    private fun resizeHandleNode(handleWidth: Double): Node {
+        val handle = Pane().apply {
+            minWidth = handleWidth
+            maxWidth = handleWidth
+            HBox.setHgrow(this, Priority.NEVER)
+            val resizing = SimpleBooleanProperty(false)
+            val transparentBlack = Background(BackgroundFill(Color.rgb(0, 0, 0, 0.5), null, null))
+            val invisible = Background(BackgroundFill(Color.rgb(0, 0, 0, 0.001), null, null))
+            backgroundProperty().bind(When(hoverProperty().or(resizing)).then(transparentBlack).otherwise(invisible))
+
+            translateX = -handleWidth / 2.0
+
+            var oldCursor = cursor
+            setOnMouseEntered {
+                oldCursor = cursor
+                cursor = Cursor.H_RESIZE
+            }
+            setOnMouseExited { cursor = oldCursor }
+
+            var startWidth = 0.0
+            var startScreenX = 0.0
+            setOnMousePressed {
+                startScreenX = it.screenX
+                startWidth = if (showExpansion.value) expansionWidth.value else 0.0
+                resizing.value = true
+            }
+            setOnMouseDragged {
+                expansionWidth.value = startWidth + it.screenX - startScreenX
+            }
+            setOnMouseReleased {
+                if (!showExpansion.value) {
+                    expansionWidth.value = 0.0
+                }
+                resizing.value = false
+            }
+        }
+        val padding = Pane().apply {
             pickOnBoundsProperty().value = false
-            children.addAll(Pane().apply {
-                minWidth = 5.0
-                maxWidth = 5.0
-                background = Background(BackgroundFill(Color.rgb(0, 0, 0, 0.001), null, null))
-                HBox.setHgrow(this, Priority.NEVER)
-                var oldCursor = cursor
-                setOnMouseEntered {
-                    oldCursor = cursor
-                    cursor = Cursor.H_RESIZE
-                }
-                setOnMouseExited { cursor = oldCursor }
-                var startWidth = 0.0
-                var startScreenX = 0.0
-                setOnMousePressed {
-                    startScreenX = it.screenX
-                    startWidth = if (showExpansion.value) expansionWidth.value else 0.0
-                }
-                setOnMouseDragged {
-                    expansionWidth.value = startWidth + it.screenX - startScreenX
-                }
-                setOnMouseReleased {
-                    if (!showExpansion.value) {
-                        expansionWidth.value = 0.0
-                    }
-                }
-            }, Pane().apply {
-                pickOnBoundsProperty().value = false
-                HBox.setHgrow(this, Priority.ALWAYS)
-            })
+            HBox.setHgrow(this, Priority.ALWAYS)
+        }
+        return HBox(handle, padding).apply {
+            pickOnBoundsProperty().value = false
         }
     }
 }
