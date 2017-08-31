@@ -101,18 +101,23 @@ class SideMenuPane : HBox() {
             maxWidth = handleWidth
             HBox.setHgrow(this, Priority.NEVER)
             val resizing = SimpleBooleanProperty(false)
+            val hoverOrResizing = hoverProperty().or(resizing)
             val transparentBlack = Background(BackgroundFill(Color.rgb(0, 0, 0, 0.5), null, null))
             val invisible = Background(BackgroundFill(Color.rgb(0, 0, 0, 0.001), null, null))
-            backgroundProperty().bind(When(hoverProperty().or(resizing)).then(transparentBlack).otherwise(invisible))
+            backgroundProperty().bind(When(hoverOrResizing).then(transparentBlack).otherwise(invisible))
 
             translateX = -handleWidth / 2.0
 
             var oldCursor = cursor
-            setOnMouseEntered {
-                oldCursor = cursor
-                cursor = Cursor.H_RESIZE
+            hoverOrResizing.addListener { _, _, new ->
+                if (new) {
+                    oldCursor = cursor
+                    cursor = Cursor.H_RESIZE
+                }
+                else {
+                    cursor = oldCursor
+                }
             }
-            setOnMouseExited { cursor = oldCursor }
 
             var startWidth = 0.0
             var startScreenX = 0.0
