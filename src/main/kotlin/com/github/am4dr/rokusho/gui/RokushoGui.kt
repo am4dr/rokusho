@@ -4,6 +4,7 @@ import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.Rokusho
 import com.github.am4dr.rokusho.app.RokushoLibrary
 import com.github.am4dr.rokusho.core.library.*
+import com.github.am4dr.rokusho.gui.sidemenu.*
 import com.github.am4dr.rokusho.gui.thumbnail.ImageThumbnail
 import com.github.am4dr.rokusho.gui.thumbnail.ThumbnailFlowPane
 import com.github.am4dr.rokusho.javafx.collection.ConcatenatedList
@@ -43,8 +44,20 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
             setOnAction { selectLibraryDirectory(stage) }
         }
         val filer = createImageFiler(allRecords)
-        return MainLayout(saveButton, addLibraryButton, filer, makeDirectorySelectorPane(stage)).apply {
+        val sideMenu = createSideMenu()
+        return MainLayout(saveButton, addLibraryButton, filer, makeDirectorySelectorPane(stage), sideMenu).apply {
             librariesNotSelectedProperty.bind(Bindings.isEmpty(allRecords))
+        }
+    }
+    private fun createSideMenu(): SideMenuPane {
+        val icon = Pane().apply {
+            border = Border(BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, null, BorderWidths(2.0)))
+            children.add(Label("Lib"))
+        }
+        val expansion = ListView(rokusho.libraries)
+        return SideMenuPane().apply {
+            items.add(SideMenuItem(icon, expansion))
+            showExpansion.value = false
         }
     }
     // TODO ImageFilerNode クラスに切り出し
