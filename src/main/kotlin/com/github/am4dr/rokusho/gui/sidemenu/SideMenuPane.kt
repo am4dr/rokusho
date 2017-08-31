@@ -70,7 +70,7 @@ class SideMenuPane : HBox() {
         }
 
         contentColumn.apply {
-            children.addAll(BorderPane().apply { centerProperty().bind(content) }, resizeHandleNode(5.0))
+            children.addAll(BorderPane().apply { centerProperty().bind(content) }, resizeHandleNode(6.0))
         }
         items.addListener(ListChangeListener{ c ->
             while (c.next()) {
@@ -102,6 +102,8 @@ class SideMenuPane : HBox() {
             val transparentBlack = Background(BackgroundFill(Color.rgb(0, 0, 0, 0.5), null, null))
             val invisible = Background(BackgroundFill(Color.rgb(0, 0, 0, 0.001), null, null))
             backgroundProperty().bind(When(hoverProperty().or(resizing)).then(transparentBlack).otherwise(invisible))
+
+            translateX = -handleWidth / 2.0
 
             var oldCursor = cursor
             setOnMouseEntered {
