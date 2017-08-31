@@ -25,7 +25,9 @@ class SideMenuPane : HBox() {
     private val contentColumn = StackPane()
 
     val items: ObservableList<SideMenuItem> = FXCollections.observableArrayList()
-    private val icons = TransformedList(items, SideMenuItem::icon)
+    private val icons = TransformedList(items) {
+        it.icon.apply { size.bind(iconSize) }
+    }
     private val currentItem = SimpleObjectProperty<SideMenuItem>(null)
     val showExpansion: BooleanProperty = SimpleBooleanProperty(true)
 

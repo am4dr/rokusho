@@ -50,7 +50,7 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
         }
     }
     private fun createSideMenu(): SideMenuPane {
-        val icon = Pane().apply {
+        val icon = SideMenuIcon().apply {
             border = Border(BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, null, BorderWidths(2.0)))
             children.add(Label("Lib"))
         }
