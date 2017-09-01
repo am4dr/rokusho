@@ -4,7 +4,9 @@ import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.Rokusho
 import com.github.am4dr.rokusho.app.RokushoLibrary
 import com.github.am4dr.rokusho.core.library.*
-import com.github.am4dr.rokusho.gui.sidemenu.*
+import com.github.am4dr.rokusho.gui.sidemenu.SideMenuIcon
+import com.github.am4dr.rokusho.gui.sidemenu.SideMenuItem
+import com.github.am4dr.rokusho.gui.sidemenu.SideMenuPane
 import com.github.am4dr.rokusho.gui.thumbnail.ImageThumbnail
 import com.github.am4dr.rokusho.gui.thumbnail.ThumbnailFlowPane
 import com.github.am4dr.rokusho.javafx.collection.ConcatenatedList
@@ -16,6 +18,7 @@ import javafx.beans.property.ReadOnlyBooleanWrapper
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleMapProperty
 import javafx.beans.value.ObservableObjectValue
+import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.collections.transformation.FilteredList
 import javafx.event.EventHandler
@@ -34,6 +37,7 @@ import java.util.function.Predicate
 class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
     private val recordLists = SimpleListProperty(rokusho.recordLists)
     private val allRecords = ConcatenatedList<Record<ImageUrl>>(TransformedList(recordLists, RecordListWatcher<ImageUrl>.Records::records))
+    private val currentRecords = SimpleListProperty<Record<ImageUrl>>(FXCollections.observableArrayList()).apply { bindContent(allRecords) }
     val mainParent: Parent = createMainScene()
 
     private fun createMainScene(): MainLayout {
@@ -43,10 +47,10 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
         val addLibraryButton = Button("追加").apply {
             setOnAction { selectLibraryDirectory(stage) }
         }
-        val filer = createImageFiler(allRecords)
+        val filer = createImageFiler(currentRecords)
         val sideMenu = createSideMenu()
         return MainLayout(saveButton, addLibraryButton, filer, makeDirectorySelectorPane(stage), sideMenu).apply {
-            librariesNotSelectedProperty.bind(Bindings.isEmpty(allRecords))
+            librariesNotSelectedProperty.bind(Bindings.isEmpty(currentRecords))
         }
     }
     private fun createSideMenu(): SideMenuPane {
@@ -54,11 +58,28 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
             border = Border(BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, null, BorderWidths(2.0)))
             children.add(Label("Lib"))
         }
-        val expansion = ListView(rokusho.libraries)
+        val expansion = createRecordsListView()
         return SideMenuPane().apply {
             items.add(SideMenuItem(icon, expansion))
             showExpansion.value = false
         }
+    }
+    private fun createRecordsListView(): Pane {
+        val transformed = TransformedList(recordLists) { r ->
+            RecordsListCell(r.toString()).apply {
+                setOnMouseClicked {
+                    currentRecords.bindContent(r.records)
+                }
+            }
+        }
+        val allCell = RecordsListCell("全て").apply {
+            setOnMouseClicked {
+                currentRecords.bindContent(allRecords)
+            }
+        }
+        val cells = ConcatenatedList.concat(FXCollections.singletonObservableList(allCell), transformed)
+        val listView = ListView(cells).apply { VBox.setVgrow(this, Priority.ALWAYS)}
+        return VBox(Label("Record Lists"), listView)
     }
     // TODO ImageFilerNode クラスに切り出し
     private fun createImageFiler(records: ObservableList<Record<ImageUrl>>): FilerLayout {
