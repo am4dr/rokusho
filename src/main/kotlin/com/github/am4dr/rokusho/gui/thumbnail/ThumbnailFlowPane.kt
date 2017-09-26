@@ -17,26 +17,28 @@ import javafx.scene.layout.FlowPane
 class ThumbnailFlowPane : ScrollPane() {
 
     val thumbnails: ListProperty<Thumbnail> = SimpleListProperty(FXCollections.observableArrayList())
-    private val vValueHeightProperty = SimpleDoubleProperty()
-    private val margin = SimpleDoubleProperty(2000.0)
-    private val screenTop = margin.multiply(-1).add(vValueHeightProperty)
-    private val screenBottom = margin.add(vValueHeightProperty)
+    private val flowPane = FlowPane(10.0, 10.0)
+    private val hiddenHeight = flowPane.heightProperty().subtract(heightProperty())
+    private val screenTop = hiddenHeight.multiply(vvalueProperty())
+    private val screenBottom = heightProperty().add(screenTop)
+    private val rowHeight = SimpleDoubleProperty(200.0)
+    private val viewTop = rowHeight.multiply(-1).add(screenTop)
+    private val viewBottom = rowHeight.add(screenBottom)
     private val configuredThumbnailNodes: ObservableList<Node> = TransformedList(thumbnails) { th ->
         th.node.apply {
             visibleProperty().bind(
                     managedProperty()
-                            .and(layoutYProperty().greaterThanOrEqualTo(screenTop))
-                            .and(layoutYProperty().lessThanOrEqualTo(screenBottom)))
+                            .and(layoutYProperty().greaterThanOrEqualTo(viewTop))
+                            .and(layoutYProperty().lessThanOrEqualTo(viewBottom)))
         }
     }
     init {
         fitToWidthProperty().set(true)
         hbarPolicy = ScrollBarPolicy.NEVER
-        content = FlowPane(10.0, 10.0).apply {
+        content = flowPane.apply {
             padding = Insets(25.0, 0.0, 25.0, 0.0)
             alignment = Pos.CENTER
             Bindings.bindContent(children, configuredThumbnailNodes)
-            vValueHeightProperty.bind(vvalueProperty().multiply(heightProperty()))
             setOnScroll {
                 vvalue -= it.deltaY * 3 / height
                 it.consume()
