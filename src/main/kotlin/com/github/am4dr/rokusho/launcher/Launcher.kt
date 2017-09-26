@@ -24,8 +24,8 @@ class Launcher : Application() {
     override fun init() {
         log.info("launched with the params: ${parameters.raw}")
         val commandline = parseArgs(parameters.raw.toTypedArray())
-        if (commandline.args.size == 1) {
-            Paths.get(commandline.args[0])?.let { path ->
+        commandline.args.forEach {
+            Paths.get(it)?.let { path ->
                 if (Files.isDirectory(path)) {
                     rokusho.addDirectory(path)
                 }
