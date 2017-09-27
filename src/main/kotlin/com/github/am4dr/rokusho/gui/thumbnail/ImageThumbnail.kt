@@ -15,7 +15,7 @@ import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.layout.Pane
 
-class ImageThumbnail(val image: Image,
+class ImageThumbnail(private val image: Image,
                      private val tagParser: (String) -> ItemTag,
                      private val tagNodeFactory: (ItemTag) -> TagNode): ThumbnailFlowPane.Thumbnail {
 
@@ -26,7 +26,7 @@ class ImageThumbnail(val image: Image,
 
     private val _tags: ObservableList<ItemTag> = FXCollections.observableArrayList()
     val tags: ReadOnlyListProperty<ItemTag> = SimpleListProperty(FXCollections.observableArrayList())
-    private fun syncTags() = tags.setAll(_tags)
+    private fun syncTags() { tags.setAll(_tags) }
     fun setTags(tags: Iterable<ItemTag>) {
         _tags.addAll(tags)
         syncTags()
@@ -39,13 +39,10 @@ class ImageThumbnail(val image: Image,
         }) }
     }
     init {
-        val onInputCommitted: (String) -> Unit = { text: String ->
-            _tags.add(tagParser(text))
-        }
-        val onEditEnded: () -> Unit = {
-            syncTags()
-        }
-        view = ThumbnailView(Pane(ImageView(image)), onInputCommitted, onEditEnded).apply {
+        view = ThumbnailView(Pane(ImageView(image))).apply {
+            onInputCommitted = { text: String -> _tags.add(tagParser(text)) }
+            onEditEnded = this@ImageThumbnail::syncTags
+
             Bindings.bindContent(tagNodes, this@ImageThumbnail.tagNodes)
         }
     }

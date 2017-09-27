@@ -14,11 +14,15 @@ import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.scene.text.Font
 
-class ThumbnailView(val content: Region, val onInputCommitted: (String) -> Unit, val onEditEnded: () -> Unit) : StackPane() {
+class ThumbnailView(private val content: Region) : StackPane() {
+
+    var onInputCommitted: ((String) -> Unit)? = null
+    var onEditEnded: (() -> Unit)? = null
 
     val tagNodes: ObservableList<Node> = FXCollections.observableArrayList()
-    val addTagButton: Button = createAddButton()
-    val inputTextField: TextField = createInputBox()
+
+    private val addTagButton: Button = createAddButton()
+    private val inputTextField: TextField = createInputBox()
 
     private val overlayContents = ConcatenatedList.concat(tagNodes, FXCollections.observableArrayList<Node>(inputTextField, addTagButton))
 
@@ -29,7 +33,7 @@ class ThumbnailView(val content: Region, val onInputCommitted: (String) -> Unit,
             focusedProperty().addListener { _, _, new ->
                 if (new == false) {
                     visibleProperty().set(false)
-                    onEditEnded()
+                    onEditEnded?.invoke()
                 }
             }
             val releaseFocus = this@ThumbnailView::requestFocus
@@ -45,7 +49,7 @@ class ThumbnailView(val content: Region, val onInputCommitted: (String) -> Unit,
                     releaseFocus()
                     return@setOnAction
                 }
-                onInputCommitted(text)
+                onInputCommitted?.invoke(text)
                 text = ""
             }
         }
