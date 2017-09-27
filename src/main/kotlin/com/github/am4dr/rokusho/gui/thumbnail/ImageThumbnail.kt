@@ -1,7 +1,7 @@
 package com.github.am4dr.rokusho.gui.thumbnail
 
 import com.github.am4dr.rokusho.core.library.ItemTag
-import com.github.am4dr.rokusho.gui.TagNode
+import com.github.am4dr.rokusho.gui.tag.TagView
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import javafx.beans.binding.Bindings
 import javafx.beans.property.ReadOnlyBooleanProperty
@@ -17,7 +17,7 @@ import javafx.scene.layout.Pane
 
 class ImageThumbnail(private val image: Image,
                      private val tagParser: (String) -> ItemTag,
-                     private val tagNodeFactory: (ItemTag) -> TagNode): ThumbnailFlowPane.Thumbnail {
+                     private val tagNodeFactory: (ItemTag) -> TagView): ThumbnailFlowPane.Thumbnail {
 
     override val view: ThumbnailView
     override val loadedProperty: ReadOnlyBooleanProperty = ReadOnlyBooleanWrapper(false).apply {
@@ -33,10 +33,12 @@ class ImageThumbnail(private val image: Image,
     }
 
     private val tagNodes: ObservableList<Node> = TransformedList(_tags) { tag ->
-        tagNodeFactory(tag).apply { onRemovedProperty.set({
-            this@ImageThumbnail._tags.remove(tag)
-            syncTags()
-        }) }
+        tagNodeFactory(tag).apply {
+            onRemoved = {
+                this@ImageThumbnail._tags.remove(tag)
+                syncTags()
+            }
+        }
     }
     init {
         view = ThumbnailView(Pane(ImageView(image))).apply {
