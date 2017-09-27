@@ -11,7 +11,7 @@ import com.github.am4dr.rokusho.gui.thumbnail.ImageThumbnail
 import com.github.am4dr.rokusho.gui.thumbnail.ThumbnailFlowPane
 import com.github.am4dr.rokusho.javafx.collection.ConcatenatedList
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
-import com.github.am4dr.rokusho.javafx.function.BoundFunction
+import com.github.am4dr.rokusho.javafx.function.bindLeft
 import javafx.beans.binding.Bindings
 import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections
@@ -82,12 +82,12 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
     // TODO ImageFilerNode クラスに切り出し
     private fun createImageFiler(records: ObservableList<Record<ImageUrl>>): FilerLayout {
         val filterInput = TextField()
-        val recordFilter = BoundFunction(filterInput.textProperty(), { input ->
+        val recordFilter = { input: String? ->
             Predicate { item: Record<ImageUrl> ->
                 if (input == null || input == "") true
                 else item.itemTags.any { it.tag.id.contains(input) }
             }
-        })
+        }.bindLeft(filterInput.textProperty())
         val filteredItems = FilteredList(records).apply { predicateProperty().bind(recordFilter) }
         val listNode = ListView(filteredItems)
         return FilerLayout(filterInput, listNode, createThumbnailNode(filteredItems), Bindings.size(records), Bindings.size(filteredItems))
