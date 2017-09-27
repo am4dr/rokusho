@@ -19,7 +19,7 @@ class ImageThumbnail(val image: Image,
                      private val tagParser: (String) -> ItemTag,
                      private val tagNodeFactory: (ItemTag) -> TagNode): ThumbnailFlowPane.Thumbnail {
 
-    override val node: ThumbnailView
+    override val view: ThumbnailView
     override val loadedProperty: ReadOnlyBooleanProperty = ReadOnlyBooleanWrapper(false).apply {
         bind(image.widthProperty().isNotEqualTo(0).and(image.heightProperty().isNotEqualTo(0)))
     }.readOnlyProperty
@@ -45,7 +45,7 @@ class ImageThumbnail(val image: Image,
         val onEditEnded: () -> Unit = {
             syncTags()
         }
-        node = ThumbnailView(Pane(ImageView(image)), onInputCommitted, onEditEnded).apply {
+        view = ThumbnailView(Pane(ImageView(image)), onInputCommitted, onEditEnded).apply {
             Bindings.bindContent(tagNodes, this@ImageThumbnail.tagNodes)
         }
     }

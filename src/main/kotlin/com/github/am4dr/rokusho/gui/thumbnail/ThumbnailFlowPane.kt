@@ -25,7 +25,7 @@ class ThumbnailFlowPane : ScrollPane() {
     private val viewTop = rowHeight.multiply(-1).add(screenTop)
     private val viewBottom = rowHeight.add(screenBottom)
     private val configuredThumbnailNodes: ObservableList<Node> = TransformedList(thumbnails) { th ->
-        th.node.apply {
+        th.view.apply {
             layoutY = - 500.0
             managedProperty().bind(th.loadedProperty)
             visibleProperty().bind(
@@ -49,7 +49,7 @@ class ThumbnailFlowPane : ScrollPane() {
     }
 
     interface Thumbnail {
-        val node: Node
+        val view: Node
 
         val loadedProperty: ReadOnlyBooleanProperty
     }

@@ -122,7 +122,7 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
             return ImageThumbnail(image, parser, tagNodeFactory).apply {
                 setTags(record.itemTags)
                 tags.addListener({ _, _, new -> rokusho.updateItemTags(record, new) })
-                node.onMouseClicked = EventHandler {
+                view.onMouseClicked = EventHandler {
                     overlay.imageProperty.value = imageLoader.getImage(record.key.url)
                     overlay.isVisible = true
                 }
