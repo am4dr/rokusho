@@ -1,6 +1,6 @@
 package com.github.am4dr.rokusho.app.savefile.yaml
 
-import com.github.am4dr.rokusho.app.savefile.SaveFile
+import com.github.am4dr.rokusho.app.savefile.FileBasedSaveData
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -9,7 +9,7 @@ class YamlSaveFileLoader {
         const val DEFAULT_SAVEFILE_NAME = "rokusho.yaml"
     }
 
-    fun load(savefilePath: Path): SaveFile = YamlSaveFileParser().parse(savefilePath)
+    fun load(savefilePath: Path): FileBasedSaveData = YamlSaveFileParser().parse(savefilePath)
 
     fun locateSaveFilePath(directory: Path): Path? =
             directory.resolve(DEFAULT_SAVEFILE_NAME).takeIf { Files.exists(it) }
