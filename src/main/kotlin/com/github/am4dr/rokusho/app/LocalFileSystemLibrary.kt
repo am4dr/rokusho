@@ -1,7 +1,6 @@
 package com.github.am4dr.rokusho.app
 
-import com.github.am4dr.rokusho.app.savefile.SaveDataSerializer
-import com.github.am4dr.rokusho.app.savefile.SaveFile
+import com.github.am4dr.rokusho.app.savefile.*
 import com.github.am4dr.rokusho.core.library.ItemTag
 import com.github.am4dr.rokusho.core.library.Library
 import com.github.am4dr.rokusho.core.library.RecordListWatcher
@@ -13,6 +12,7 @@ import javafx.beans.property.ReadOnlyMapWrapper
 import javafx.collections.FXCollections.observableArrayList
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.Paths
 
 class LocalFileSystemLibrary(savefilePath: Path,
                              private val library: Library<ImageUrl, ImageUrl>) : RokushoLibrary<ImageUrl> {
@@ -28,13 +28,19 @@ class LocalFileSystemLibrary(savefilePath: Path,
     override fun createRecordList(list: Iterable<ImageUrl>): RecordListWatcher<ImageUrl>.Records = library.getRecordList(library.records).also { _recordLists.add(it) }
 
     fun save(serializer: SaveDataSerializer) {
-        val savefile = SaveFile.fromRegistries(savefilePath, tags, itemTags)
-        val serialized = serializer.serialize(savefile.data)
-        Files.write(savefilePath, serialized.split("\n"))
+        Files.write(savefilePath, serializer.serialize(createSaveData()).split("\n"))
     }
 
     override fun updateItemTags(key: ImageUrl, tags: Iterable<ItemTag>) {
         tags.forEach { it.tag.let { tag -> if (tag !== library.tags[tag.id]) { library.tags[tag.id] = tag } } }
         library.itemTags[key] = tags.toList()
+    }
+
+    private fun createSaveData(): SaveData {
+        val metaData = itemTags.keys.map {
+            val path = savefilePath.parent.relativize(Paths.get(it.url.toURI()))
+            path to ImageMetaData(itemTags.getOrDefault(it, mutableListOf()))
+        }.toMap()
+        return SaveData(SaveData.Version.VERSION_1, tags, metaData)
     }
 }

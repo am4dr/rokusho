@@ -26,9 +26,11 @@ class LocalFileSystemLibraryLoader {
         val items = getAllItems(directory)
         val library = Library({ items.asSequence() }, { it }).apply {
             if (Files.exists(savefilePath)) {
-                val (initTags, initItemTags) = savefileLoader.load(savefilePath).toRegistries()
-                tags.putAll(initTags)
-                itemTags.putAll(initItemTags)
+                val data = savefileLoader.load(savefilePath)
+                tags.putAll(data.data.tags)
+                data.data.metaData.forEach { (path, meta) ->
+                    itemTags[ImageUrl(savefilePath.parent.resolve(path).toUri().toURL())] = meta.tags
+                }
             }
         }
         return LocalFileSystemLibrary(savefilePath, library).apply(this::addLibrary)

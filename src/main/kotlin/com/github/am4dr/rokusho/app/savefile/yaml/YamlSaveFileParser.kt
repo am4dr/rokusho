@@ -1,8 +1,8 @@
 package com.github.am4dr.rokusho.app.savefile.yaml
 
+import com.github.am4dr.rokusho.app.savefile.FileBasedSaveData
 import com.github.am4dr.rokusho.app.savefile.ImageMetaData
 import com.github.am4dr.rokusho.app.savefile.SaveData
-import com.github.am4dr.rokusho.app.savefile.SaveFile
 import com.github.am4dr.rokusho.app.savefile.SaveFileParser
 import com.github.am4dr.rokusho.app.savefile.SaveFileParser.IllegalSaveFormatException
 import com.github.am4dr.rokusho.app.savefile.SaveFileParser.VersionNotSpecifiedException
@@ -21,11 +21,11 @@ class YamlSaveFileParser : SaveFileParser {
         fun parse(string: String): SaveData {
             val yaml = Yaml().load(string)
             if (yaml == null || yaml !is Map<*,*>) { throw IllegalSaveFormatException("top level of save file must be a Map") }
-            val version = parseVersion(yaml["version"])
+            val versionString = parseVersion(yaml["version"])
+            val version = SaveData.Version.of(versionString) ?: throw IllegalSaveFormatException("version $versionString is not supported")
             val tags = parseTagInfo(yaml["tags"])
             val metaData = parseMetaData(yaml["metaData"], tags)
-            // TODO select suitable SaveData.Version for the savefile version
-            return SaveData(SaveData.Version.VERSION_1, tags, metaData)
+            return SaveData(version, tags, metaData)
         }
         private fun parseVersion(data: Any?): String {
             data ?: throw VersionNotSpecifiedException()
@@ -75,5 +75,5 @@ class YamlSaveFileParser : SaveFileParser {
         }
     }
 
-    override fun parse(path: Path): SaveFile = SaveFile(path, parse(path.toFile().readText()))
+    override fun parse(path: Path): FileBasedSaveData = FileBasedSaveData(path, parse(path.toFile().readText()))
 }

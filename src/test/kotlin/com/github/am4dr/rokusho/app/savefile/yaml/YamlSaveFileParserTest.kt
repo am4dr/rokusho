@@ -1,9 +1,8 @@
-package com.github.am4dr.rokusho.core;
+package com.github.am4dr.rokusho.app.savefile.yaml
 
 import com.github.am4dr.rokusho.app.savefile.SaveData
 import com.github.am4dr.rokusho.app.savefile.SaveFileParser.IllegalSaveFormatException
 import com.github.am4dr.rokusho.app.savefile.SaveFileParser.VersionNotSpecifiedException
-import com.github.am4dr.rokusho.app.savefile.yaml.YamlSaveFileParser
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.nio.file.Paths
@@ -28,6 +27,12 @@ class YamlSaveFileParserTest {
             YamlSaveFileParser.parse("version: 1")
         }
         assertNotEquals(res.javaClass, VersionNotSpecifiedException::class.java)
+    }
+    @Test
+    fun invalidVersionStringTest() {
+        assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
+            YamlSaveFileParser.parse("version: \"INVALID VERSION STRING\"")
+        }
     }
     @Test
     fun nullTagsMetaDataTest() {
