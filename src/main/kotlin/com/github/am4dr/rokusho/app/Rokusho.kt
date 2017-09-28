@@ -3,7 +3,6 @@ package com.github.am4dr.rokusho.app
 import com.github.am4dr.rokusho.app.savefile.yaml.YamlSaveDataSerializer
 import com.github.am4dr.rokusho.core.library.ItemTag
 import com.github.am4dr.rokusho.core.library.Record
-import com.github.am4dr.rokusho.core.library.RecordListWatcher
 import com.github.am4dr.rokusho.javafx.collection.ConcatenatedList
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import javafx.beans.property.ReadOnlyListProperty
@@ -18,19 +17,17 @@ class Rokusho {
         fun isSupportedImageFile(path: Path) =
                 Files.isRegularFile(path) && imageFileNameMatcher.matches(path.fileName.toString())
     }
-    private val libraryLoader = LocalFileSystemLibraryLoader()
+    private val lfsLibraryLoader = LocalFileSystemLibraryLoader()
 
-    val libraries: ReadOnlyListProperty<out RokushoLibrary<ImageUrl>> = libraryLoader.loadedLibraries
-
-    val recordLists: ReadOnlyListProperty<RecordListWatcher<ImageUrl>.Records>
+    val libraries: ReadOnlyListProperty<out RokushoLibrary<ImageUrl>> = lfsLibraryLoader.loadedLibraries
+    val recordLists: ReadOnlyListProperty<ObservableList<Record<ImageUrl>>>
     init {
-        val listOfRecordLists: ObservableList<ObservableList<RecordListWatcher<ImageUrl>.Records>> =
-                TransformedList(libraryLoader.loadedLibraries, RokushoLibrary<ImageUrl>::recordLists)
+        val listOfRecordLists: ObservableList<ObservableList<ObservableList<Record<ImageUrl>>>> = TransformedList(libraries, RokushoLibrary<ImageUrl>::recordLists)
         recordLists = ReadOnlyListWrapper(ConcatenatedList(listOfRecordLists)).readOnlyProperty
     }
 
-    fun addDirectory(directory: Path): RecordListWatcher<ImageUrl>.Records {
-        val library = libraryLoader.getOrLoadLibrary(directory)
+    fun addDirectory(directory: Path): ObservableList<Record<ImageUrl>> {
+        val library = lfsLibraryLoader.getOrLoadLibrary(directory)
         return library.createRecordList(library.items)
     }
 
@@ -38,11 +35,11 @@ class Rokusho {
 
     fun save() {
         val serializer = YamlSaveDataSerializer()
-        libraryLoader.loadedLibraries.forEach { it.save(serializer) }
+        lfsLibraryLoader.loadedLibraries.forEach { it.save(serializer) }
     }
 
     fun getLibrary(record: Record<ImageUrl>): RokushoLibrary<ImageUrl>? =
-            recordLists.find { it.records.contains(record) }?.let { list ->
+            recordLists.find { it.contains(record) }?.let { list ->
                 libraries.find { it.recordLists.contains(list) }
             }
 }
