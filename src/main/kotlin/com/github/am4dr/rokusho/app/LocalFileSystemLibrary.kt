@@ -1,6 +1,8 @@
 package com.github.am4dr.rokusho.app
 
-import com.github.am4dr.rokusho.app.savefile.*
+import com.github.am4dr.rokusho.app.savefile.ImageMetaData
+import com.github.am4dr.rokusho.app.savefile.SaveData
+import com.github.am4dr.rokusho.app.savefile.SaveDataSerializer
 import com.github.am4dr.rokusho.core.library.ItemTag
 import com.github.am4dr.rokusho.core.library.Library
 import com.github.am4dr.rokusho.core.library.RecordListWatcher
