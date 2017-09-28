@@ -7,9 +7,7 @@ import com.github.am4dr.rokusho.app.savefile.SaveFileParser
 import com.github.am4dr.rokusho.app.savefile.SaveFileParser.IllegalSaveFormatException
 import com.github.am4dr.rokusho.app.savefile.SaveFileParser.VersionNotSpecifiedException
 import com.github.am4dr.rokusho.core.library.ItemTag
-import com.github.am4dr.rokusho.core.library.SimpleTag
 import com.github.am4dr.rokusho.core.library.Tag
-import com.github.am4dr.rokusho.core.library.TagType
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.nio.file.Path
@@ -45,7 +43,7 @@ class YamlSaveFileParser : SaveFileParser {
                 val type = opts["type"] as? String ?: "text"
                 @Suppress("UNCHECKED_CAST")
                 opts as Map<String, Any>
-                Pair(name, SimpleTag(name , TagType.from(type), opts))
+                Pair(name, Tag(name , Tag.Type.from(type), opts))
             }.toMap(mutableMapOf())
         }
         private fun parseMetaData(data: Any?, tagInfo: MutableMap<String, Tag>): Map<Path, ImageMetaData> {
@@ -70,7 +68,7 @@ class YamlSaveFileParser : SaveFileParser {
                 }
                 @Suppress("UNCHECKED_CAST")
                 ops as Map<String, Any>
-                ItemTag(tagInfo.getOrPut(name, { SimpleTag(name , TagType.TEXT, mapOf("value" to name)) }) , ops["value"]?.toString())
+                ItemTag(tagInfo.getOrPut(name, { Tag(name , Tag.Type.TEXT, mapOf("value" to name)) }) , ops["value"]?.toString())
             }
         }
     }

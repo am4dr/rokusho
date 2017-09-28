@@ -2,8 +2,9 @@ package com.github.am4dr.rokusho.dev.gui
 
 import com.github.am4dr.rokusho.app.Rokusho
 import com.github.am4dr.rokusho.app.RokushoLibrary
-import com.github.am4dr.rokusho.core.library.RecordListWatcher
+import com.github.am4dr.rokusho.core.library.Record
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
+import javafx.collections.ObservableList
 import javafx.scene.Scene
 import javafx.scene.control.Hyperlink
 import javafx.scene.control.Label
@@ -41,7 +42,7 @@ class RokushoViewer(val rokusho: Rokusho) {
             }, Label(library.toString()))
         }
     }
-    private class RecordsCell<T>(records: RecordListWatcher<T>.Records) : FlowPane() {
+    private class RecordsCell<T>(records: ObservableList<Record<T>>) : FlowPane() {
         init {
             children.addAll(Hyperlink("show").apply {
                 setOnAction {

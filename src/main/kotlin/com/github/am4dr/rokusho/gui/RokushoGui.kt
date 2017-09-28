@@ -2,7 +2,9 @@ package com.github.am4dr.rokusho.gui
 
 import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.Rokusho
-import com.github.am4dr.rokusho.core.library.*
+import com.github.am4dr.rokusho.core.library.ItemTag
+import com.github.am4dr.rokusho.core.library.Record
+import com.github.am4dr.rokusho.core.library.Tag
 import com.github.am4dr.rokusho.gui.sidemenu.SideMenuIcon
 import com.github.am4dr.rokusho.gui.sidemenu.SideMenuItem
 import com.github.am4dr.rokusho.gui.sidemenu.SideMenuPane
@@ -34,7 +36,7 @@ import java.util.function.Predicate
 
 class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
     private val recordLists = SimpleListProperty(rokusho.recordLists)
-    private val allRecords = ConcatenatedList<Record<ImageUrl>>(TransformedList(recordLists, RecordListWatcher<ImageUrl>.Records::records))
+    private val allRecords = ConcatenatedList(recordLists)
     private val currentRecords = SimpleListProperty<Record<ImageUrl>>(FXCollections.observableArrayList()).apply { bindContent(allRecords) }
     val mainParent: Parent = createMainScene()
 
@@ -66,7 +68,7 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
         val transformed = TransformedList(recordLists) { r ->
             RecordsListCell(r.toString()).apply {
                 setOnMouseClicked {
-                    currentRecords.bindContent(r.records)
+                    currentRecords.bindContent(r)
                 }
             }
         }
@@ -102,7 +104,7 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage) {
 
         val imageLoader = UrlImageLoader()
         // TODO Libraryの内容を反映するようなparserを実装する
-        val parser = { text: String -> ItemTag(SimpleTag(text, TagType.TEXT, mapOf("value" to text)), null) }
+        val parser = { text: String -> ItemTag(Tag(text, Tag.Type.TEXT, mapOf("value" to text)), null) }
         val tagNodeFactory = { tag: ItemTag -> TagNode(tag).view }
 
         val thumbnailCache = WeakHashMap(mutableMapOf<Record<ImageUrl>, SoftReference<ThumbnailFlowPane.Thumbnail>>())

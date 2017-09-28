@@ -2,6 +2,7 @@ package com.github.am4dr.rokusho.app
 
 import com.github.am4dr.rokusho.app.savefile.yaml.YamlSaveFileLoader
 import com.github.am4dr.rokusho.core.library.Library
+import com.github.am4dr.rokusho.core.library.Record
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyListWrapper
 import javafx.collections.FXCollections.observableArrayList
@@ -23,14 +24,18 @@ class LocalFileSystemLibraryLoader {
         val savefilePath = getSavefilePathFor(directory)
         findLibraryBySavefilePath(savefilePath)?.let { return it }
 
-        val items = getAllItems(directory)
-        val library = Library({ items.asSequence() }, { it }).apply {
+        val library = Library<ImageUrl>().apply {
+
             if (Files.exists(savefilePath)) {
                 val data = savefileLoader.load(savefilePath)
                 tags.putAll(data.data.tags)
                 data.data.metaData.forEach { (path, meta) ->
-                    itemTags[ImageUrl(savefilePath.parent.resolve(path).toUri().toURL())] = meta.tags
+                    val key = ImageUrl(savefilePath.parent.resolve(path).toUri().toURL())
+                    records[key] = Record(key, meta.tags)
                 }
+            }
+            getAllItems(directory).forEach { key ->
+                records.getOrPut(key, { Record(key, listOf())})
             }
         }
         return LocalFileSystemLibrary(savefilePath, library).apply(this::addLibrary)
