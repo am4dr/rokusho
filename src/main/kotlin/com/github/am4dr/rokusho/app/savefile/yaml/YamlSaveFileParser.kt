@@ -21,11 +21,11 @@ class YamlSaveFileParser : SaveFileParser {
         fun parse(string: String): SaveData {
             val yaml = Yaml().load(string)
             if (yaml == null || yaml !is Map<*,*>) { throw IllegalSaveFormatException("top level of save file must be a Map") }
-            val version = parseVersion(yaml["version"])
+            val versionString = parseVersion(yaml["version"])
+            val version = SaveData.Version.of(versionString) ?: throw IllegalSaveFormatException("version $versionString is not supported")
             val tags = parseTagInfo(yaml["tags"])
             val metaData = parseMetaData(yaml["metaData"], tags)
-            // TODO select suitable SaveData.Version for the savefile version
-            return SaveData(SaveData.Version.VERSION_1, tags, metaData)
+            return SaveData(version, tags, metaData)
         }
         private fun parseVersion(data: Any?): String {
             data ?: throw VersionNotSpecifiedException()
