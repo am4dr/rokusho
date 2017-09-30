@@ -35,7 +35,6 @@ class LocalFileSystemLibrary(savefilePath: Path, private val library: Library<Im
     }
 
     override fun updateItemTags(key: ImageUrl, tags: Iterable<ItemTag>) {
-        tags.forEach { it.tag.let { tag -> if (tag !== library.tags[tag.id]) { library.tags[tag.id] = tag } } }
         library.records[key] = Record(key, tags.toList())
     }
 
