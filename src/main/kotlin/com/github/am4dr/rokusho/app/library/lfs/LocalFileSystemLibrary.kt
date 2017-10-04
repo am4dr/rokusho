@@ -2,7 +2,7 @@ package com.github.am4dr.rokusho.app.library.lfs
 
 import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.RokushoLibrary
-import com.github.am4dr.rokusho.app.savedata.ImageMetaData
+import com.github.am4dr.rokusho.app.savedata.ItemMetaData
 import com.github.am4dr.rokusho.app.savedata.SaveData
 import com.github.am4dr.rokusho.app.savedata.store.SaveDataStore
 import com.github.am4dr.rokusho.core.library.*
@@ -38,7 +38,7 @@ class LocalFileSystemLibrary(private val root: Path,
     private fun createSaveData(): SaveData {
         val metaData = library.records.keys.map {
             val path = root.relativize(Paths.get(it.url.toURI()))
-            path to ImageMetaData(library.records[it]?.itemTags ?: mutableListOf())
+            path to ItemMetaData(library.records[it]?.itemTags ?: mutableListOf())
         }.toMap()
         return SaveData(SaveData.Version.VERSION_1, tags, metaData)
     }

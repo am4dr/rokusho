@@ -1,6 +1,6 @@
 package com.github.am4dr.rokusho.app.savefile.yaml
 
-import com.github.am4dr.rokusho.app.savedata.ImageMetaData
+import com.github.am4dr.rokusho.app.savedata.ItemMetaData
 import com.github.am4dr.rokusho.app.savedata.SaveData
 import com.github.am4dr.rokusho.app.savefile.yaml.SaveFileParser.IllegalSaveFormatException
 import com.github.am4dr.rokusho.app.savefile.yaml.SaveFileParser.VersionNotSpecifiedException
@@ -44,14 +44,14 @@ class YamlSaveFileParser : SaveFileParser {
                 Pair(name, Tag(name , Tag.Type.from(type), opts))
             }.toMap(mutableMapOf())
         }
-        private fun parseMetaData(data: Any?, tagInfo: MutableMap<String, Tag>): Map<Path, ImageMetaData> {
+        private fun parseMetaData(data: Any?, tagInfo: MutableMap<String, Tag>): Map<Path, ItemMetaData> {
             data ?: return mapOf()
             data as? Map<*, *> ?: throw IllegalSaveFormatException("metaData must be a Map")
             return data.map {
                 val path = it.key as? String ?: throw IllegalSaveFormatException("key of metaData must be a String")
                 val metaData = it.value as? Map<*, *> ?: throw IllegalSaveFormatException("value of metaData must be a Map")
                 val tags = parseTagData(metaData["tags"], tagInfo)
-                Pair(Paths.get(path), ImageMetaData(tags))
+                Pair(Paths.get(path), ItemMetaData(tags))
             }.toMap()
         }
         private fun parseTagData(data: Any?, tagInfo: MutableMap<String, Tag>): List<ItemTag> {

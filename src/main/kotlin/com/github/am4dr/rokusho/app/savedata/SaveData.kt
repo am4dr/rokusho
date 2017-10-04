@@ -6,7 +6,7 @@ import java.nio.file.Path
 data class SaveData(
         val version: Version,
         val tags: Map<String, Tag>,
-        val metaData: Map<Path, ImageMetaData>) {
+        val metaData: Map<Path, ItemMetaData>) {
 
     enum class Version(val stringValue: String) {
         VERSION_1("1");
