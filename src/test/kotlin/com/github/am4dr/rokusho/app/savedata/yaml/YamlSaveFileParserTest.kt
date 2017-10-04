@@ -1,22 +1,23 @@
-package com.github.am4dr.rokusho.app.savefile.yaml
+package com.github.am4dr.rokusho.app.savedata.yaml
 
-import com.github.am4dr.rokusho.app.savefile.SaveData
-import com.github.am4dr.rokusho.app.savefile.SaveFileParser.IllegalSaveFormatException
-import com.github.am4dr.rokusho.app.savefile.SaveFileParser.VersionNotSpecifiedException
+import com.github.am4dr.rokusho.app.savedata.SaveData
+import com.github.am4dr.rokusho.app.savedata.store.yaml.YamlSaveDataDeserializer
+import com.github.am4dr.rokusho.app.savedata.store.yaml.YamlSaveDataDeserializer.IllegalSaveFormatException
+import com.github.am4dr.rokusho.app.savedata.store.yaml.YamlSaveDataDeserializer.VersionNotSpecifiedException
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.nio.file.Paths
 
-class YamlSaveFileParserTest {
+class YamlSaveDataDeserializerTest {
     @Test
     fun emptyStringTest() {
         assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
-            YamlSaveFileParser.parse("")
+            YamlSaveDataDeserializer.parse("")
         }
     }
     @Test
     fun versionOnlyTest() {
-        val save = YamlSaveFileParser.parse("version: \"1\"")
+        val save = YamlSaveDataDeserializer.parse("version: \"1\"")
         assertEquals(SaveData.Version.VERSION_1, save.version)
         assertEquals(0, save.tags.size)
         assertEquals(0, save.metaData.size)
@@ -24,19 +25,19 @@ class YamlSaveFileParserTest {
     @Test
     fun intVersionTest() {
         val res = assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
-            YamlSaveFileParser.parse("version: 1")
+            YamlSaveDataDeserializer.parse("version: 1")
         }
         assertNotEquals(res.javaClass, VersionNotSpecifiedException::class.java)
     }
     @Test
     fun invalidVersionStringTest() {
         assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
-            YamlSaveFileParser.parse("version: \"INVALID VERSION STRING\"")
+            YamlSaveDataDeserializer.parse("version: \"INVALID VERSION STRING\"")
         }
     }
     @Test
     fun nullTagsMetaDataTest() {
-        val save = YamlSaveFileParser.parse("""
+        val save = YamlSaveDataDeserializer.parse("""
             |version: "1"
             |tags: null
             |""".trimMargin())
@@ -44,7 +45,7 @@ class YamlSaveFileParserTest {
     }
     @Test
     fun emptyTagsMetaDataTest() {
-        val save = YamlSaveFileParser.parse("""
+        val save = YamlSaveDataDeserializer.parse("""
             |version: "1"
             |tags: {}
             |""".trimMargin())
@@ -55,7 +56,7 @@ class YamlSaveFileParserTest {
     @Test
     fun tagsMetaDataIsNotAMapTest() {
         assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
-            YamlSaveFileParser.parse("""
+            YamlSaveDataDeserializer.parse("""
             |version: "1"
             |tags: ["tagA", "tagB"]
             |""".trimMargin())
@@ -63,31 +64,31 @@ class YamlSaveFileParserTest {
     }
     @Test
     fun singleTagsMetaDataTest() {
-        val save = YamlSaveFileParser.parse("""
+        val save = YamlSaveDataDeserializer.parse("""
             |version: "1"
             |tags: { tagA: {} }
             |""".trimMargin())
         assertEquals(1, save.tags.size)
         assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
-            YamlSaveFileParser.parse("""
+            YamlSaveDataDeserializer.parse("""
             |version: "1"
             |tags: { tagA: data }
             |""".trimMargin())
         }
         assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
-            YamlSaveFileParser.parse("""
+            YamlSaveDataDeserializer.parse("""
             |version: "1"
             |tags: { tagA: { key: null } }
             |""".trimMargin())
         }
         assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
-            YamlSaveFileParser.parse("""
+            YamlSaveDataDeserializer.parse("""
             |version: "1"
             |tags: { tagA: { type: 1 } }
             |""".trimMargin())
         }
         assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
-            YamlSaveFileParser.parse("""
+            YamlSaveDataDeserializer.parse("""
             |version: "1"
             |tags: { tagA: { null: value } }
             |""".trimMargin())
@@ -95,7 +96,7 @@ class YamlSaveFileParserTest {
     }
     @Test
     fun tagsMetaDataTest() {
-        val save = YamlSaveFileParser.parse("""
+        val save = YamlSaveDataDeserializer.parse("""
             |version: "1"
             |tags: { tagA: {}, tagB: {}, tagC: {} }
             |""".trimMargin())
@@ -108,7 +109,7 @@ class YamlSaveFileParserTest {
     }
     @Test
     fun emptyMetaDataTest() {
-        val save = YamlSaveFileParser.parse("""
+        val save = YamlSaveDataDeserializer.parse("""
             |version: "1"
             |metaData: {}
             |""".trimMargin())
@@ -116,7 +117,7 @@ class YamlSaveFileParserTest {
     }
     @Test
     fun nullMetaDataTest() {
-        val save = YamlSaveFileParser.parse("""
+        val save = YamlSaveDataDeserializer.parse("""
             |version: "1"
             |metaData: null
             |""".trimMargin())
@@ -125,7 +126,7 @@ class YamlSaveFileParserTest {
     @Test
     fun metaDataIsNotAMapTest() {
         assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
-            YamlSaveFileParser.parse("""
+            YamlSaveDataDeserializer.parse("""
             |version: "1"
             |metaData: data
             |""".trimMargin())
@@ -134,7 +135,7 @@ class YamlSaveFileParserTest {
     @Test
     fun keyOfMetaDataMustBeString() {
         assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
-            YamlSaveFileParser.parse("""
+            YamlSaveDataDeserializer.parse("""
             |version: "1"
             |metaData: { null: {} }
             |""".trimMargin())
@@ -142,7 +143,7 @@ class YamlSaveFileParserTest {
     }
     @Test
     fun emptyTagMetaDataTest() {
-        val save = YamlSaveFileParser.parse("""
+        val save = YamlSaveDataDeserializer.parse("""
             |version: "1"
             |metaData: { path/to/image: {} }
             |""".trimMargin())
@@ -151,7 +152,7 @@ class YamlSaveFileParserTest {
     @Test
     fun tagsInMetaDataMustBeMap() {
         assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
-            YamlSaveFileParser.parse("""
+            YamlSaveDataDeserializer.parse("""
             |version: "1"
             |metaData: { path/to/image: [tagA] }
             |""".trimMargin())
@@ -159,7 +160,7 @@ class YamlSaveFileParserTest {
     }
     @Test
     fun singleTagInMetaDataTest() {
-        val save = YamlSaveFileParser.parse("""
+        val save = YamlSaveDataDeserializer.parse("""
             |version: "1"
             |metaData: { path/to/image: { tags: { tagA: {}} } }
             |""".trimMargin())
@@ -167,7 +168,7 @@ class YamlSaveFileParserTest {
         assert(save.metaData.containsKey(Paths.get("path/to/image")))
         assert(save.metaData[Paths.get("path/to/image")]!!.tags.first().tag.id == "tagA")
 
-        val withOption = YamlSaveFileParser.parse("""
+        val withOption = YamlSaveDataDeserializer.parse("""
             |version: "1"
             |metaData: { path/to/image: { tags: { tagA: { option: value }} } }
             |""".trimMargin())
@@ -176,7 +177,7 @@ class YamlSaveFileParserTest {
         assert(withOption.metaData[Paths.get("path/to/image")]!!.tags.first().tag.id == "tagA")
 
         assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
-            YamlSaveFileParser.parse("""
+            YamlSaveDataDeserializer.parse("""
             |version: "1"
             |metaData: { path/to/image: { tags: { tagA: { opt: null } } } }
             |""".trimMargin())

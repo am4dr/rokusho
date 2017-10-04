@@ -1,24 +1,24 @@
-package com.github.am4dr.rokusho.app.savefile.yaml
+package com.github.am4dr.rokusho.app.savedata.store.yaml
 
-import com.github.am4dr.rokusho.app.savefile.FileBasedSaveData
-import com.github.am4dr.rokusho.app.savefile.ImageMetaData
-import com.github.am4dr.rokusho.app.savefile.SaveData
-import com.github.am4dr.rokusho.app.savefile.SaveFileParser
-import com.github.am4dr.rokusho.app.savefile.SaveFileParser.IllegalSaveFormatException
-import com.github.am4dr.rokusho.app.savefile.SaveFileParser.VersionNotSpecifiedException
+import com.github.am4dr.rokusho.app.savedata.ItemMetaData
+import com.github.am4dr.rokusho.app.savedata.SaveData
+import com.github.am4dr.rokusho.app.savedata.store.SaveDataDeserializer
 import com.github.am4dr.rokusho.core.library.ItemTag
 import com.github.am4dr.rokusho.core.library.Tag
-import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
+import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 import java.nio.file.Paths
 
-class YamlSaveFileParser : SaveFileParser {
+class YamlSaveDataDeserializer : SaveDataDeserializer<SaveData> {
+    open class IllegalSaveFormatException(message: String = "") : RuntimeException(message)
+    class VersionNotSpecifiedException(message: String = ""): IllegalSaveFormatException(message)
     companion object {
-        private val log = LoggerFactory.getLogger(YamlSaveFileParser::class.java)
+
         fun parse(string: String): SaveData {
             val yaml = Yaml().load(string)
-            if (yaml == null || yaml !is Map<*,*>) { throw IllegalSaveFormatException("top level of save file must be a Map") }
+            if (yaml == null || yaml !is Map<*,*>) { throw IllegalSaveFormatException("top level of save file must be a Map")
+            }
             val versionString = parseVersion(yaml["version"])
             val version = SaveData.Version.of(versionString) ?: throw IllegalSaveFormatException("version $versionString is not supported")
             val tags = parseTagInfo(yaml["tags"])
@@ -46,14 +46,14 @@ class YamlSaveFileParser : SaveFileParser {
                 Pair(name, Tag(name , Tag.Type.from(type), opts))
             }.toMap(mutableMapOf())
         }
-        private fun parseMetaData(data: Any?, tagInfo: MutableMap<String, Tag>): Map<Path, ImageMetaData> {
+        private fun parseMetaData(data: Any?, tagInfo: MutableMap<String, Tag>): Map<Path, ItemMetaData> {
             data ?: return mapOf()
             data as? Map<*, *> ?: throw IllegalSaveFormatException("metaData must be a Map")
             return data.map {
                 val path = it.key as? String ?: throw IllegalSaveFormatException("key of metaData must be a String")
                 val metaData = it.value as? Map<*, *> ?: throw IllegalSaveFormatException("value of metaData must be a Map")
                 val tags = parseTagData(metaData["tags"], tagInfo)
-                Pair(Paths.get(path), ImageMetaData(tags))
+                Pair(Paths.get(path), ItemMetaData(tags))
             }.toMap()
         }
         private fun parseTagData(data: Any?, tagInfo: MutableMap<String, Tag>): List<ItemTag> {
@@ -73,5 +73,5 @@ class YamlSaveFileParser : SaveFileParser {
         }
     }
 
-    override fun parse(path: Path): FileBasedSaveData = FileBasedSaveData(path, parse(path.toFile().readText()))
+    override fun invoke(bytes: ByteArray): SaveData = parse(bytes.toString(StandardCharsets.UTF_8))
 }

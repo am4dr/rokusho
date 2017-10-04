@@ -1,18 +1,18 @@
-package com.github.am4dr.rokusho.app.savefile.yaml
+package com.github.am4dr.rokusho.app.savedata.store.yaml
 
-import com.github.am4dr.rokusho.app.savefile.ImageMetaData
-import com.github.am4dr.rokusho.app.savefile.SaveData
-import com.github.am4dr.rokusho.app.savefile.SaveDataSerializer
+import com.github.am4dr.rokusho.app.savedata.ItemMetaData
+import com.github.am4dr.rokusho.app.savedata.SaveData
+import com.github.am4dr.rokusho.app.savedata.store.SaveDataSerializer
 import com.github.am4dr.rokusho.core.library.ItemTag
 import org.yaml.snakeyaml.Yaml
 
-class YamlSaveDataSerializer : SaveDataSerializer {
+class YamlSaveDataSerializer : SaveDataSerializer<SaveData> {
     companion object {
         const val pathSeparator: String = "/"
 
         // Dump method of SnakeYAML converts same objects into a YAML anchor and references.
         // To avoid that, if the 'tags' is empty, create a new empty mutable map.
-        private fun ImageMetaData.toDumpStructure(): Map<String, Any> =
+        private fun ItemMetaData.toDumpStructure(): Map<String, Any> =
                 mapOf("tags" to tags.map { it.toDumpStructure() }.toMap(mutableMapOf()))
 
         private fun ItemTag.toDumpStructure(): Pair<String, Any> = tag.id to (value?.let { mapOf("value" to it) } ?: mutableMapOf())
@@ -32,5 +32,5 @@ class YamlSaveDataSerializer : SaveDataSerializer {
                         }.toMap().toMutableMap())
     }
 
-    override fun serialize(data: SaveData): String = Yaml().dump(data.toDumpStructure())
+    override fun invoke(data: SaveData): ByteArray = Yaml().dump(data.toDumpStructure()).toByteArray()
 }
