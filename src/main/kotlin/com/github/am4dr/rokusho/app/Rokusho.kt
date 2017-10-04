@@ -4,10 +4,10 @@ import com.github.am4dr.rokusho.app.library.lfs.FileCollector
 import com.github.am4dr.rokusho.app.library.lfs.LocalFileSystemLibrary
 import com.github.am4dr.rokusho.app.library.lfs.LocalFileSystemLibraryLoader
 import com.github.am4dr.rokusho.app.library.lfs.SaveDataStoreProvider
+import com.github.am4dr.rokusho.app.savedata.SaveData
 import com.github.am4dr.rokusho.app.savedata.store.FileBasedSaveDataStore
 import com.github.am4dr.rokusho.app.savedata.store.SaveDataDeserializer
 import com.github.am4dr.rokusho.app.savedata.store.SaveDataSerializer
-import com.github.am4dr.rokusho.app.savefile.SaveData
 import com.github.am4dr.rokusho.app.savefile.yaml.YamlSaveDataSerializer
 import com.github.am4dr.rokusho.app.savefile.yaml.YamlSaveFileLoader
 import com.github.am4dr.rokusho.app.savefile.yaml.YamlSaveFileParser

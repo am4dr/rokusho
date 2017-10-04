@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.app.savefile
+package com.github.am4dr.rokusho.app.savedata
 
 import com.github.am4dr.rokusho.core.library.Tag
 import java.nio.file.Path

@@ -2,9 +2,9 @@ package com.github.am4dr.rokusho.app.library.lfs
 
 import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.RokushoLibrary
+import com.github.am4dr.rokusho.app.savedata.ImageMetaData
+import com.github.am4dr.rokusho.app.savedata.SaveData
 import com.github.am4dr.rokusho.app.savedata.store.SaveDataStore
-import com.github.am4dr.rokusho.app.savefile.ImageMetaData
-import com.github.am4dr.rokusho.app.savefile.SaveData
 import com.github.am4dr.rokusho.core.library.*
 import com.github.am4dr.rokusho.javafx.collection.toObservableList
 import javafx.beans.property.ReadOnlyListProperty

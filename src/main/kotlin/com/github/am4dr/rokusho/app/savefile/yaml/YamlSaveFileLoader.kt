@@ -1,6 +1,5 @@
 package com.github.am4dr.rokusho.app.savefile.yaml
 
-import com.github.am4dr.rokusho.app.savefile.FileBasedSaveData
 import java.nio.file.Files
 import java.nio.file.Path
 

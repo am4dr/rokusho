@@ -1,7 +1,7 @@
 package com.github.am4dr.rokusho.app.library.lfs
 
+import com.github.am4dr.rokusho.app.savedata.SaveData
 import com.github.am4dr.rokusho.app.savedata.store.SaveDataStore
-import com.github.am4dr.rokusho.app.savefile.SaveData
 import java.nio.file.Path
 
 class SaveDataStoreProvider(private val saveDataStoreLocator: (Path) -> Pair<Path, SaveDataStore<SaveData>>,

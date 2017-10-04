@@ -1,11 +1,9 @@
 package com.github.am4dr.rokusho.app.savefile.yaml
 
-import com.github.am4dr.rokusho.app.savefile.FileBasedSaveData
-import com.github.am4dr.rokusho.app.savefile.ImageMetaData
-import com.github.am4dr.rokusho.app.savefile.SaveData
-import com.github.am4dr.rokusho.app.savefile.SaveFileParser
-import com.github.am4dr.rokusho.app.savefile.SaveFileParser.IllegalSaveFormatException
-import com.github.am4dr.rokusho.app.savefile.SaveFileParser.VersionNotSpecifiedException
+import com.github.am4dr.rokusho.app.savedata.ImageMetaData
+import com.github.am4dr.rokusho.app.savedata.SaveData
+import com.github.am4dr.rokusho.app.savefile.yaml.SaveFileParser.IllegalSaveFormatException
+import com.github.am4dr.rokusho.app.savefile.yaml.SaveFileParser.VersionNotSpecifiedException
 import com.github.am4dr.rokusho.core.library.ItemTag
 import com.github.am4dr.rokusho.core.library.Tag
 import org.slf4j.LoggerFactory

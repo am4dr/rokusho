@@ -1,8 +1,8 @@
 package com.github.am4dr.rokusho.app.savefile.yaml
 
+import com.github.am4dr.rokusho.app.savedata.ImageMetaData
+import com.github.am4dr.rokusho.app.savedata.SaveData
 import com.github.am4dr.rokusho.app.savedata.store.SaveDataSerializer
-import com.github.am4dr.rokusho.app.savefile.ImageMetaData
-import com.github.am4dr.rokusho.app.savefile.SaveData
 import com.github.am4dr.rokusho.core.library.ItemTag
 import org.yaml.snakeyaml.Yaml
 

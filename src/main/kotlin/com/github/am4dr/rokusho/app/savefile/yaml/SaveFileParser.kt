@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.app.savefile
+package com.github.am4dr.rokusho.app.savefile.yaml
 
 import java.nio.file.Path
 

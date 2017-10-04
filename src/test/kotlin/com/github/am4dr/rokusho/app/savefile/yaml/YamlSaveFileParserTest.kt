@@ -1,8 +1,8 @@
 package com.github.am4dr.rokusho.app.savefile.yaml
 
 import com.github.am4dr.rokusho.app.savefile.SaveData
-import com.github.am4dr.rokusho.app.savefile.SaveFileParser.IllegalSaveFormatException
-import com.github.am4dr.rokusho.app.savefile.SaveFileParser.VersionNotSpecifiedException
+import com.github.am4dr.rokusho.app.savefile.yaml.SaveFileParser.IllegalSaveFormatException
+import com.github.am4dr.rokusho.app.savefile.yaml.SaveFileParser.VersionNotSpecifiedException
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.nio.file.Paths
