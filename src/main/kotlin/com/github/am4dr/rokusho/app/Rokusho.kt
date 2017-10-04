@@ -8,9 +8,9 @@ import com.github.am4dr.rokusho.app.savedata.SaveData
 import com.github.am4dr.rokusho.app.savedata.store.FileBasedSaveDataStore
 import com.github.am4dr.rokusho.app.savedata.store.SaveDataDeserializer
 import com.github.am4dr.rokusho.app.savedata.store.SaveDataSerializer
-import com.github.am4dr.rokusho.app.savefile.yaml.YamlSaveDataSerializer
-import com.github.am4dr.rokusho.app.savefile.yaml.YamlSaveFileLoader
-import com.github.am4dr.rokusho.app.savefile.yaml.YamlSaveFileParser
+import com.github.am4dr.rokusho.app.savedata.store.yaml.YamlSaveDataDeserializer
+import com.github.am4dr.rokusho.app.savedata.store.yaml.YamlSaveDataSerializer
+import com.github.am4dr.rokusho.app.savedata.store.yaml.YamlSaveFileLocator
 import com.github.am4dr.rokusho.core.library.ItemTag
 import com.github.am4dr.rokusho.core.library.Record
 import com.github.am4dr.rokusho.javafx.collection.ConcatenatedList
@@ -29,16 +29,16 @@ class Rokusho {
         fun isSupportedImageFile(path: Path) =
                 Files.isRegularFile(path) && imageFileNameMatcher.matches(path.fileName.toString())
     }
-    private val yamlSaveFileLoader = YamlSaveFileLoader()
+    private val yamlSaveFileLoader = YamlSaveFileLocator()
     private val saveDataStoreProvider = SaveDataStoreProvider({
-        val savefile = yamlSaveFileLoader.locateSaveFilePath(it)?:it.resolve(YamlSaveFileLoader.DEFAULT_SAVEFILE_NAME)
+        val savefile = yamlSaveFileLoader.locateSaveFilePathOrDefault(it)
         val store = FileBasedSaveDataStore(savefile,
                 object : SaveDataSerializer<SaveData> {
                     val serializer = YamlSaveDataSerializer()
                     override fun invoke(data: SaveData): ByteArray = serializer(data)
                 },
                 object : SaveDataDeserializer<SaveData> {
-                    override fun invoke(bytes: ByteArray): SaveData = YamlSaveFileParser.parse(bytes.toString(StandardCharsets.UTF_8))
+                    override fun invoke(bytes: ByteArray): SaveData = YamlSaveDataDeserializer.parse(bytes.toString(StandardCharsets.UTF_8))
                 })
         savefile.parent to store
     })

@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.app.savefile.yaml
+package com.github.am4dr.rokusho.app.savedata.store.yaml
 
 import com.github.am4dr.rokusho.app.savedata.ItemMetaData
 import com.github.am4dr.rokusho.app.savedata.SaveData
