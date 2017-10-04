@@ -4,12 +4,7 @@ import com.github.am4dr.rokusho.app.library.lfs.FileCollector
 import com.github.am4dr.rokusho.app.library.lfs.LocalFileSystemLibrary
 import com.github.am4dr.rokusho.app.library.lfs.LocalFileSystemLibraryLoader
 import com.github.am4dr.rokusho.app.library.lfs.SaveDataStoreProvider
-import com.github.am4dr.rokusho.app.savedata.SaveData
-import com.github.am4dr.rokusho.app.savedata.store.FileBasedSaveDataStore
-import com.github.am4dr.rokusho.app.savedata.store.SaveDataDeserializer
-import com.github.am4dr.rokusho.app.savedata.store.SaveDataSerializer
-import com.github.am4dr.rokusho.app.savedata.store.yaml.YamlSaveDataDeserializer
-import com.github.am4dr.rokusho.app.savedata.store.yaml.YamlSaveDataSerializer
+import com.github.am4dr.rokusho.app.savedata.store.yaml.YamlSaveDataStore
 import com.github.am4dr.rokusho.app.savedata.store.yaml.YamlSaveFileLocator
 import com.github.am4dr.rokusho.core.library.ItemTag
 import com.github.am4dr.rokusho.core.library.Record
@@ -19,7 +14,6 @@ import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyListWrapper
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
-import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -29,18 +23,9 @@ class Rokusho {
         fun isSupportedImageFile(path: Path) =
                 Files.isRegularFile(path) && imageFileNameMatcher.matches(path.fileName.toString())
     }
-    private val yamlSaveFileLoader = YamlSaveFileLocator()
     private val saveDataStoreProvider = SaveDataStoreProvider({
-        val savefile = yamlSaveFileLoader.locateSaveFilePathOrDefault(it)
-        val store = FileBasedSaveDataStore(savefile,
-                object : SaveDataSerializer<SaveData> {
-                    val serializer = YamlSaveDataSerializer()
-                    override fun invoke(data: SaveData): ByteArray = serializer(data)
-                },
-                object : SaveDataDeserializer<SaveData> {
-                    override fun invoke(bytes: ByteArray): SaveData = YamlSaveDataDeserializer.parse(bytes.toString(StandardCharsets.UTF_8))
-                })
-        savefile.parent to store
+        val savefile = YamlSaveFileLocator.locateSaveFilePathOrDefault(it)
+        savefile.parent to YamlSaveDataStore(savefile)
     })
     private val lfsLibraryLoader = LocalFileSystemLibraryLoader(saveDataStoreProvider::get, FileCollector(saveDataStoreProvider::get, Rokusho.Companion::isSupportedImageFile)::collect)
 
