@@ -73,5 +73,5 @@ class YamlSaveDataDeserializer : SaveDataDeserializer<SaveData> {
         }
     }
 
-    override fun invoke(bytes: ByteArray): SaveData = parse(bytes.toString(StandardCharsets.UTF_8))
+    override fun deserialize(bytes: ByteArray): SaveData = parse(bytes.toString(StandardCharsets.UTF_8))
 }

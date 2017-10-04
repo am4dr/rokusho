@@ -32,5 +32,5 @@ class YamlSaveDataSerializer : SaveDataSerializer<SaveData> {
                         }.toMap().toMutableMap())
     }
 
-    override fun invoke(data: SaveData): ByteArray = Yaml().dump(data.toDumpStructure()).toByteArray()
+    override fun serialize(data: SaveData): ByteArray = Yaml().dump(data.toDumpStructure()).toByteArray()
 }
