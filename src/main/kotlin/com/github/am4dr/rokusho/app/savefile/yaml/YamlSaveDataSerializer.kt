@@ -1,12 +1,12 @@
 package com.github.am4dr.rokusho.app.savefile.yaml
 
+import com.github.am4dr.rokusho.app.savedata.store.SaveDataSerializer
 import com.github.am4dr.rokusho.app.savefile.ImageMetaData
 import com.github.am4dr.rokusho.app.savefile.SaveData
-import com.github.am4dr.rokusho.app.savefile.SaveDataSerializer
 import com.github.am4dr.rokusho.core.library.ItemTag
 import org.yaml.snakeyaml.Yaml
 
-class YamlSaveDataSerializer : SaveDataSerializer {
+class YamlSaveDataSerializer : SaveDataSerializer<SaveData> {
     companion object {
         const val pathSeparator: String = "/"
 
@@ -32,5 +32,5 @@ class YamlSaveDataSerializer : SaveDataSerializer {
                         }.toMap().toMutableMap())
     }
 
-    override fun serialize(data: SaveData): String = Yaml().dump(data.toDumpStructure())
+    override fun invoke(data: SaveData): ByteArray = Yaml().dump(data.toDumpStructure()).toByteArray()
 }

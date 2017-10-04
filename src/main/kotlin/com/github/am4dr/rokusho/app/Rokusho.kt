@@ -35,7 +35,7 @@ class Rokusho {
         val store = FileBasedSaveDataStore(savefile,
                 object : SaveDataSerializer<SaveData> {
                     val serializer = YamlSaveDataSerializer()
-                    override fun invoke(data: SaveData): ByteArray = serializer.serialize(data).toByteArray()
+                    override fun invoke(data: SaveData): ByteArray = serializer(data)
                 },
                 object : SaveDataDeserializer<SaveData> {
                     override fun invoke(bytes: ByteArray): SaveData = YamlSaveFileParser.parse(bytes.toString(StandardCharsets.UTF_8))
