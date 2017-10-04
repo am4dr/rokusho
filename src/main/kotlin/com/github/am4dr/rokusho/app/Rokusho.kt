@@ -1,5 +1,6 @@
 package com.github.am4dr.rokusho.app
 
+import com.github.am4dr.rokusho.app.library.RokushoLibrary
 import com.github.am4dr.rokusho.app.library.lfs.FileCollector
 import com.github.am4dr.rokusho.app.library.lfs.LocalFileSystemLibrary
 import com.github.am4dr.rokusho.app.library.lfs.LocalFileSystemLibraryLoader

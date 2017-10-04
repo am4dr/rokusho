@@ -1,6 +1,6 @@
 package com.github.am4dr.rokusho.dev.gui
 
-import com.github.am4dr.rokusho.app.RokushoLibrary
+import com.github.am4dr.rokusho.app.library.RokushoLibrary
 import com.github.am4dr.rokusho.core.library.Tag
 import javafx.collections.FXCollections
 import javafx.collections.MapChangeListener

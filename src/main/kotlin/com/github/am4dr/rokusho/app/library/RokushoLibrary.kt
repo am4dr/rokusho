@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.app
+package com.github.am4dr.rokusho.app.library
 
 import com.github.am4dr.rokusho.core.library.ItemTag
 import com.github.am4dr.rokusho.core.library.Record
