@@ -16,7 +16,7 @@ class YamlSaveDataDeserializer : SaveDataDeserializer<SaveData> {
     companion object {
 
         fun parse(string: String): SaveData {
-            val yaml = Yaml().load(string)
+            val yaml: Any? = Yaml().load(string)
             if (yaml == null || yaml !is Map<*,*>) { throw IllegalSaveFormatException("top level of save file must be a Map")
             }
             val versionString = parseVersion(yaml["version"])

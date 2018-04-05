@@ -1,18 +1,32 @@
-buildscript {
-    ext.junit_version = '5.0.0'
-}
 
 plugins {
-    id 'com.github.ben-manes.versions' version '0.15.0'
-    id 'org.jetbrains.kotlin.jvm'
-    id 'org.junit.platform.gradle.plugin'
+    id 'com.github.ben-manes.versions' version '0.17.0'
+    id 'org.jetbrains.kotlin.jvm' version '1.2.31'
     id 'application'
 }
 
 group = 'com.github.am4dr'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+version = '0.1.0-SNAPSHOT'
+
+ext {
+    libraries = [
+            kotlin: [
+                    stdlib: 'org.jetbrains.kotlin:kotlin-stdlib:1.2.31',
+            ],
+            junit: [
+                    api: 'org.junit.jupiter:junit-jupiter-api:5.1.0',
+                    engine: 'org.junit.jupiter:junit-jupiter-engine:5.1.0',
+            ],
+            commons: [
+                    cli: 'commons-cli:commons-cli:1.4',
+            ],
+            snakeyaml: 'org.yaml:snakeyaml:1.20',
+            slf4j: [
+                    api: 'org.slf4j:slf4j-api:1.7.25',
+            ],
+            logback: 'ch.qos.logback:logback-classic:1.2.3',
+    ]
+}
 
 mainClassName = 'com.github.am4dr.rokusho.launcher.Launcher'
 
@@ -21,20 +35,18 @@ repositories {
 }
 
 dependencies {
-    compile group:'org.jetbrains.kotlin', name :'kotlin-stdlib', version: kotlin_version
+    compile libraries.kotlin.stdlib
+    compile libraries.commons.cli
+    compile libraries.snakeyaml
 
-    compile 'commons-cli:commons-cli:1.4'
+    compile libraries.slf4j.api
+    runtime libraries.logback
 
-    compile 'org.slf4j:slf4j-api:1.7.24'
-    runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
-
-    compile group: 'org.yaml', name: 'snakeyaml', version: '1.18'
-
-    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junit_version
-    testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junit_version
+    testCompile libraries.junit.api
+    testRuntime libraries.junit.engine
 }
-junitPlatform {
-    platformVersion junit_platform_version
+test {
+    useJUnitPlatform()
 }
 run {
     if (project.hasProperty('args')) {
