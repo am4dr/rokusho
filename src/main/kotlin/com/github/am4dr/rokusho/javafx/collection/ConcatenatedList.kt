@@ -98,4 +98,6 @@ class ConcatenatedList<E>(lists: ObservableList<ObservableList<E>>) : Transforma
         val list = _lists[listIndex]
         return if (index < list.size) list[index] else get(index - list.size, listIndex + 1)
     }
+
+    override fun getViewIndex(index: Int): Int = -1
 }

@@ -20,6 +20,8 @@ class TransformedList<E, F>(source: ObservableList<out F>, private val transform
         }
         endChange()
     }
+    override fun getViewIndex(index: Int): Int = index
+
     private fun  permutate(c: ListChangeListener.Change<out F>) {
         throw UnsupportedOperationException("observing permutation is not support yet: arg=$c")
     }
