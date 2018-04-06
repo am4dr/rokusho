@@ -1,17 +1,14 @@
 
 plugins {
     id 'com.github.ben-manes.versions' version '0.17.0'
-    id 'org.jetbrains.kotlin.jvm' version '1.2.31'
-    id 'application'
+    id 'org.jetbrains.kotlin.jvm' version '1.2.31' apply false
 }
 
-group = 'com.github.am4dr'
-version = '0.1.0-SNAPSHOT'
-
 ext {
+    packageProjects = ['app', 'old'].collect { project ":$it" }
     libraries = [
             kotlin: [
-                    stdlib: 'org.jetbrains.kotlin:kotlin-stdlib:1.2.31',
+                    stdlib: 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.31',
             ],
             junit: [
                     api: 'org.junit.jupiter:junit-jupiter-api:5.1.0',
@@ -28,28 +25,58 @@ ext {
     ]
 }
 
-mainClassName = 'com.github.am4dr.rokusho.launcher.Launcher'
-
-repositories {
-    jcenter()
-}
-
-dependencies {
-    compile libraries.kotlin.stdlib
-    compile libraries.commons.cli
-    compile libraries.snakeyaml
-
-    compile libraries.slf4j.api
-    runtime libraries.logback
-
-    testCompile libraries.junit.api
-    testRuntime libraries.junit.engine
-}
-test {
-    useJUnitPlatform()
-}
-run {
-    if (project.hasProperty('args')) {
-        args = project.getProperty('args').split(/\s+/).grep()
+allprojects {
+    group = 'com.github.am4dr.rokusho'
+    version = '0.1.0-SNAPSHOT'
+    repositories {
+        jcenter()
     }
+}
+
+project(':application') {
+    apply plugin: 'application'
+    archivesBaseName = "rokusho-$it.name"
+
+    mainClassName = 'com.github.am4dr.rokusho.launcher.Launcher'
+    dependencies {
+        runtimeOnly packageProjects
+    }
+    jar {
+        onlyIf { false }
+    }
+    run {
+        if (project.hasProperty('args')) {
+            args = project.getProperty('args').split(/\s+/).grep()
+        }
+    }
+}
+
+configure(packageProjects) {
+    apply plugin: 'org.jetbrains.kotlin.jvm'
+    archivesBaseName = "rokusho-$it.name"
+
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
+        kotlinOptions.jvmTarget = '1.8'
+    }
+    dependencies {
+        compile libraries.kotlin.stdlib
+    }
+    test {
+        useJUnitPlatform()
+    }
+}
+project(':old') {
+    dependencies {
+        compile libraries.commons.cli
+        compile libraries.snakeyaml
+
+        compile libraries.slf4j.api
+        runtime libraries.logback
+
+        testCompile libraries.junit.api
+        testRuntime libraries.junit.engine
+    }
+}
+project(':app') {
+
 }
