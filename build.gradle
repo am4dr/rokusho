@@ -5,7 +5,7 @@ plugins {
 }
 
 ext {
-    packageProjects = ['app', 'old'].collect { project ":$it" }
+    packageProjects = ['app', 'javafx', 'old'].collect { project ":$it" }
     libraries = [
             kotlin: [
                     stdlib: 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.31',
@@ -60,6 +60,9 @@ configure(packageProjects) {
     }
     dependencies {
         compile libraries.kotlin.stdlib
+
+        testCompile libraries.junit.api
+        testRuntime libraries.junit.engine
     }
     test {
         useJUnitPlatform()
@@ -67,16 +70,17 @@ configure(packageProjects) {
 }
 project(':old') {
     dependencies {
+        compile project(':javafx')
         compile libraries.commons.cli
         compile libraries.snakeyaml
 
         compile libraries.slf4j.api
         runtime libraries.logback
-
-        testCompile libraries.junit.api
-        testRuntime libraries.junit.engine
     }
 }
 project(':app') {
+
+}
+project(':javafx') {
 
 }

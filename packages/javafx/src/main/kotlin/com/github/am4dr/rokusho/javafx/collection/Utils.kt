@@ -5,7 +5,6 @@ import javafx.collections.FXCollections.observableArrayList
 
 fun <T> toObservableList(observableSet: ObservableSet<T>): ObservableList<T> {
     val list = object : ObservableList<T> by FXCollections.observableArrayList<T>(observableSet), SetChangeListener<T> {
-        val source = observableSet
         override fun onChanged(change: SetChangeListener.Change<out T>?) {
             change ?: return
             if (change.wasRemoved()) remove(change.elementRemoved)
@@ -18,7 +17,6 @@ fun <T> toObservableList(observableSet: ObservableSet<T>): ObservableList<T> {
 
 fun <K, V> toObservableList(map: ObservableMap<K, V>): ObservableList<V> {
     val list = object : ObservableList<V> by observableArrayList<V>(), MapChangeListener<K, V> {
-        val source = map
         val index: MutableMap<K, Int> = mutableMapOf()
         init {
             map.toList().forEachIndexed { i, (k, v) ->
@@ -55,7 +53,6 @@ fun <T, K> toObservableMap(observableSet: ObservableSet<T>, keyExtractor: (T) ->
         init {
             putAll(observableSet.map { keyExtractor(it) to it })
         }
-        val source = observableSet
         override fun onChanged(change: SetChangeListener.Change<out T>?) {
             change ?: return
             if (change.wasRemoved()) remove(keyExtractor(change.elementRemoved))
