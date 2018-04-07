@@ -7,7 +7,6 @@ import javafx.collections.ObservableList
 import javafx.collections.WeakListChangeListener
 import javafx.scene.Scene
 import javafx.scene.control.ListView
-import javafx.scene.layout.VBox
 import javafx.stage.Stage
 
 class RecordsViewer<T>(val records: ObservableList<Record<T>>) {
@@ -34,6 +33,6 @@ class RecordsViewer<T>(val records: ObservableList<Record<T>>) {
             }
         }
         records.addListener(WeakListChangeListener(recordList))
-        return Scene(VBox(ListView<Record<T>>(recordList)), w, h)
+        return Scene(ListView<Record<T>>(recordList), w, h)
     }
 }

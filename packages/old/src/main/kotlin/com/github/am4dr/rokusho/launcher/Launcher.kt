@@ -1,6 +1,11 @@
 package com.github.am4dr.rokusho.launcher
 
 import com.github.am4dr.rokusho.app.Rokusho
+import com.github.am4dr.rokusho.app.library.lfs.FileCollector
+import com.github.am4dr.rokusho.app.library.lfs.LocalFileSystemLibraryLoader
+import com.github.am4dr.rokusho.app.library.lfs.SaveDataStoreProvider
+import com.github.am4dr.rokusho.app.savedata.store.yaml.YamlSaveDataStore
+import com.github.am4dr.rokusho.app.savedata.store.yaml.YamlSaveFileLocator
 import com.github.am4dr.rokusho.dev.gui.RokushoViewer
 import com.github.am4dr.rokusho.gui.RokushoGui
 import javafx.application.Application
@@ -15,6 +20,7 @@ import java.nio.file.Paths
 
 class Launcher : Application() {
     private val rokusho = Rokusho()
+    private val lfsLoader = createDefaultLocalFileSystemLibraryLoader()
 
     companion object {
         @JvmStatic fun main(args: Array<String>) = Application.launch(Launcher::class.java, *args)
@@ -23,21 +29,18 @@ class Launcher : Application() {
 
     override fun init() {
         log.info("launched with the params: ${parameters.raw}")
-        val commandline = parseArgs(parameters.raw.toTypedArray())
-        commandline.args.forEach {
-            Paths.get(it)?.let { path ->
-                if (Files.isDirectory(path)) {
-                    rokusho.addDirectory(path)
-                }
-            }
-        }
+        parseArgs(parameters.raw.toTypedArray()).args
+                .map { Paths.get(it) }
+                .filter { Files.isDirectory(it) }
+                .forEach { rokusho.addLibrary(lfsLoader.getLibrary(it)) }
     }
 
     private fun parseArgs(args: Array<String>): CommandLine = DefaultParser().parse(Options(), args)
+
     override fun start(stage: Stage) {
         stage.run {
             title = "Rokusho"
-            scene = Scene(RokushoGui(rokusho, stage).mainParent, 800.0, 500.0)
+            scene = Scene(RokushoGui(rokusho, stage, lfsLoader::getLibrary).mainParent, 800.0, 500.0)
             show()
         }
         RokushoViewer(rokusho).also { devViewer ->
@@ -47,4 +50,11 @@ class Launcher : Application() {
             }
         }.show()
     }
+}
+
+private fun createDefaultLocalFileSystemLibraryLoader(): LocalFileSystemLibraryLoader {
+    val saveDataStoreProvider = SaveDataStoreProvider({
+        YamlSaveFileLocator.locateSaveFilePathOrDefault(it).let { it.parent to YamlSaveDataStore(it) }
+    })
+    return LocalFileSystemLibraryLoader(saveDataStoreProvider::get, FileCollector(saveDataStoreProvider::get, Rokusho.Companion::isSupportedImageFile)::collect)
 }
