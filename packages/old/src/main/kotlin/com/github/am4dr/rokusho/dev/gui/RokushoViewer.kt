@@ -1,7 +1,7 @@
 package com.github.am4dr.rokusho.dev.gui
 
 import com.github.am4dr.rokusho.app.Rokusho
-import com.github.am4dr.rokusho.app.library.RokushoLibrary
+import com.github.am4dr.rokusho.core.library.RokushoLibrary
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import javafx.scene.Scene
 import javafx.scene.control.Hyperlink

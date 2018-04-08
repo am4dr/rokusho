@@ -1,10 +1,13 @@
-package com.github.am4dr.rokusho.core.library
+package com.github.am4dr.rokusho.core.library.helper
 
+import com.github.am4dr.rokusho.core.library.ItemTag
+import com.github.am4dr.rokusho.core.library.Record
+import com.github.am4dr.rokusho.core.library.Tag
 import javafx.collections.FXCollections
 import javafx.collections.MapChangeListener
 import javafx.collections.ObservableMap
 
-class Library<T>(records: List<Record<T>> = listOf(), tags: List<Tag> = listOf()) {
+class LibrarySupport<T>(records: List<Record<T>> = listOf(), tags: List<Tag> = listOf()) {
     val records: ObservableMap<T, Record<T>> = records.associateByTo(FXCollections.observableHashMap(), Record<T>::key)
     val tags: ObservableMap<String, Tag> = tags.associateByTo(FXCollections.observableHashMap(), Tag::id)
 

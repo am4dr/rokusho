@@ -1,8 +1,5 @@
-package com.github.am4dr.rokusho.app.library
+package com.github.am4dr.rokusho.core.library
 
-import com.github.am4dr.rokusho.core.library.ItemTag
-import com.github.am4dr.rokusho.core.library.Record
-import com.github.am4dr.rokusho.core.library.Tag
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyMapProperty
 import javafx.collections.ObservableList

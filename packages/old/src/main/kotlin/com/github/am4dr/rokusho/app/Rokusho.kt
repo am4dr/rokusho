@@ -1,6 +1,6 @@
 package com.github.am4dr.rokusho.app
 
-import com.github.am4dr.rokusho.app.library.RokushoLibrary
+import com.github.am4dr.rokusho.core.library.RokushoLibrary
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyListWrapper
 import javafx.collections.FXCollections
