@@ -73,16 +73,11 @@ configure(packageProjects) {
 }
 project(':old') {
     dependencies {
+        compile project(':app')
         compile project(':core')
         compile project(':javafx')
         compile project(':gui')
         compile libraries.commons.cli
-        compile libraries.snakeyaml
-    }
-}
-project(':gui') {
-    dependencies {
-        compile project(':javafx')
     }
 }
 project(':core') {
@@ -91,5 +86,8 @@ project(':core') {
     }
 }
 project(':app') {
-
+    dependencies {
+        compile project(':core')
+        compile libraries.snakeyaml
+    }
 }
