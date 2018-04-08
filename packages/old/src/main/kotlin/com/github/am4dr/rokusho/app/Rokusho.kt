@@ -1,7 +1,6 @@
 package com.github.am4dr.rokusho.app
 
 import com.github.am4dr.rokusho.app.library.RokushoLibrary
-import com.github.am4dr.rokusho.core.library.Record
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyListWrapper
 import javafx.collections.FXCollections
@@ -20,7 +19,6 @@ class Rokusho {
 
     fun addLibrary(library: RokushoLibrary<ImageUrl>) {
         if (!_libraries.contains(library)) {
-            library.createRecordList(library.records.map(Record<ImageUrl>::key))
             _libraries.add(library)
         }
     }
