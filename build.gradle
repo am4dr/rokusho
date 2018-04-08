@@ -53,19 +53,20 @@ project(':application') {
 
 configure(packageProjects) {
     apply plugin: 'org.jetbrains.kotlin.jvm'
+    apply plugin: 'java-library'
     archivesBaseName = "rokusho-$it.name"
 
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
         kotlinOptions.jvmTarget = '1.8'
     }
     dependencies {
-        compile libraries.kotlin.stdlib
+        api libraries.kotlin.stdlib
 
-        testCompile libraries.junit.api
-        testRuntime libraries.junit.engine
+        testImplementation libraries.junit.api
+        testRuntimeOnly libraries.junit.engine
 
-        compile libraries.slf4j.api
-        runtime libraries.logback
+        api libraries.slf4j.api
+        runtimeOnly libraries.logback
     }
     test {
         useJUnitPlatform()
@@ -73,21 +74,22 @@ configure(packageProjects) {
 }
 project(':app-gui') {
     dependencies {
-        compile project(':app')
-        compile project(':core')
-        compile project(':javafx')
-        compile project(':gui')
-        compile libraries.commons.cli
+        implementation project(':app')
+        implementation project(':core')
+        implementation project(':javafx')
+        implementation project(':gui')
+        implementation libraries.commons.cli
     }
 }
 project(':core') {
     dependencies {
-        compile project(':javafx')
+        implementation project(':javafx')
     }
 }
 project(':app') {
     dependencies {
-        compile project(':core')
-        compile libraries.snakeyaml
+        api project(':core')
+        implementation project(':javafx')
+        implementation libraries.snakeyaml
     }
 }
