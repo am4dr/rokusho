@@ -5,7 +5,7 @@ plugins {
 }
 
 ext {
-    packageProjects = ['app', 'javafx', 'gui', 'core', 'old'].collect { project ":$it" }
+    packageProjects = ['app', 'javafx', 'gui', 'core', 'app-gui'].collect { project ":$it" }
     libraries = [
             kotlin: [
                     stdlib: 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.31',
@@ -71,7 +71,7 @@ configure(packageProjects) {
         useJUnitPlatform()
     }
 }
-project(':old') {
+project(':app-gui') {
     dependencies {
         compile project(':app')
         compile project(':core')

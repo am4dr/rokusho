@@ -2,7 +2,7 @@ rootProject.name = 'rokusho'
 
 include 'application'
 
-def packages = ['app', 'javafx', 'gui', 'core', 'old']
+def packages = ['app', 'javafx', 'gui', 'core', 'app-gui']
 packages.each {
     include it
     project(':'+it).projectDir = new File(rootProject.projectDir, "packages/$it")
