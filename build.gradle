@@ -5,7 +5,7 @@ plugins {
 }
 
 ext {
-    packageProjects = ['app', 'javafx', 'gui', 'core', 'app-gui'].collect { project ":$it" }
+    packageProjects = ['app', 'javafx-commons', 'gui', 'core', 'app-gui'].collect { project ":$it" }
     libraries = [
             kotlin: [
                     stdlib: 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.31',
@@ -76,25 +76,25 @@ project(':app-gui') {
     dependencies {
         implementation project(':app')
         implementation project(':core')
-        implementation project(':javafx')
+        implementation project(':javafx-commons')
         implementation project(':gui')
         implementation libraries.commons.cli
     }
 }
 project(':gui') {
     dependencies {
-        implementation project(':javafx')
+        implementation project(':javafx-commons')
     }
 }
 project(':core') {
     dependencies {
-        implementation project(':javafx')
+        implementation project(':javafx-commons')
     }
 }
 project(':app') {
     dependencies {
         api project(':core')
-        implementation project(':javafx')
+        implementation project(':javafx-commons')
         implementation libraries.snakeyaml
     }
 }
