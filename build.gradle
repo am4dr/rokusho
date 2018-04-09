@@ -81,6 +81,11 @@ project(':app-gui') {
         implementation libraries.commons.cli
     }
 }
+project(':gui') {
+    dependencies {
+        implementation project(':javafx')
+    }
+}
 project(':core') {
     dependencies {
         implementation project(':javafx')

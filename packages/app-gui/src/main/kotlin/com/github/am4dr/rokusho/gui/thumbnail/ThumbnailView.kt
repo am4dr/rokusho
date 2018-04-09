@@ -1,7 +1,7 @@
 package com.github.am4dr.rokusho.gui.thumbnail
 
 import com.github.am4dr.rokusho.javafx.collection.ConcatenatedList
-import com.github.am4dr.rokusho.javafx.control.FittingTextField
+import com.github.am4dr.rokusho.gui.control.FittingTextField
 import javafx.beans.binding.Bindings
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
