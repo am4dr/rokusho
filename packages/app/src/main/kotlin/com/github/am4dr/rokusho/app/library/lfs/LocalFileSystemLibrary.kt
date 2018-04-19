@@ -1,12 +1,13 @@
 package com.github.am4dr.rokusho.app.library.lfs
 
 import com.github.am4dr.rokusho.app.ImageUrl
-import com.github.am4dr.rokusho.core.library.RokushoLibrary
 import com.github.am4dr.rokusho.app.savedata.ItemMetaData
 import com.github.am4dr.rokusho.app.savedata.SaveData
 import com.github.am4dr.rokusho.app.savedata.store.SaveDataStore
-import com.github.am4dr.rokusho.core.library.*
-import com.github.am4dr.rokusho.core.library.helper.ChangeAwareRecords
+import com.github.am4dr.rokusho.core.library.ItemTag
+import com.github.am4dr.rokusho.core.library.Record
+import com.github.am4dr.rokusho.core.library.RokushoLibrary
+import com.github.am4dr.rokusho.core.library.Tag
 import com.github.am4dr.rokusho.core.library.helper.LibrarySupport
 import com.github.am4dr.rokusho.javafx.collection.toObservableList
 import javafx.beans.property.ReadOnlyListProperty
@@ -27,9 +28,6 @@ class LocalFileSystemLibrary(private val root: Path,
 
     private val _recordLists = ReadOnlyListWrapper(FXCollections.observableArrayList<ObservableList<Record<ImageUrl>>>())
     override val recordLists: ReadOnlyListProperty<ObservableList<Record<ImageUrl>>> = _recordLists.readOnlyProperty
-    override fun createRecordList(list: Iterable<ImageUrl>): ObservableList<Record<ImageUrl>> {
-        return ChangeAwareRecords(FXCollections.observableArrayList(list.mapNotNull(librarySupport.records::get)), librarySupport).also { _recordLists.add(it) }
-    }
     override fun updateItemTags(key: ImageUrl, tags: Iterable<ItemTag>) {
         librarySupport.records[key] = Record(key, tags.toList())
     }

@@ -9,6 +9,5 @@ interface RokushoLibrary<T> {
     val records: ReadOnlyListProperty<Record<T>>
     val recordLists: ReadOnlyListProperty<ObservableList<Record<T>>>
 
-    fun createRecordList(list: Iterable<T>): ObservableList<Record<T>>
     fun updateItemTags(key: T, tags: Iterable<ItemTag>)
 }
