@@ -6,7 +6,7 @@ import com.github.am4dr.rokusho.app.savedata.SaveData
 import com.github.am4dr.rokusho.app.savedata.store.SaveDataStore
 import com.github.am4dr.rokusho.core.library.ItemTag
 import com.github.am4dr.rokusho.core.library.Record
-import com.github.am4dr.rokusho.core.library.RokushoLibrary
+import com.github.am4dr.rokusho.core.library.Library
 import com.github.am4dr.rokusho.core.library.Tag
 import com.github.am4dr.rokusho.core.library.helper.LibrarySupport
 import com.github.am4dr.rokusho.javafx.collection.toObservableList
@@ -14,20 +14,16 @@ import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyListWrapper
 import javafx.beans.property.ReadOnlyMapProperty
 import javafx.beans.property.ReadOnlyMapWrapper
-import javafx.collections.FXCollections
-import javafx.collections.ObservableList
 import java.nio.file.Path
 import java.nio.file.Paths
 
 class LocalFileSystemLibrary(private val root: Path,
                              private val saveDataStore: SaveDataStore<SaveData>,
-                             private val librarySupport: LibrarySupport<ImageUrl>) : RokushoLibrary<ImageUrl> {
+                             private val librarySupport: LibrarySupport<ImageUrl>) : Library<ImageUrl> {
 
     override val tags: ReadOnlyMapProperty<String, Tag> = ReadOnlyMapWrapper(librarySupport.tags).readOnlyProperty
     override val records: ReadOnlyListProperty<Record<ImageUrl>> = ReadOnlyListWrapper(toObservableList(librarySupport.records)).readOnlyProperty
 
-    private val _recordLists = ReadOnlyListWrapper(FXCollections.observableArrayList<ObservableList<Record<ImageUrl>>>())
-    override val recordLists: ReadOnlyListProperty<ObservableList<Record<ImageUrl>>> = _recordLists.readOnlyProperty
     override fun updateItemTags(key: ImageUrl, tags: Iterable<ItemTag>) {
         librarySupport.records[key] = Record(key, tags.toList())
     }

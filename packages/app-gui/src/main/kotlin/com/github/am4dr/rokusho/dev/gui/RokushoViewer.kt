@@ -1,7 +1,7 @@
 package com.github.am4dr.rokusho.dev.gui
 
 import com.github.am4dr.rokusho.app.Rokusho
-import com.github.am4dr.rokusho.core.library.RokushoLibrary
+import com.github.am4dr.rokusho.core.library.Library
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import javafx.scene.Scene
 import javafx.scene.control.Hyperlink
@@ -31,7 +31,7 @@ class RokushoViewer(val rokusho: Rokusho) {
         return Scene(libraryList, w, h)
     }
 
-    private class LibraryListCell<T>(library: RokushoLibrary<T>) : FlowPane() {
+    private class LibraryListCell<T>(library: Library<T>) : FlowPane() {
         init {
             children.addAll(
                     Hyperlink("tags").apply {

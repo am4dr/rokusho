@@ -1,6 +1,6 @@
 package com.github.am4dr.rokusho.dev.gui
 
-import com.github.am4dr.rokusho.core.library.RokushoLibrary
+import com.github.am4dr.rokusho.core.library.Library
 import com.github.am4dr.rokusho.core.library.Tag
 import javafx.collections.FXCollections
 import javafx.collections.MapChangeListener
@@ -11,7 +11,7 @@ import javafx.scene.control.ListView
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
 
-class LibraryViewer<T>(val library: RokushoLibrary<T>) {
+class LibraryViewer<T>(val library: Library<T>) {
     companion object {
         const val initialWidth: Double  = 300.0
         const val initialHeight: Double = 300.0
