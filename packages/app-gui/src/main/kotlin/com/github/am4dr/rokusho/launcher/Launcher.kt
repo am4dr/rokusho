@@ -2,6 +2,7 @@ package com.github.am4dr.rokusho.launcher
 
 import com.github.am4dr.rokusho.app.Rokusho
 import com.github.am4dr.rokusho.app.library.lfs.FileCollector
+import com.github.am4dr.rokusho.app.library.lfs.LocalFileSystemLibrary
 import com.github.am4dr.rokusho.app.library.lfs.LocalFileSystemLibraryLoader
 import com.github.am4dr.rokusho.app.library.lfs.SaveDataStoreProvider
 import com.github.am4dr.rokusho.app.savedata.store.yaml.YamlSaveDataStore
@@ -40,7 +41,8 @@ class Launcher : Application() {
     override fun start(stage: Stage) {
         stage.run {
             title = "Rokusho"
-            scene = Scene(RokushoGui(rokusho, stage, lfsLoader::getLibrary).mainParent, 800.0, 500.0)
+            val rokushoGui = RokushoGui(rokusho, stage, { path -> rokusho.addLibrary(lfsLoader.getLibrary(path)) }, { lib -> (lib as? LocalFileSystemLibrary)?.save() })
+            scene = Scene(rokushoGui.mainParent, 800.0, 500.0)
             show()
         }
         RokushoViewer(rokusho).also { devViewer ->

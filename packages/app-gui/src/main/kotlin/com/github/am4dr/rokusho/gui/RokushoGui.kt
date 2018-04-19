@@ -2,7 +2,6 @@ package com.github.am4dr.rokusho.gui
 
 import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.Rokusho
-import com.github.am4dr.rokusho.app.library.lfs.LocalFileSystemLibrary
 import com.github.am4dr.rokusho.core.library.ItemTag
 import com.github.am4dr.rokusho.core.library.Record
 import com.github.am4dr.rokusho.core.library.RokushoLibrary
@@ -37,7 +36,7 @@ import java.nio.file.Path
 import java.util.*
 import java.util.function.Predicate
 
-class RokushoGui(val rokusho: Rokusho, val stage: Stage, val getLibrary: (Path) -> LocalFileSystemLibrary) {
+class RokushoGui(val rokusho: Rokusho, val stage: Stage, val addLibraryFromPath: (Path) -> Unit, val saveLibrary: (RokushoLibrary<*>) -> Unit) {
 
     private val libs: ObservableList<Triple<RokushoLibrary<ImageUrl>, SideMenuIcon, FilerLayout>> = TransformedList(rokusho.libraries) { Triple(it, it.toSideMenuIcon(), createImageFiler(it)) }
     private val currentLibrary: ObjectProperty<RokushoLibrary<ImageUrl>> = SimpleObjectProperty()
@@ -46,9 +45,7 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage, val getLibrary: (Path) 
     private fun createMainScene(): MainLayout {
         val saveButton = Button("保存").apply {
             setOnAction {
-                currentLibrary.get()?.let { lib ->
-                    (lib as? LocalFileSystemLibrary)?.save()
-                }
+                currentLibrary.get()?.let(saveLibrary)
             }
         }
         val addLibraryButton = Button("追加").apply {
@@ -82,7 +79,7 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage, val getLibrary: (Path) 
             initialDirectory = lastSelectedDirectory
             showDialog(window)?.let {
                 lastSelectedDirectory = it
-                rokusho.addLibrary(getLibrary(it.toPath()))
+                addLibraryFromPath(it.toPath())
             }
         }
     }
