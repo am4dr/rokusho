@@ -2,8 +2,8 @@ package com.github.am4dr.rokusho.gui
 
 import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.Rokusho
-import com.github.am4dr.rokusho.core.library.Record
 import com.github.am4dr.rokusho.core.library.Library
+import com.github.am4dr.rokusho.core.library.Record
 import com.github.am4dr.rokusho.gui.sidemenu.SideMenuIcon
 import com.github.am4dr.rokusho.javafx.function.bindLeft
 import javafx.beans.binding.Bindings
