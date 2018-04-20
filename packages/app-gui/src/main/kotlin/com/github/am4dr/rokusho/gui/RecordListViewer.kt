@@ -2,6 +2,7 @@ package com.github.am4dr.rokusho.gui
 
 import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.core.library.Record
+import com.github.am4dr.rokusho.gui.thumbnail.ImageThumbnail
 import javafx.beans.binding.Bindings
 import javafx.beans.property.*
 import javafx.collections.FXCollections.observableArrayList
@@ -28,7 +29,10 @@ class RecordListViewer : VBox() {
 
     // TODO remove these hardcoded dependencies
     val listViewer: ListView<Record<ImageUrl>> = ListView(records)
-    val thumbnailViewer: RecordThumbnailViewer = RecordThumbnailViewer()
+    private val imageLoader = UrlImageLoader()
+    val thumbnailViewer: RecordThumbnailViewer<ImageUrl> = RecordThumbnailViewer({ record, width, height ->
+        ImageThumbnail(imageLoader.getImage(record.key.url, width, height, true))
+    })
 
     init {
         thumbnailViewer.apply {
@@ -37,7 +41,6 @@ class RecordListViewer : VBox() {
                 onMouseClicked = EventHandler { isVisible = false }
                 background = Background(BackgroundFill(Color.rgb(30, 30, 30, 0.75), null, null))
             }
-            val imageLoader = UrlImageLoader()
             children.add(overlay)
             records.bindContent(this@RecordListViewer.records)
             onActionProperty.set {

@@ -60,7 +60,7 @@ private fun createLibraryViewer(library: Library<ImageUrl>): Node {
     val viewer = RecordListViewer()
 
     val recordFilter = { input: String? ->
-        Predicate { item: Record<ImageUrl> ->
+        Predicate { item: Record<*> ->
             if (input == null || input == "") true
             else item.itemTags.any { it.tag.id.contains(input) }
         }
