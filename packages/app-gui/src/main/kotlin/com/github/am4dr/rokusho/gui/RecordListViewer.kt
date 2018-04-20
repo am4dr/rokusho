@@ -5,11 +5,10 @@ import com.github.am4dr.rokusho.core.library.Record
 import javafx.beans.binding.Bindings
 import javafx.beans.property.*
 import javafx.collections.FXCollections.observableArrayList
+import javafx.event.EventHandler
 import javafx.scene.control.*
-import javafx.scene.layout.BorderPane
-import javafx.scene.layout.HBox
-import javafx.scene.layout.Priority
-import javafx.scene.layout.VBox
+import javafx.scene.layout.*
+import javafx.scene.paint.Color
 
 
 // TODO separate into RecordListViewerContainer and Viewer
@@ -32,7 +31,20 @@ class RecordListViewer : VBox() {
     val thumbnailViewer: RecordThumbnailViewer = RecordThumbnailViewer()
 
     init {
-        thumbnailViewer.records.bindContent(records)
+        thumbnailViewer.apply {
+            val overlay = ImageOverlay().apply {
+                isVisible = false
+                onMouseClicked = EventHandler { isVisible = false }
+                background = Background(BackgroundFill(Color.rgb(30, 30, 30, 0.75), null, null))
+            }
+            val imageLoader = UrlImageLoader()
+            children.add(overlay)
+            records.bindContent(this@RecordListViewer.records)
+            onActionProperty.set {
+                overlay.imageProperty.value = imageLoader.getImage(it.first().key.url)
+                overlay.isVisible = true
+            }
+        }
         content.center = listViewer
         children.addAll(
                 HBox(
