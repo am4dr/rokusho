@@ -1,17 +1,14 @@
 
 plugins {
     id 'com.github.ben-manes.versions' version '0.17.0'
-    id 'org.jetbrains.kotlin.jvm' version '1.2.31'
-    id 'application'
+    id 'org.jetbrains.kotlin.jvm' version '1.2.31' apply false
 }
 
-group = 'com.github.am4dr'
-version = '0.1.0-SNAPSHOT'
-
 ext {
+    packageProjects = ['app', 'javafx-commons', 'gui', 'core', 'app-gui'].collect { project ":$it" }
     libraries = [
             kotlin: [
-                    stdlib: 'org.jetbrains.kotlin:kotlin-stdlib:1.2.31',
+                    stdlib: 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.31',
             ],
             junit: [
                     api: 'org.junit.jupiter:junit-jupiter-api:5.1.0',
@@ -28,28 +25,76 @@ ext {
     ]
 }
 
-mainClassName = 'com.github.am4dr.rokusho.launcher.Launcher'
-
-repositories {
-    jcenter()
+allprojects {
+    group = 'com.github.am4dr.rokusho'
+    version = '0.1.0-SNAPSHOT'
+    repositories {
+        jcenter()
+    }
 }
 
-dependencies {
-    compile libraries.kotlin.stdlib
-    compile libraries.commons.cli
-    compile libraries.snakeyaml
+project(':application') {
+    apply plugin: 'application'
+    archivesBaseName = "rokusho-$it.name"
 
-    compile libraries.slf4j.api
-    runtime libraries.logback
+    mainClassName = 'com.github.am4dr.rokusho.launcher.Launcher'
+    dependencies {
+        runtimeOnly packageProjects
+    }
+    jar {
+        onlyIf { false }
+    }
+    run {
+        if (project.hasProperty('args')) {
+            args = project.getProperty('args').split(/\s+/).grep()
+        }
+    }
+}
 
-    testCompile libraries.junit.api
-    testRuntime libraries.junit.engine
+configure(packageProjects) {
+    apply plugin: 'org.jetbrains.kotlin.jvm'
+    apply plugin: 'java-library'
+    archivesBaseName = "rokusho-$it.name"
+
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
+        kotlinOptions.jvmTarget = '1.8'
+    }
+    dependencies {
+        api libraries.kotlin.stdlib
+
+        testImplementation libraries.junit.api
+        testRuntimeOnly libraries.junit.engine
+
+        api libraries.slf4j.api
+        runtimeOnly libraries.logback
+    }
+    test {
+        useJUnitPlatform()
+    }
 }
-test {
-    useJUnitPlatform()
+project(':app-gui') {
+    dependencies {
+        implementation project(':app')
+        implementation project(':core')
+        implementation project(':javafx-commons')
+        implementation project(':gui')
+        implementation libraries.commons.cli
+    }
 }
-run {
-    if (project.hasProperty('args')) {
-        args = project.getProperty('args').split(/\s+/).grep()
+project(':gui') {
+    dependencies {
+        implementation project(':javafx-commons')
+    }
+}
+project(':core') {
+    dependencies {
+        implementation project(':javafx-commons')
+    }
+}
+project(':app') {
+    dependencies {
+        api project(':core')
+        implementation project(':javafx-commons')
+        implementation libraries.snakeyaml
     }
 }
