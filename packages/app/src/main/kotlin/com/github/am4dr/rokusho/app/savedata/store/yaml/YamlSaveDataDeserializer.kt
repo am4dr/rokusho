@@ -16,6 +16,9 @@ class YamlSaveDataDeserializer : SaveDataDeserializer<SaveData> {
     companion object {
 
         fun parse(string: String): SaveData {
+            if (string == "") {
+                return SaveData(SaveData.Version.VERSION_1, emptyMap(), emptyMap())
+            }
             val yaml: Any? = Yaml().load(string)
             if (yaml == null || yaml !is Map<*,*>) { throw IllegalSaveFormatException("top level of save file must be a Map")
             }
@@ -25,12 +28,13 @@ class YamlSaveDataDeserializer : SaveDataDeserializer<SaveData> {
             val metaData = parseMetaData(yaml["metaData"], tags)
             return SaveData(version, tags, metaData)
         }
+        private fun <K, V> emptyMap(): MutableMap<K, V> = mutableMapOf()   // do not use mapOf() to avoid Yaml reference
         private fun parseVersion(data: Any?): String {
             data ?: throw VersionNotSpecifiedException()
             return data as? String ?: throw IllegalSaveFormatException("version must be a String")
         }
         private fun parseTagInfo(data: Any?): MutableMap<String, Tag> {
-            data ?: return mutableMapOf() // do not use mapOf() to avoid Yaml reference
+            data ?: return emptyMap()
             val map = data as? Map<*, *> ?: throw IllegalSaveFormatException("tags must be a Map<String, Map<String, String>>")
             return map.map {
                 val name = it.key as? String ?: throw IllegalSaveFormatException("id of tag in tags must be a String")

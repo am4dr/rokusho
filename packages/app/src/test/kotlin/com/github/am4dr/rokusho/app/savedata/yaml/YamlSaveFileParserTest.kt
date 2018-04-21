@@ -10,10 +10,11 @@ import java.nio.file.Paths
 
 class YamlSaveDataDeserializerTest {
     @Test
-    fun emptyStringTest() {
-        assertThrows<IllegalSaveFormatException>(IllegalSaveFormatException::class.java) {
-            YamlSaveDataDeserializer.parse("")
-        }
+    fun emptyStringRepresentsEmptySaveDataTest() {
+        val save = YamlSaveDataDeserializer.parse("")
+        assertEquals(SaveData.Version.VERSION_1, save.version)
+        assertEquals(0, save.tags.size)
+        assertEquals(0, save.metaData.size)
     }
     @Test
     fun versionOnlyTest() {
