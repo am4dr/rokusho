@@ -15,6 +15,8 @@ import javafx.scene.control.Hyperlink
 import javafx.scene.control.Label
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
+import java.lang.ref.SoftReference
+import java.util.*
 
 class MainView<T>(private val libraryIconFactory: (Library<T>) -> SideMenuIcon,
                   private val libraryViewerFactory: (Library<T>) -> Node) : BorderPane() {
@@ -55,10 +57,13 @@ class MainView<T>(private val libraryIconFactory: (Library<T>) -> SideMenuIcon,
         alignment = Pos.CENTER
     }
 
+    private val libraryViewCache = WeakHashMap(mutableMapOf<Library<*>, SoftReference<Node>>())
+    private fun getLibraryView(library: Library<T>): Node = libraryViewCache[library]?.get() ?: createLibraryViewAndCache(library)
+    private fun createLibraryViewAndCache(library: Library<T>): Node = libraryViewerFactory(library).also { libraryViewCache[library] = SoftReference(it) }
     private fun createIcon(library: Library<T>): SideMenuIcon =
             libraryIconFactory(library).apply {
                 setOnMouseClicked {
-                    libraryViewer.set(libraryViewerFactory(library))
+                    libraryViewer.set(getLibraryView(library))
                     (currentLibrary as SimpleObjectProperty).set(library)
                 }
             }
