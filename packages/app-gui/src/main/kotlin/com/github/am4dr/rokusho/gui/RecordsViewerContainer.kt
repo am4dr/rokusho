@@ -1,11 +1,10 @@
 package com.github.am4dr.rokusho.gui
 
+import com.github.am4dr.rokusho.core.library.Record
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import javafx.beans.InvalidationListener
 import javafx.beans.binding.Bindings
-import javafx.beans.property.LongProperty
-import javafx.beans.property.ReadOnlyStringProperty
-import javafx.beans.property.SimpleLongProperty
+import javafx.beans.property.*
 import javafx.collections.FXCollections.observableArrayList
 import javafx.scene.Node
 import javafx.scene.control.Button
@@ -15,19 +14,21 @@ import javafx.scene.control.TextField
 import javafx.scene.layout.*
 
 
-class RecordsViewerContainer : VBox() {
+class RecordsViewerContainer<T> : VBox() {
 
     val filteredCount: LongProperty = SimpleLongProperty(0)
     val totalCount: LongProperty = SimpleLongProperty(0)
+    val records: ListProperty<Record<T>> = SimpleListProperty(observableArrayList())
 
     private val filterInputNode = TextField()
     val filterProperty: ReadOnlyStringProperty = filterInputNode.textProperty()
 
     private val content = BorderPane().apply { VBox.setVgrow(this, Priority.ALWAYS) }
     private val viewers = observableArrayList<Pair<Node, Button>>()
+    private val buttons = TransformedList(viewers) { it.second }
     init {
         val viewerButtons = FlowPane()
-        Bindings.bindContent(viewerButtons.children, TransformedList(viewers) { it.second })
+        Bindings.bindContent(viewerButtons.children, buttons)
         children.addAll(
                 HBox(
                         viewerButtons,

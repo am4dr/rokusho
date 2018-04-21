@@ -8,6 +8,7 @@ import com.github.am4dr.rokusho.gui.sidemenu.SideMenuIcon
 import com.github.am4dr.rokusho.gui.thumbnail.ImageThumbnail
 import com.github.am4dr.rokusho.javafx.function.bindLeft
 import javafx.beans.binding.Bindings
+import javafx.beans.property.SimpleListProperty
 import javafx.collections.transformation.FilteredList
 import javafx.event.EventHandler
 import javafx.geometry.Insets
@@ -60,7 +61,7 @@ private fun Library<ImageUrl>.toSideMenuIcon(): SideMenuIcon =
         }
 
 private fun createLibraryViewer(library: Library<ImageUrl>): Node {
-    val viewer = RecordsViewerContainer()
+    val viewer = RecordsViewerContainer<ImageUrl>()
 
     val recordFilter = { input: String? ->
         Predicate { item: Record<*> ->
@@ -68,35 +69,37 @@ private fun createLibraryViewer(library: Library<ImageUrl>): Node {
             else item.itemTags.any { it.tag.id.contains(input) }
         }
     }.bindLeft(viewer.filterProperty)
-    val filteredItems = FilteredList(library.records).apply { predicateProperty().bind(recordFilter) }
 
-    return viewer.apply {
+    viewer.apply {
+        records.bind(SimpleListProperty(FilteredList(library.records).apply { predicateProperty().bind(recordFilter) }))
         totalCount.bind(Bindings.size(library.records))
-        filteredCount.bind(Bindings.size(filteredItems))
-
-        val listViewer = ListView<Record<Any>>()
-        Bindings.bindContent(listViewer.items, filteredItems)
-        add("リスト", listViewer)
-
-        val imageLoader = UrlImageLoader()
-        val thumbnailPane = RecordThumbnailViewer<ImageUrl>({ record, width, height ->
-            ImageThumbnail(imageLoader.getImage(record.key.url, width, height, true))
-        })
-        val (thumbnailViewer) = ImageOverlay.attach(thumbnailPane).also { (_, thumbnailPane, overlay) ->
-            thumbnailPane.apply {
-                records.bindContent(filteredItems)
-                onActionProperty.set {
-                    overlay.imageProperty.value = imageLoader.getImage(it.first().key.url)
-                    overlay.isVisible = true
-                }
-                updateTagsProperty.set({ record, tags -> library.updateItemTags(record.key, tags) })
-            }
-            overlay.apply {
-                isVisible = false
-                onMouseClicked = EventHandler { isVisible = false }
-                background = Background(BackgroundFill(Color.rgb(30, 30, 30, 0.75), null, null))
-            }
-        }
-        add("サムネイル", thumbnailViewer)
+        filteredCount.bind(Bindings.size(records))
     }
+
+    val listViewer = ListView<Record<Any>>()
+    Bindings.bindContent(listViewer.items, viewer.records)
+    viewer.add("リスト", listViewer)
+
+    val imageLoader = UrlImageLoader()
+    val thumbnailPane = RecordThumbnailViewer<ImageUrl>({ record, width, height ->
+        ImageThumbnail(imageLoader.getImage(record.key.url, width, height, true))
+    })
+    val (thumbnailViewer) = ImageOverlay.attach(thumbnailPane).also { (_, thumbnailPane, overlay) ->
+        thumbnailPane.apply {
+            records.bindContent(viewer.records)
+            onActionProperty.set {
+                overlay.imageProperty.value = imageLoader.getImage(it.first().key.url)
+                overlay.isVisible = true
+            }
+            updateTagsProperty.set({ record, tags -> library.updateItemTags(record.key, tags) })
+        }
+        overlay.apply {
+            isVisible = false
+            onMouseClicked = EventHandler { isVisible = false }
+            background = Background(BackgroundFill(Color.rgb(30, 30, 30, 0.75), null, null))
+        }
+    }
+    viewer.add("サムネイル", thumbnailViewer)
+
+    return viewer
 }

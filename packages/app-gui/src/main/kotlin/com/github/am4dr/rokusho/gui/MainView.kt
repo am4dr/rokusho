@@ -38,7 +38,7 @@ class MainView<T>(private val libraryIconFactory: (Library<T>) -> SideMenuIcon,
             setOnAction { onSaveClickedProperty.get()?.invoke() }
             disableProperty().bind(librariesNotSelectedProperty)
         })
-        left = sideMenu.node
+        left = sideMenu
         icons.addListener(InvalidationListener {
             sideMenu.setIcons(icons)
         })

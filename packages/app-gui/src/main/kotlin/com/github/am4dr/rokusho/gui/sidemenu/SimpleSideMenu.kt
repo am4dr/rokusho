@@ -7,17 +7,13 @@ import javafx.scene.control.Label
 import javafx.scene.layout.*
 import javafx.scene.paint.Color
 
-class SimpleSideMenu(onAddClicked: () -> Unit) {
+class SimpleSideMenu(onAddClicked: () -> Unit): VBox() {
 
     private val _icons = ReadOnlyListWrapper<SideMenuIcon>(observableArrayList())
     val icons: ReadOnlyListProperty<SideMenuIcon> = _icons.readOnlyProperty
     val width: DoubleProperty = SimpleDoubleProperty(20.0)
-    val node: VBox = VBox().apply {
-        prefWidthProperty().bind(this@SimpleSideMenu.width)
-        Bindings.bindContent(children, icons)
-    }
 
-    val addIcon: SideMenuIcon = SideMenuIcon().apply {
+    private val addIcon: SideMenuIcon = SideMenuIcon().apply {
         border = Border(BorderStroke(Color.DIMGRAY, BorderStrokeStyle.DASHED, CornerRadii(4.0), BorderWidths(2.0)))
         children.add(Label("Add"))
         viewOrder = Double.MAX_VALUE
@@ -27,6 +23,8 @@ class SimpleSideMenu(onAddClicked: () -> Unit) {
     }
 
     init {
+        prefWidthProperty().bind(this@SimpleSideMenu.width)
+        Bindings.bindContent(children, icons)
         setIcons(listOf())
     }
 
