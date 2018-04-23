@@ -37,7 +37,7 @@ class LocalFileSystemLibrary(private val root: Path,
 
     private fun createSaveData(): SaveData {
         val metaData = librarySupport.records.keys.map {
-            val path = root.relativize(Paths.get(it.url.toURI())).toString()
+            val path = root.relativize(Paths.get(it.url.toURI())).joinToString("/")
             Item(path, ItemMetaData(librarySupport.records[it]?.itemTags
                     ?: mutableListOf()))
         }.toList()
