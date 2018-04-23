@@ -3,6 +3,7 @@ package com.github.am4dr.rokusho.app.savedata
 import com.github.am4dr.rokusho.core.library.Tag
 import java.nio.file.Path
 
+@Deprecated("")
 data class SaveData(
         val version: Version,
         val tags: Map<String, Tag>,

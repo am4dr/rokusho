@@ -1,13 +1,12 @@
 package com.github.am4dr.rokusho.app.library.lfs
 
-import com.github.am4dr.rokusho.app.savedata.SaveData
-import com.github.am4dr.rokusho.app.savedata.store.SaveDataStore
+import com.github.am4dr.rokusho.app.savedata.store.yaml_new.SaveDataStore
 import java.nio.file.Path
 
-class SaveDataStoreProvider(private val saveDataStoreLocator: (Path) -> Pair<Path, SaveDataStore<SaveData>>,
-                            private val knownStore: MutableMap<Path, SaveDataStore<SaveData>> = mutableMapOf()) {
+class SaveDataStoreProvider<T>(private val saveDataStoreLocator: (Path) -> Pair<Path, SaveDataStore<T>>,
+                               private val knownStore: MutableMap<Path, SaveDataStore<T>> = mutableMapOf()) {
 
-    fun get(path: Path): Pair<Path, SaveDataStore<SaveData>> {
+    fun get(path: Path): Pair<Path, SaveDataStore<T>> {
         val known = findMostInnerKnownStore(path)
         known?.let {
             if  (it.first.toRealPath() == path.toRealPath()) {
@@ -26,6 +25,6 @@ class SaveDataStoreProvider(private val saveDataStoreLocator: (Path) -> Pair<Pat
             knownStore[first.toRealPath()] = second
         }
     }
-    private fun findMostInnerKnownStore(path: Path): Pair<Path, SaveDataStore<SaveData>>? =
+    private fun findMostInnerKnownStore(path: Path): Pair<Path, SaveDataStore<T>>? =
             knownStore.filterKeys { path.startsWith(it) }.maxBy { it.key.nameCount }?.toPair()
 }

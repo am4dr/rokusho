@@ -1,7 +1,7 @@
 package com.github.am4dr.rokusho.app.library.lfs
 
-import com.github.am4dr.rokusho.app.savedata.SaveData
-import com.github.am4dr.rokusho.app.savedata.store.SaveDataStore
+import com.github.am4dr.rokusho.app.savedata.store.yaml_new.SaveData
+import com.github.am4dr.rokusho.app.savedata.store.yaml_new.SaveDataStore
 import java.io.IOException
 import java.nio.file.FileVisitResult
 import java.nio.file.FileVisitor
