@@ -1,10 +1,10 @@
 package com.github.am4dr.rokusho.app.library.lfs
 
 import com.github.am4dr.rokusho.app.ImageUrl
+import com.github.am4dr.rokusho.app.savedata.Item
 import com.github.am4dr.rokusho.app.savedata.ItemMetaData
-import com.github.am4dr.rokusho.app.savedata.store.yaml_new.Item
-import com.github.am4dr.rokusho.app.savedata.store.yaml_new.SaveData
-import com.github.am4dr.rokusho.app.savedata.store.yaml_new.SaveDataStore
+import com.github.am4dr.rokusho.app.savedata.SaveData
+import com.github.am4dr.rokusho.app.savedata.store.SaveDataStore
 import com.github.am4dr.rokusho.core.library.ItemTag
 import com.github.am4dr.rokusho.core.library.Library
 import com.github.am4dr.rokusho.core.library.Record
@@ -38,7 +38,8 @@ class LocalFileSystemLibrary(private val root: Path,
     private fun createSaveData(): SaveData {
         val metaData = librarySupport.records.keys.map {
             val path = root.relativize(Paths.get(it.url.toURI())).toString()
-            Item(path, ItemMetaData(librarySupport.records[it]?.itemTags ?: mutableListOf()))
+            Item(path, ItemMetaData(librarySupport.records[it]?.itemTags
+                    ?: mutableListOf()))
         }.toList()
         return SaveData(SaveData.Version.VERSION_1, tags.values.distinct(), metaData)
     }

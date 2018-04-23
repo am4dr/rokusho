@@ -1,8 +1,8 @@
 package com.github.am4dr.rokusho.app.library.lfs
 
 import com.github.am4dr.rokusho.app.ImageUrl
-import com.github.am4dr.rokusho.app.savedata.store.yaml_new.SaveData
-import com.github.am4dr.rokusho.app.savedata.store.yaml_new.SaveDataStore
+import com.github.am4dr.rokusho.app.savedata.SaveData
+import com.github.am4dr.rokusho.app.savedata.store.SaveDataStore
 import com.github.am4dr.rokusho.core.library.Record
 import com.github.am4dr.rokusho.core.library.helper.LibrarySupport
 import java.nio.file.Path

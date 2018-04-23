@@ -5,8 +5,8 @@ import com.github.am4dr.rokusho.app.library.lfs.FileCollector
 import com.github.am4dr.rokusho.app.library.lfs.LocalFileSystemLibrary
 import com.github.am4dr.rokusho.app.library.lfs.LocalFileSystemLibraryLoader
 import com.github.am4dr.rokusho.app.library.lfs.SaveDataStoreProvider
+import com.github.am4dr.rokusho.app.savedata.store.yaml.YamlSaveDataStore
 import com.github.am4dr.rokusho.app.savedata.store.yaml.YamlSaveFileLocator
-import com.github.am4dr.rokusho.app.savedata.store.yaml_new.YamlSaveDataStore
 import com.github.am4dr.rokusho.dev.gui.RokushoViewer
 import com.github.am4dr.rokusho.gui.RokushoGui
 import javafx.application.Application

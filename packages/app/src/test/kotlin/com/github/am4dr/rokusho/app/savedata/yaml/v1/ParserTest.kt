@@ -1,6 +1,6 @@
-package com.github.am4dr.rokusho.app.savedata.yaml_new.v1
+package com.github.am4dr.rokusho.app.savedata.yaml.v1
 
-import com.github.am4dr.rokusho.app.savedata.store.yaml_new.v1.*
+import com.github.am4dr.rokusho.app.savedata.store.yaml.v1.*
 import com.github.am4dr.rokusho.core.library.Tag
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -71,13 +71,5 @@ class ParserTest {
             assertEquals(expected.size, extracted.size)
             assertTrue(extracted.containsAll(expected))
         }
-//
-//        @TestFactory
-//        fun parseTagDataTest(): Stream<DynamicTest> = listOf(
-//                mapOf<String, Any>() to listOf<TagData>()
-//        ).dynamicTest { (data, expected) ->
-//            val parsed = parseItemEntry(data)
-//
-//        }
     }
 }

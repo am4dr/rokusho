@@ -1,81 +1,38 @@
 package com.github.am4dr.rokusho.app.savedata.store.yaml
 
-import com.github.am4dr.rokusho.app.savedata.ItemMetaData
 import com.github.am4dr.rokusho.app.savedata.SaveData
-import com.github.am4dr.rokusho.app.savedata.store.SaveDataDeserializer
-import com.github.am4dr.rokusho.core.library.ItemTag
-import com.github.am4dr.rokusho.core.library.Tag
+import com.github.am4dr.rokusho.app.savedata.SaveDataDeserializer
+import com.github.am4dr.rokusho.app.savedata.SaveDataDeserializer.Result
 import org.yaml.snakeyaml.Yaml
 import java.nio.charset.StandardCharsets
-import java.nio.file.Path
-import java.nio.file.Paths
+import com.github.am4dr.rokusho.app.savedata.store.yaml.v1.parse as parseV1
 
 class YamlSaveDataDeserializer : SaveDataDeserializer<SaveData> {
-    open class IllegalSaveFormatException(message: String = "") : RuntimeException(message)
-    class VersionNotSpecifiedException(message: String = ""): IllegalSaveFormatException(message)
-    companion object {
+    override fun deserialize(bytes: ByteArray): Result<SaveData> = deserialize(bytes.toString(StandardCharsets.UTF_8))
+}
 
-        fun parse(string: String): SaveData {
-            if (string == "") {
-                return SaveData(SaveData.Version.VERSION_1, emptyMap(), emptyMap())
-            }
-            val yaml: Any? = Yaml().load(string)
-            if (yaml == null || yaml !is Map<*,*>) { throw IllegalSaveFormatException("top level of save file must be a Map")
-            }
-            val versionString = parseVersion(yaml["version"])
-            val version = SaveData.Version.of(versionString) ?: throw IllegalSaveFormatException("version $versionString is not supported")
-            val tags = parseTagInfo(yaml["tags"])
-            val metaData = parseMetaData(yaml["metaData"], tags)
-            return SaveData(version, tags, metaData)
-        }
-        private fun <K, V> emptyMap(): MutableMap<K, V> = mutableMapOf()   // do not use mapOf() to avoid Yaml reference
-        private fun parseVersion(data: Any?): String {
-            data ?: throw VersionNotSpecifiedException()
-            return data as? String ?: throw IllegalSaveFormatException("version must be a String")
-        }
-        private fun parseTagInfo(data: Any?): MutableMap<String, Tag> {
-            data ?: return emptyMap()
-            val map = data as? Map<*, *> ?: throw IllegalSaveFormatException("tags must be a Map<String, Map<String, String>>")
-            return map.map {
-                val name = it.key as? String ?: throw IllegalSaveFormatException("id of tag in tags must be a String")
-                val opts = it.value as? Map<*, *> ?: throw IllegalSaveFormatException("value of tags must be a Map<String, String>")
-                opts.forEach {
-                    it.key as? String ?: throw IllegalSaveFormatException("id of tag option must be a String")
-                    if (it.value == null) throw IllegalSaveFormatException("value of tag option must not be null")
-                }
-                if (opts.containsKey("type") && opts["type"] !is String) throw IllegalSaveFormatException("type of tag must be a String")
-                val type = opts["type"] as? String ?: "text"
-                @Suppress("UNCHECKED_CAST")
-                opts as Map<String, Any>
-                Pair(name, Tag(name , Tag.Type.from(type), opts))
-            }.toMap(mutableMapOf())
-        }
-        private fun parseMetaData(data: Any?, tagInfo: MutableMap<String, Tag>): Map<Path, ItemMetaData> {
-            data ?: return mapOf()
-            data as? Map<*, *> ?: throw IllegalSaveFormatException("metaData must be a Map")
-            return data.map {
-                val path = it.key as? String ?: throw IllegalSaveFormatException("key of metaData must be a String")
-                val metaData = it.value as? Map<*, *> ?: throw IllegalSaveFormatException("value of metaData must be a Map")
-                val tags = parseTagData(metaData["tags"], tagInfo)
-                Pair(Paths.get(path), ItemMetaData(tags))
-            }.toMap()
-        }
-        private fun parseTagData(data: Any?, tagInfo: MutableMap<String, Tag>): List<ItemTag> {
-            data ?: return listOf()
-            val map = data as? Map<*, *> ?: throw IllegalSaveFormatException("tags in metaData must be a Map<String, Any>")
-            return map.map { tag ->
-                val name = tag.key as? String ?: throw IllegalSaveFormatException("tag id in metaData must be a String: ${tag.key}")
-                val ops = tag.value as? Map<*, *> ?: mutableMapOf<String, Any>() // do not use mapOf() to avoid Yaml reference
-                ops.forEach {
-                    if (it.key !is String) throw IllegalSaveFormatException("key of metaData.tags must be a String: ${it.key}")
-                    if (it.value == null) throw IllegalSaveFormatException("value of metaData.tags.<option id> must not be null: ${it.value}")
-                }
-                @Suppress("UNCHECKED_CAST")
-                ops as Map<String, Any>
-                ItemTag(tagInfo.getOrPut(name, { Tag(name , Tag.Type.TEXT, mapOf("value" to name)) }) , ops["value"]?.toString())
-            }
-        }
+internal val CURRENT_VERSION = SaveData.Version.VERSION_1
+
+fun deserialize(string: String): Result<SaveData> {
+    if (string.isBlank()) return Result(SaveData.EMPTY)
+
+    val msg = mutableListOf<String>()
+    fun error(message: String): Result<SaveData> = Result(null, msg.apply { add("error: $message") }.toMutableList())
+    fun warning(message: String): Unit { msg.add("warning: $message") }
+
+    val data: Map<*, *> = Yaml().load(string) as? Map<*, *> ?: return error("top level must be a Map")
+    val version: SaveData.Version = when (detectVersion(data)) {
+        SaveData.Version.VERSION_1 -> SaveData.Version.VERSION_1
+        SaveData.Version.UNKNOWN -> return error("unknown version is specified")
+        null -> return error("version is not specified")
     }
+    // select data parser by version
 
-    override fun deserialize(bytes: ByteArray): SaveData = parse(bytes.toString(StandardCharsets.UTF_8))
+    val parsed = parseV1(data).toSaveData()
+    return Result(parsed)
+}
+
+fun detectVersion(map: Map<*, *>): SaveData.Version? {
+    val version = map["version"] as? String ?: return null
+    return SaveData.Version.of(version)
 }

@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.app.savedata.store.yaml_new.v1
+package com.github.am4dr.rokusho.app.savedata.store.yaml.v1
 
 import com.github.am4dr.rokusho.core.library.Tag
 

@@ -1,6 +1,7 @@
-package com.github.am4dr.rokusho.app.savedata.store.yaml_new
+package com.github.am4dr.rokusho.app.savedata.store
 
-import com.github.am4dr.rokusho.app.savedata.store.SaveDataSerializer
+import com.github.am4dr.rokusho.app.savedata.SaveDataDeserializer
+import com.github.am4dr.rokusho.app.savedata.SaveDataSerializer
 import java.nio.file.Files
 import java.nio.file.Path
 

@@ -1,8 +1,8 @@
-package com.github.am4dr.rokusho.app.savedata.store.yaml_new.v1
+package com.github.am4dr.rokusho.app.savedata.store.yaml.v1
 
+import com.github.am4dr.rokusho.app.savedata.Item
 import com.github.am4dr.rokusho.app.savedata.ItemMetaData
-import com.github.am4dr.rokusho.app.savedata.store.yaml_new.Item
-import com.github.am4dr.rokusho.app.savedata.store.yaml_new.SaveData
+import com.github.am4dr.rokusho.app.savedata.SaveData
 import com.github.am4dr.rokusho.core.library.ItemTag
 import com.github.am4dr.rokusho.core.library.Tag
 
