@@ -25,6 +25,10 @@ data class V1SaveData(val tags: List<TagEntry> = listOf(), val items: List<ItemE
             }
             return V1SaveData(tags, items)
         }
+
+        private fun List<ItemTagEntry>.toItemMetaData(tags: Map<String, Tag>): ItemMetaData =
+                ItemMetaData(filter { tags.containsKey(it.id) }
+                        .map { ItemTag(tags[it.id]!!, it.data["value"] as? String) })
     }
     fun toSaveData(): SaveData {
         val sdTags = tags.distinctBy(TagEntry::id).map { Tag(it.id, detectTagType(it.data), it.data) }
@@ -32,8 +36,9 @@ data class V1SaveData(val tags: List<TagEntry> = listOf(), val items: List<ItemE
         val sdItems = items.distinctBy(ItemEntry::id).map { Item(it.id, it.tags.toItemMetaData(sdTagMap)) }
         return SaveData(SaveData.Version.VERSION_1, sdTags, sdItems)
     }
+}
 
-    private fun List<ItemTagEntry>.toItemMetaData(tags: Map<String, Tag>): ItemMetaData =
-            ItemMetaData(filter { tags.containsKey(it.id) }
-                    .map { ItemTag(tags[it.id]!!, it.data["value"] as? String) })
+fun detectTagType(data: Map<String, Any>): Tag.Type {
+    val type = data["type"] as? String ?: return Tag.Type.TEXT
+    return Tag.Type.from(type)
 }

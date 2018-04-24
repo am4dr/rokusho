@@ -1,7 +1,5 @@
 package com.github.am4dr.rokusho.app.savedata.store.yaml.v1
 
-import com.github.am4dr.rokusho.core.library.Tag
-
 
 fun parse(data: Map<*, *>): V1SaveData = V1SaveData(extractTags(data), extractItems(data))
 
@@ -19,11 +17,6 @@ fun parseTagEntry(entry: Map.Entry<*, *>): TagEntry? {
             .map { it.key as String to it.value as Any }
             .toMap()
     return TagEntry(id, typeCheckedData)
-}
-
-fun detectTagType(data: Map<String, Any>): Tag.Type {
-    val type = data["type"] as? String ?: return Tag.Type.TEXT
-    return Tag.Type.from(type)
 }
 
 
