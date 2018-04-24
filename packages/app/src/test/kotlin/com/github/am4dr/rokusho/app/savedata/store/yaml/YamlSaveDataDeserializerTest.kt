@@ -1,8 +1,6 @@
-package com.github.am4dr.rokusho.app.savedata.yaml
+package com.github.am4dr.rokusho.app.savedata.store.yaml
 
 import com.github.am4dr.rokusho.app.savedata.SaveData
-import com.github.am4dr.rokusho.app.savedata.store.yaml.deserialize
-import com.github.am4dr.rokusho.app.savedata.store.yaml.detectVersion
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test

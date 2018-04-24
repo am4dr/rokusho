@@ -1,6 +1,5 @@
-package com.github.am4dr.rokusho.app.savedata.yaml.v1
+package com.github.am4dr.rokusho.app.savedata.store.yaml.v1
 
-import com.github.am4dr.rokusho.app.savedata.store.yaml.v1.*
 import com.github.am4dr.rokusho.core.library.Tag
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
