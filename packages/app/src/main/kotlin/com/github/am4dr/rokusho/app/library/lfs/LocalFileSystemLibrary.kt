@@ -1,6 +1,7 @@
 package com.github.am4dr.rokusho.app.library.lfs
 
 import com.github.am4dr.rokusho.app.ImageUrl
+import com.github.am4dr.rokusho.app.savedata.Item
 import com.github.am4dr.rokusho.app.savedata.ItemMetaData
 import com.github.am4dr.rokusho.app.savedata.SaveData
 import com.github.am4dr.rokusho.app.savedata.store.SaveDataStore
@@ -19,7 +20,8 @@ import java.nio.file.Paths
 
 class LocalFileSystemLibrary(private val root: Path,
                              private val saveDataStore: SaveDataStore<SaveData>,
-                             private val librarySupport: LibrarySupport<ImageUrl>) : Library<ImageUrl> {
+                             private val librarySupport: LibrarySupport<ImageUrl>,
+                             private val isReadOnly: Boolean) : Library<ImageUrl> {
 
     override val tags: ReadOnlyMapProperty<String, Tag> = ReadOnlyMapWrapper(librarySupport.tags).readOnlyProperty
     override val records: ReadOnlyListProperty<Record<ImageUrl>> = ReadOnlyListWrapper(toObservableList(librarySupport.records)).readOnlyProperty
@@ -28,14 +30,17 @@ class LocalFileSystemLibrary(private val root: Path,
         librarySupport.records[key] = Record(key, tags.toList())
     }
     fun save() {
-        saveDataStore.save(createSaveData())
+        if (!isReadOnly) {
+            saveDataStore.save(createSaveData())
+        }
     }
 
     private fun createSaveData(): SaveData {
         val metaData = librarySupport.records.keys.map {
-            val path = root.relativize(Paths.get(it.url.toURI()))
-            path to ItemMetaData(librarySupport.records[it]?.itemTags ?: mutableListOf())
-        }.toMap()
-        return SaveData(SaveData.Version.VERSION_1, tags, metaData)
+            val path = root.relativize(Paths.get(it.url.toURI())).joinToString("/")
+            Item(path, ItemMetaData(librarySupport.records[it]?.itemTags
+                    ?: mutableListOf()))
+        }.toList()
+        return SaveData(SaveData.Version.VERSION_1, tags.values.distinct(), metaData)
     }
 }

@@ -18,15 +18,17 @@ class LocalFileSystemLibraryLoader(private val saveDataStoreProvider: (Path) -> 
         return loadedLibraries[store] ?: createLocalFileSystemLibrary(root, store)
     }
 
-    private fun createLocalFileSystemLibrary(root: Path, store: SaveDataStore<SaveData>): LocalFileSystemLibrary =
-            LocalFileSystemLibrary(root, store, createLibrary(root, store)).apply { loadedLibraries[store] = this }
+    private fun createLocalFileSystemLibrary(root: Path, store: SaveDataStore<SaveData>): LocalFileSystemLibrary {
+        var loaded = false
+        val data = store.load()?.also { loaded = true } ?: SaveData.EMPTY
+        return LocalFileSystemLibrary(root, store, createLibrary(root, data), !loaded).apply { loadedLibraries[store] = this }
+    }
 
-    private fun createLibrary(root: Path, store: SaveDataStore<SaveData>): LibrarySupport<ImageUrl> =
+    private fun createLibrary(root: Path, data: SaveData): LibrarySupport<ImageUrl> =
             LibrarySupport<ImageUrl>().apply {
-                val data = store.load()
-                tags.putAll(data.tags)
-                data.metaData.forEach { (path, meta) ->
-                    val key = ImageUrl(root.resolve(path).toUri().toURL())
+                tags.putAll(data.tags.map { it.id to it })
+                data.items.forEach { (id, meta) ->
+                    val key = ImageUrl(root.resolve(id).toUri().toURL())
                     records[key] = Record(key, meta.tags)
                 }
                 fileCollector(root).map { ImageUrl(it.toUri().toURL()) }.forEach { key ->
