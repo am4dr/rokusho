@@ -24,12 +24,12 @@ class YamlSaveDataDeserializerTest {
         companion object {
             @JvmStatic
             fun versionDetection(): Stream<Arguments> = Stream.of(
-                    Arguments.of(SaveData.Version.VERSION_1, mapOf("version" to "1")),
-                    Arguments.of(SaveData.Version.UNKNOWN, mapOf("version" to "future version")))
+                    Arguments.of(Versions.V1, mapOf("version" to "1")),
+                    Arguments.of(Versions.UNKNOWN, mapOf("version" to "future version")))
         }
         @ParameterizedTest
         @MethodSource
-        fun versionDetection(expected: SaveData.Version?, map: Map<*, *>) {
+        fun versionDetection(expected: Versions?, map: Map<*, *>) {
             assertEquals(expected, detectVersion(map))
         }
     }

@@ -13,8 +13,6 @@ data class ItemTagEntry(val id: String, val data: Map<String, Any> = mapOf())
 data class V1SaveData(val tags: List<TagEntry> = listOf(), val items: List<ItemEntry> = listOf()) {
 
     companion object {
-        val version: String = SaveData.Version.VERSION_1.stringValue
-
         fun from(data: SaveData): V1SaveData {
             val tags = data.tags.map { TagEntry(it.id, it.data) }
             val items = data.items.map { (id, meta) ->
@@ -36,7 +34,7 @@ data class V1SaveData(val tags: List<TagEntry> = listOf(), val items: List<ItemE
         val sdTags = tags.distinctBy(TagEntry::id).map { Tag(it.id, detectTagType(it.data), it.data) }
         val sdTagMap = sdTags.map { it.id to it }.toMap()
         val sdItems = items.distinctBy(ItemEntry::id).map { Item(it.id, it.tags.toItemMetaData(sdTagMap)) }
-        return SaveData(SaveData.Version.VERSION_1, sdTags, sdItems)
+        return SaveData(sdTags, sdItems)
     }
 }
 

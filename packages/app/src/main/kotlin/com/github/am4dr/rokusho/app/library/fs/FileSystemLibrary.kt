@@ -36,7 +36,7 @@ class FileSystemLibrary(val root: Path,
             val id = root.relativize(it.key).joinToString("/")
             Item(id, ItemMetaData(it.itemTags))
         }
-        return SaveData(SaveData.Version.VERSION_1, tags.values.distinct(), metaData)
+        return SaveData(tags.values.distinct(), metaData)
     }
 }
 

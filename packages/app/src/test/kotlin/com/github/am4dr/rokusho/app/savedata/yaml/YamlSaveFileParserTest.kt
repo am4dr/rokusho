@@ -15,14 +15,12 @@ class YamlSaveFileParserTest {
     @Test
     fun emptyStringRepresentsEmptySaveDataTest() {
         val save = "".parse().result!!
-        assertEquals(SaveData.Version.VERSION_1, save.version)
         assertEquals(0, save.tags.size)
         assertEquals(0, save.items.size)
     }
     @Test
     fun versionOnlyTest() {
         val save = "version: \"1\"".parse().result!!
-        assertEquals(SaveData.Version.VERSION_1, save.version)
         assertEquals(0, save.tags.size)
         assertEquals(0, save.items.size)
     }
@@ -37,7 +35,6 @@ class YamlSaveFileParserTest {
             |version: "1"
             |tags: {}
             |""".parse().result!!
-        assertEquals(SaveData.Version.VERSION_1, result.version)
         assertEquals(0, result.tags.size)
         assertEquals(0, result.items.size)
     }

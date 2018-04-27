@@ -1,5 +1,6 @@
 package com.github.am4dr.rokusho.app.savedata.yaml.v1
 
+import com.github.am4dr.rokusho.app.savedata.yaml.Versions
 import org.yaml.snakeyaml.Yaml
 
 // TODO test
@@ -7,7 +8,7 @@ fun serialize(data: V1SaveData): ByteArray = Yaml().dump(data.toDumpStructure())
 
 fun V1SaveData.toDumpStructure(): Map<Any, Any> {
     return mapOf(
-            "version" to V1SaveData.version,
+            "version" to Versions.V1.string,
             "tags" to tags.map { it.toDumpStructure() }.toMap().toMutableMap(),
             "metaData" to items.map { it.toDumpStructure() }.filter { (_, data) -> data.isNotEmpty() }.toMap().toMutableMap()
             )
