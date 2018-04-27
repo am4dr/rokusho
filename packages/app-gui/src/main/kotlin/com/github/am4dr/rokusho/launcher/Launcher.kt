@@ -4,10 +4,11 @@ import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.Rokusho
 import com.github.am4dr.rokusho.app.Rokusho.Companion.isSupportedImageFile
 import com.github.am4dr.rokusho.app.SaveDataStoreProvider
+import com.github.am4dr.rokusho.app.library.RokushoLibrary
 import com.github.am4dr.rokusho.app.library.fs.FileSystemLibraryLoader
 import com.github.am4dr.rokusho.app.library.fs.LibraryRootDetector
+import com.github.am4dr.rokusho.app.library.toRokushoLibrary
 import com.github.am4dr.rokusho.app.savedata.store.yaml.YamlSaveDataStore
-import com.github.am4dr.rokusho.core.library.Library
 import com.github.am4dr.rokusho.core.library.filter
 import com.github.am4dr.rokusho.core.library.transform
 import com.github.am4dr.rokusho.dev.gui.RokushoViewer
@@ -27,10 +28,11 @@ class Launcher : Application() {
 
     private val rokusho = Rokusho()
     private val fsLoader = createFileSystemLibraryLoader()
-    private fun getLibrary(path: Path): Library<ImageUrl> =
+    private fun getLibrary(path: Path): RokushoLibrary<ImageUrl> =
             fsLoader.load(path).apply { autoSaveEnabled = true }
                     .filter { isSupportedImageFile(it) }
                     .transform { ImageUrl(it.toUri().toURL()) }
+                    .toRokushoLibrary(path.toString())
 
     companion object {
         @JvmStatic fun main(args: Array<String>) = Application.launch(Launcher::class.java, *args)
@@ -50,7 +52,7 @@ class Launcher : Application() {
     override fun start(stage: Stage) {
         stage.run {
             title = "Rokusho"
-            val rokushoGui = RokushoGui(rokusho, stage, { path -> rokusho.addLibrary(getLibrary(path)) }, { _ ->  })
+            val rokushoGui = RokushoGui(rokusho, stage, { path -> rokusho.addLibrary(getLibrary(path)) }, { it.save() })
             scene = Scene(rokushoGui.mainParent, 800.0, 500.0)
             show()
         }

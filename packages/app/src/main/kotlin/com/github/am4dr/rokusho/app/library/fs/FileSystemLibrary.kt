@@ -1,5 +1,6 @@
 package com.github.am4dr.rokusho.app.library.fs
 
+import com.github.am4dr.rokusho.app.library.RokushoLibrary
 import com.github.am4dr.rokusho.app.savedata.Item
 import com.github.am4dr.rokusho.app.savedata.ItemMetaData
 import com.github.am4dr.rokusho.app.savedata.SaveData
@@ -21,9 +22,10 @@ import java.nio.file.Path
  */
 class FileSystemLibrary(val root: Path,
                         private val store: SaveDataStore<SaveData>,
-                        private val librarySupport: LibrarySupport<Path> = LibrarySupport()) : Library<Path> {
+                        private val librarySupport: LibrarySupport<Path> = LibrarySupport()) : RokushoLibrary<Path> {
 
-    var autoSaveEnabled: Boolean = false
+    override val name: String = root.toString()
+    override var autoSaveEnabled: Boolean = false
 
     override val tags: ReadOnlyMapProperty<String, Tag> = ReadOnlyMapWrapper(librarySupport.tags).readOnlyProperty
     override val records: ReadOnlyListProperty<Record<Path>> = ReadOnlyListWrapper(toObservableList(librarySupport.records)).readOnlyProperty
@@ -33,7 +35,7 @@ class FileSystemLibrary(val root: Path,
         if (autoSaveEnabled) save()
     }
 
-    fun save() = store.save(toSaveData())
+    override fun save() = store.save(toSaveData())
 }
 
 internal fun FileSystemLibrary.toSaveData(): SaveData {

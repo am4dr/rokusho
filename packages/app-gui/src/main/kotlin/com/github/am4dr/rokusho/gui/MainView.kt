@@ -1,6 +1,6 @@
 package com.github.am4dr.rokusho.gui
 
-import com.github.am4dr.rokusho.core.library.Library
+import com.github.am4dr.rokusho.app.library.RokushoLibrary
 import com.github.am4dr.rokusho.gui.sidemenu.SideMenuIcon
 import com.github.am4dr.rokusho.gui.sidemenu.SimpleSideMenu
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
@@ -18,14 +18,14 @@ import javafx.scene.layout.HBox
 import java.lang.ref.SoftReference
 import java.util.*
 
-class MainView<T>(private val libraryIconFactory: (Library<T>) -> SideMenuIcon,
-                  private val libraryViewerFactory: (Library<T>) -> Node) : BorderPane() {
+class MainView<T>(private val libraryIconFactory: (RokushoLibrary<T>) -> SideMenuIcon,
+                  private val libraryViewerFactory: (RokushoLibrary<T>) -> Node) : BorderPane() {
 
-    val libraries: ReadOnlyListProperty<Library<T>> = SimpleListProperty(observableArrayList())
+    val libraries: ReadOnlyListProperty<RokushoLibrary<T>> = SimpleListProperty(observableArrayList())
     val onSaveClickedProperty: ObjectProperty<() -> Unit> = SimpleObjectProperty { }
     val openLibrarySelectorProperty: ObjectProperty<() -> Unit> = SimpleObjectProperty { }
 
-    val currentLibrary: ReadOnlyObjectProperty<Library<T>> = SimpleObjectProperty()
+    val currentLibrary: ReadOnlyObjectProperty<RokushoLibrary<T>> = SimpleObjectProperty()
 
 
     private val icons = TransformedList(libraries, this::createIcon)
@@ -57,10 +57,10 @@ class MainView<T>(private val libraryIconFactory: (Library<T>) -> SideMenuIcon,
         alignment = Pos.CENTER
     }
 
-    private val libraryViewCache = WeakHashMap(mutableMapOf<Library<*>, SoftReference<Node>>())
-    private fun getLibraryView(library: Library<T>): Node = libraryViewCache[library]?.get() ?: createLibraryViewAndCache(library)
-    private fun createLibraryViewAndCache(library: Library<T>): Node = libraryViewerFactory(library).also { libraryViewCache[library] = SoftReference(it) }
-    private fun createIcon(library: Library<T>): SideMenuIcon =
+    private val libraryViewCache = WeakHashMap(mutableMapOf<RokushoLibrary<*>, SoftReference<Node>>())
+    private fun getLibraryView(library: RokushoLibrary<T>): Node = libraryViewCache[library]?.get() ?: createLibraryViewAndCache(library)
+    private fun createLibraryViewAndCache(library: RokushoLibrary<T>): Node = libraryViewerFactory(library).also { libraryViewCache[library] = SoftReference(it) }
+    private fun createIcon(library: RokushoLibrary<T>): SideMenuIcon =
             libraryIconFactory(library).apply {
                 setOnMouseClicked {
                     libraryViewer.set(getLibraryView(library))
