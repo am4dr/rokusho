@@ -1,10 +1,10 @@
 package com.github.am4dr.rokusho.app.library.fs
 
+import com.github.am4dr.rokusho.app.datastore.DataStore
 import com.github.am4dr.rokusho.app.library.RokushoLibrary
 import com.github.am4dr.rokusho.app.savedata.Item
 import com.github.am4dr.rokusho.app.savedata.ItemMetaData
 import com.github.am4dr.rokusho.app.savedata.SaveData
-import com.github.am4dr.rokusho.app.savedata.store.SaveDataStore
 import com.github.am4dr.rokusho.core.library.*
 import com.github.am4dr.rokusho.core.library.helper.LibrarySupport
 import javafx.beans.property.ReadOnlyListProperty
@@ -15,7 +15,7 @@ import java.nio.file.Path
  * a implementation of [Library] based on [java.nio.file.FileSystem]
  */
 class FileSystemLibrary(val root: Path,
-                        private val store: SaveDataStore<SaveData>,
+                        private val store: DataStore<SaveData>,
                         private val library: Library<Path> = SimpleLibrary()) : RokushoLibrary<Path> {
 
     override val tags: ReadOnlyMapProperty<String, Tag> get() = library.tags

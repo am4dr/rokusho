@@ -4,11 +4,11 @@ import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.Rokusho
 import com.github.am4dr.rokusho.app.Rokusho.Companion.isSupportedImageFile
 import com.github.am4dr.rokusho.app.SaveDataStoreProvider
+import com.github.am4dr.rokusho.app.datastore.yaml.YamlSaveDataStore
 import com.github.am4dr.rokusho.app.library.RokushoLibrary
 import com.github.am4dr.rokusho.app.library.fs.FileSystemLibraryLoader
 import com.github.am4dr.rokusho.app.library.fs.LibraryRootDetector
 import com.github.am4dr.rokusho.app.library.toRokushoLibrary
-import com.github.am4dr.rokusho.app.savedata.store.yaml.YamlSaveDataStore
 import com.github.am4dr.rokusho.core.library.filter
 import com.github.am4dr.rokusho.core.library.transform
 import com.github.am4dr.rokusho.dev.gui.RokushoViewer

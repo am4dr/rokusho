@@ -1,14 +1,15 @@
-package com.github.am4dr.rokusho.app.savedata.store.yaml
+package com.github.am4dr.rokusho.app.savedata.yaml
 
+import com.github.am4dr.rokusho.app.datastore.Deserializer
+import com.github.am4dr.rokusho.app.datastore.yaml.YamlSaveDataDeserializer
 import com.github.am4dr.rokusho.app.savedata.SaveData
-import com.github.am4dr.rokusho.app.savedata.SaveDataDeserializer
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 class YamlSaveFileParserTest {
 
     companion object {
-        fun String.parse(): SaveDataDeserializer.Result<SaveData> =
+        fun String.parse(): Deserializer.Result<SaveData> =
                 YamlSaveDataDeserializer().deserialize(trimMargin().toByteArray())
     }
     @Test

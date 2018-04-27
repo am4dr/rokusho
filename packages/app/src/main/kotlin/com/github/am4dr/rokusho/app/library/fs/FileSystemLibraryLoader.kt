@@ -1,7 +1,7 @@
 package com.github.am4dr.rokusho.app.library.fs
 
+import com.github.am4dr.rokusho.app.datastore.DataStore
 import com.github.am4dr.rokusho.app.savedata.SaveData
-import com.github.am4dr.rokusho.app.savedata.store.SaveDataStore
 import java.io.IOException
 import java.nio.file.FileVisitResult
 import java.nio.file.FileVisitor
@@ -14,7 +14,7 @@ typealias LibraryRootDetector = (Path) -> Boolean
 
 class FileSystemLibraryLoader(
         private val libraryRootDetector: LibraryRootDetector,
-        private val saveDataStoreProvider: (Path) -> SaveDataStore<SaveData>,
+        private val saveDataStoreProvider: (Path) -> DataStore<SaveData>,
         private val collectDepthLimit: Int = 3 /* limit for safety */) {
 
     private val knownLibraries = mutableListOf<FileSystemLibrary>()

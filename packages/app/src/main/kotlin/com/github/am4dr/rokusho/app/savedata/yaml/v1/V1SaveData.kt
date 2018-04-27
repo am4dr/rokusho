@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.app.savedata.store.yaml.v1
+package com.github.am4dr.rokusho.app.savedata.yaml.v1
 
 import com.github.am4dr.rokusho.app.savedata.Item
 import com.github.am4dr.rokusho.app.savedata.ItemMetaData
@@ -13,6 +13,8 @@ data class ItemTagEntry(val id: String, val data: Map<String, Any> = mapOf())
 data class V1SaveData(val tags: List<TagEntry> = listOf(), val items: List<ItemEntry> = listOf()) {
 
     companion object {
+        val version: String = SaveData.Version.VERSION_1.stringValue
+
         fun from(data: SaveData): V1SaveData {
             val tags = data.tags.map { TagEntry(it.id, it.data) }
             val items = data.items.map { (id, meta) ->

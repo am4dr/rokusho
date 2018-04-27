@@ -1,12 +1,12 @@
-package com.github.am4dr.rokusho.app.savedata.store
+package com.github.am4dr.rokusho.app.datastore
 
-import com.github.am4dr.rokusho.app.savedata.SaveDataDeserializer
-import com.github.am4dr.rokusho.app.savedata.SaveDataSerializer
 import java.nio.file.Files
 import java.nio.file.Path
 
 // TODO expose save() is enabled or not
-class FileBasedSaveDataStore<T>(private val path: Path, private val serializer: SaveDataSerializer<T>, private val deserializer: SaveDataDeserializer<T>) : SaveDataStore<T> {
+class FileBasedDataStore<T>(private val path: Path,
+                            private val serializer: Serializer<T>,
+                            private val deserializer: Deserializer<T>) : DataStore<T> {
 
     @Volatile
     private var saveEnabled: Boolean = true
