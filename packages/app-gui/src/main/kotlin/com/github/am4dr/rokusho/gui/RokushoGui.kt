@@ -27,6 +27,7 @@ import java.io.File
 import java.nio.file.Path
 import java.util.function.Predicate
 
+// TODO remove save button
 class RokushoGui(val rokusho: Rokusho, val stage: Stage, val addLibraryFromPath: (Path) -> Unit, val saveLibrary: (Library<*>) -> Unit) {
 
     val mainParent: Parent  = createMainScene()
