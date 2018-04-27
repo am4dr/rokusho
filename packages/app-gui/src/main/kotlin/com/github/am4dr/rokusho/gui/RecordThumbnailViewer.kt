@@ -17,7 +17,7 @@ import javafx.scene.layout.StackPane
 import java.lang.ref.SoftReference
 import java.util.*
 
-class RecordThumbnailViewer<T>(thumbnailFactory: (Record<T>, Double, Double) -> ThumbnailFlowPane.Thumbnail,
+class RecordThumbnailViewer<T>(private val thumbnailFactory: (Record<T>, Double, Double) -> ThumbnailFlowPane.Thumbnail,
                                val thumbnailMaxWidth: Double = 500.0, val thumbnailMaxHeight: Double = 200.0) : StackPane() {
 
     val records: ReadOnlyListProperty<Record<T>> = SimpleListProperty(observableArrayList())
@@ -26,27 +26,42 @@ class RecordThumbnailViewer<T>(thumbnailFactory: (Record<T>, Double, Double) -> 
     val parserProperty: ObjectProperty<(String) -> ItemTag> = SimpleObjectProperty { text: String -> ItemTag(Tag(text, Tag.Type.TEXT, mapOf("value" to text)), null) }
     val tagNodeFactoryProperty: ObjectProperty<(ItemTag) -> TagView> = SimpleObjectProperty { tag: ItemTag -> TagNode(tag).view }
 
+    private val thumbnailCache = MutableValueCache(::createThumbnail)
+    private val thumbnails = TransformedList(records, thumbnailCache::getOrPut)
     init {
-        val thumbnailCache = WeakHashMap(mutableMapOf<Record<*>, SoftReference<ThumbnailFlowPane.Thumbnail>>())
+        children.add(ThumbnailFlowPane().apply {
+            thumbnails.bindContent(this@RecordThumbnailViewer.thumbnails)
+        })
+    }
 
-        fun createThumbnail(record: Record<T>): ThumbnailFlowPane.Thumbnail {
-            val thumbnail = thumbnailFactory(record, thumbnailMaxWidth, thumbnailMaxHeight)
-            return OverlayThumbnailDecorator(thumbnail, parserProperty.get(), tagNodeFactoryProperty.get()).apply {
-                tags.setAll(record.itemTags)
-                onEditEndedProperty.set { new -> updateTagsProperty.value?.invoke(record, new) }
-                setOnMouseClicked {
-                    onActionProperty.get()?.invoke(listOf(record))
-                }
+    private fun createThumbnail(record: Record<T>): ThumbnailFlowPane.Thumbnail {
+        val thumbnail = thumbnailFactory(record, thumbnailMaxWidth, thumbnailMaxHeight)
+        return OverlayThumbnailDecorator(thumbnail, parserProperty.get(), tagNodeFactoryProperty.get()).apply {
+            tags.setAll(record.itemTags)
+            onEditEndedProperty.set { new -> updateTagsProperty.value?.invoke(record, new) }
+            setOnMouseClicked {
+                onActionProperty.get()?.invoke(listOf(record))
             }
         }
-        fun createAndCacheThumbnail(record: Record<T>): ThumbnailFlowPane.Thumbnail =
-                createThumbnail(record).apply {
-                    thumbnailCache[record] = SoftReference(this)
-                }
-        fun getThumbnail(record: Record<T>): ThumbnailFlowPane.Thumbnail = thumbnailCache[record]?.get() ?: createAndCacheThumbnail(record)
+    }
 
-        children.add(ThumbnailFlowPane().apply {
-            thumbnails.value = TransformedList(records, ::getThumbnail)
-        })
+    /**
+     * @param K key which must be immutable class but must not be Flyweight pattern
+     * @param V value which may be mutable class
+     */
+    internal class MutableValueCache<K, V>(private val function: (K) -> V) {
+        private val cache = WeakHashMap(mutableMapOf<K, SoftReference<V>>())
+
+        operator fun get(key: K): V? {
+            // ignore K::equals because of the mutability of V
+            if (cache.keys.all { it !== key }) return  null
+            return cache[key]?.get()
+        }
+
+        fun getOrPut(key: K): V = get(key) ?: function(key).also { set(key, it) }
+
+        operator fun set(key: K, value: V) {
+            cache[key] = SoftReference(value)
+        }
     }
 }
