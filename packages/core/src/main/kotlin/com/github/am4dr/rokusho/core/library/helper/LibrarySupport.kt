@@ -3,12 +3,15 @@ package com.github.am4dr.rokusho.core.library.helper
 import com.github.am4dr.rokusho.core.library.ItemTag
 import com.github.am4dr.rokusho.core.library.Record
 import com.github.am4dr.rokusho.core.library.Tag
+import com.github.am4dr.rokusho.javafx.collection.toObservableList
 import javafx.collections.FXCollections
 import javafx.collections.MapChangeListener
+import javafx.collections.ObservableList
 import javafx.collections.ObservableMap
 
 class LibrarySupport<T>(records: List<Record<T>> = listOf(), tags: List<Tag> = listOf()) {
-    val records: ObservableMap<T, Record<T>> = records.associateByTo(FXCollections.observableHashMap(), Record<T>::key)
+    val recordMap: ObservableMap<T, Record<T>> = records.associateByTo(FXCollections.observableHashMap(), Record<T>::key)
+    val records: ObservableList<Record<T>> = toObservableList(recordMap)
     val tags: ObservableMap<String, Tag> = tags.associateByTo(FXCollections.observableHashMap(), Tag::id)
 
     private val recordsChangeListener = MapChangeListener<T, Record<T>> { c ->
@@ -23,7 +26,7 @@ class LibrarySupport<T>(records: List<Record<T>> = listOf(), tags: List<Tag> = l
     private val tagsChangeListener = MapChangeListener<String, Tag> { c ->
         if (!c.wasRemoved()) return@MapChangeListener
 
-        this.records.forEach { _, r ->
+        this.recordMap.forEach { _, r ->
             if (r.itemTags.any { it.tag == c.valueRemoved }) {
                 if (c.wasAdded()) {
                     updateTagInRecords(r, c.valueAdded)
@@ -35,7 +38,7 @@ class LibrarySupport<T>(records: List<Record<T>> = listOf(), tags: List<Tag> = l
         }
     }
     private fun updateTagInRecords(record: Record<T>, updated: Tag) {
-        this.records[record.key] = record.copy(itemTags = record.itemTags.map {
+        this.recordMap[record.key] = record.copy(itemTags = record.itemTags.map {
             if (it.tag.id == updated.id) {
                 it.copy(tag = updated)
             } else {
@@ -44,10 +47,14 @@ class LibrarySupport<T>(records: List<Record<T>> = listOf(), tags: List<Tag> = l
         })
     }
     private fun removeTagInRecords(record: Record<T>, removed: Tag) {
-        this.records[record.key] = record.copy(itemTags = record.itemTags.filter { it.tag != removed })
+        this.recordMap[record.key] = record.copy(itemTags = record.itemTags.filter { it.tag != removed })
     }
     init {
         this.tags.addListener(tagsChangeListener)
-        this.records.addListener(recordsChangeListener)
+        this.recordMap.addListener(recordsChangeListener)
+    }
+
+    fun updateItemTags(key: T, itemTags: Iterable<ItemTag>) {
+        recordMap[key] = Record(key, itemTags.toList())
     }
 }
