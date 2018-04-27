@@ -8,6 +8,8 @@ import com.github.am4dr.rokusho.gui.sidemenu.SideMenuIcon
 import com.github.am4dr.rokusho.gui.thumbnail.ImageThumbnail
 import com.github.am4dr.rokusho.javafx.function.bindLeft
 import javafx.beans.binding.Bindings
+import javafx.beans.binding.Bindings.createObjectBinding
+import javafx.beans.binding.When
 import javafx.beans.property.SimpleListProperty
 import javafx.collections.transformation.FilteredList
 import javafx.event.EventHandler
@@ -16,15 +18,19 @@ import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.control.Label
 import javafx.scene.control.ListView
+import javafx.scene.control.Tooltip
+import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.Background
 import javafx.scene.layout.BackgroundFill
 import javafx.scene.layout.CornerRadii
 import javafx.scene.paint.Color
+import javafx.scene.text.Font
 import javafx.stage.DirectoryChooser
 import javafx.stage.Stage
 import javafx.stage.Window
 import java.io.File
 import java.nio.file.Path
+import java.util.concurrent.Callable
 import java.util.function.Predicate
 
 // TODO remove save button
@@ -55,10 +61,23 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage, val addLibraryFromPath:
     }
 }
 
+// TODO move into SideMenuIcon and redesign
 private fun RokushoLibrary<ImageUrl>.toSideMenuIcon(): SideMenuIcon =
         SideMenuIcon().apply {
-            background = Background(BackgroundFill(Color.INDIANRED, CornerRadii(4.0), Insets.EMPTY))
-            children.add(Label("Lib: ${this@toSideMenuIcon.name}"))
+            Tooltip.install(this, Tooltip(name))
+            backgroundProperty().bind(When(selectedProperty)
+                    .then(Background(BackgroundFill(Color.INDIANRED, CornerRadii(4.0), Insets.EMPTY)))
+                    .otherwise(Background(BackgroundFill(Color.ANTIQUEWHITE, CornerRadii(4.0), Insets.EMPTY))))
+            val firstLetter = Label(this@toSideMenuIcon.shortName.first().toString()).apply {
+                fontProperty().bind(createObjectBinding(Callable { Font(size.get() * 0.7) }, size))
+            }
+            AnchorPane.setTopAnchor(firstLetter, 0.0)
+            AnchorPane.setLeftAnchor(firstLetter, 6.0)
+            val libLabel = Label("Lib:")
+            AnchorPane.setTopAnchor(libLabel, 0.0)
+            AnchorPane.setLeftAnchor(libLabel, 0.0)
+            val labels = AnchorPane(firstLetter, libLabel)
+            children.add(labels)
         }
 
 private fun createLibraryViewer(library: RokushoLibrary<ImageUrl>): Node {

@@ -21,6 +21,7 @@ class FileSystemLibrary(val root: Path,
     override val tags: ReadOnlyMapProperty<String, Tag> get() = library.tags
     override val records: ReadOnlyListProperty<Record<Path>> get() = library.records
     override val name: String = root.toString()
+    override val shortName: String = root.fileName.toString()
     override var autoSaveEnabled: Boolean = false
 
     override fun updateItemTags(key: Path, tags: Iterable<ItemTag>) {

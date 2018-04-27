@@ -5,9 +5,11 @@ import com.github.am4dr.rokusho.gui.sidemenu.SideMenuIcon
 import com.github.am4dr.rokusho.gui.sidemenu.SimpleSideMenu
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import javafx.beans.InvalidationListener
+import javafx.beans.binding.Bindings.createObjectBinding
 import javafx.beans.binding.When
 import javafx.beans.property.*
 import javafx.collections.FXCollections.observableArrayList
+import javafx.collections.ListChangeListener
 import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.control.Button
@@ -17,6 +19,7 @@ import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
 import java.lang.ref.SoftReference
 import java.util.*
+import java.util.concurrent.Callable
 
 class MainView<T>(private val libraryIconFactory: (RokushoLibrary<T>) -> SideMenuIcon,
                   private val libraryViewerFactory: (RokushoLibrary<T>) -> Node) : BorderPane() {
@@ -29,7 +32,9 @@ class MainView<T>(private val libraryIconFactory: (RokushoLibrary<T>) -> SideMen
 
 
     private val icons = TransformedList(libraries, this::createIcon)
-    private val libraryViewer = SimpleObjectProperty<Node>()
+    private val libraryViewer = SimpleObjectProperty<Node>().apply {
+        bind(createObjectBinding(Callable { currentLibrary.get()?.let(::getLibraryView) }, currentLibrary))
+    }
     private val sideMenu = SimpleSideMenu({ openLibrarySelectorProperty.get()?.invoke() }).apply {
         width.set(40.0)
     }
@@ -43,6 +48,15 @@ class MainView<T>(private val libraryIconFactory: (RokushoLibrary<T>) -> SideMen
         left = sideMenu
         icons.addListener(InvalidationListener {
             sideMenu.setIcons(icons)
+        })
+        libraries.addListener(ListChangeListener {
+            while (it.next()) {
+                if (it.wasAdded()) {
+                    it.addedSubList.last()?.let { lib ->
+                        (currentLibrary as SimpleObjectProperty).set(lib)
+                    }
+                }
+            }
         })
 
         val directorySelectorPane = createDirectorySelectorPane()
@@ -62,8 +76,8 @@ class MainView<T>(private val libraryIconFactory: (RokushoLibrary<T>) -> SideMen
     private fun createLibraryViewAndCache(library: RokushoLibrary<T>): Node = libraryViewerFactory(library).also { libraryViewCache[library] = SoftReference(it) }
     private fun createIcon(library: RokushoLibrary<T>): SideMenuIcon =
             libraryIconFactory(library).apply {
+                selectedProperty.bind(currentLibrary.isEqualTo(library))
                 setOnMouseClicked {
-                    libraryViewer.set(getLibraryView(library))
                     (currentLibrary as SimpleObjectProperty).set(library)
                 }
             }

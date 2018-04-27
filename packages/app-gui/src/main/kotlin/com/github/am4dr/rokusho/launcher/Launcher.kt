@@ -32,7 +32,7 @@ class Launcher : Application() {
             fsLoader.load(path).let { base ->
                 base.filter { isSupportedImageFile(it) }
                         .transform { ImageUrl(it.toUri().toURL()) }
-                        .toRokushoLibrary(path.toString(), base::save)
+                        .toRokushoLibrary(path.toString(), base.shortName, base::save)
             }
 
     companion object {
