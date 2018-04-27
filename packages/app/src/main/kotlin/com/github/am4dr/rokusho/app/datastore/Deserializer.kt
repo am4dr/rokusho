@@ -1,6 +1,6 @@
-package com.github.am4dr.rokusho.app.savedata
+package com.github.am4dr.rokusho.app.datastore
 
-interface SaveDataDeserializer<T> {
+interface Deserializer<T> {
 
     fun deserialize(bytes: ByteArray): Result<T>
 

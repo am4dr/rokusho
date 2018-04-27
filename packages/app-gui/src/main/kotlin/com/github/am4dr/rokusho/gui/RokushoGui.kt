@@ -2,7 +2,7 @@ package com.github.am4dr.rokusho.gui
 
 import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.Rokusho
-import com.github.am4dr.rokusho.core.library.Library
+import com.github.am4dr.rokusho.app.library.RokushoLibrary
 import com.github.am4dr.rokusho.core.library.Record
 import com.github.am4dr.rokusho.gui.sidemenu.SideMenuIcon
 import com.github.am4dr.rokusho.gui.thumbnail.ImageThumbnail
@@ -27,7 +27,8 @@ import java.io.File
 import java.nio.file.Path
 import java.util.function.Predicate
 
-class RokushoGui(val rokusho: Rokusho, val stage: Stage, val addLibraryFromPath: (Path) -> Unit, val saveLibrary: (Library<*>) -> Unit) {
+// TODO remove save button
+class RokushoGui(val rokusho: Rokusho, val stage: Stage, val addLibraryFromPath: (Path) -> Unit, val saveLibrary: (RokushoLibrary<*>) -> Unit) {
 
     val mainParent: Parent  = createMainScene()
 
@@ -54,13 +55,13 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage, val addLibraryFromPath:
     }
 }
 
-private fun Library<ImageUrl>.toSideMenuIcon(): SideMenuIcon =
+private fun RokushoLibrary<ImageUrl>.toSideMenuIcon(): SideMenuIcon =
         SideMenuIcon().apply {
             background = Background(BackgroundFill(Color.INDIANRED, CornerRadii(4.0), Insets.EMPTY))
-            children.add(Label("Lib: ${System.identityHashCode(this@toSideMenuIcon)}"))
+            children.add(Label("Lib: ${this@toSideMenuIcon.name}"))
         }
 
-private fun createLibraryViewer(library: Library<ImageUrl>): Node {
+private fun createLibraryViewer(library: RokushoLibrary<ImageUrl>): Node {
     val viewer = RecordsViewerContainer<ImageUrl>()
 
     val recordFilter = { input: String? ->

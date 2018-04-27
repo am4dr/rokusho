@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.app.savedata.store.yaml.v1
+package com.github.am4dr.rokusho.app.savedata.yaml.v1
 
 import com.github.am4dr.rokusho.app.savedata.Item
 import com.github.am4dr.rokusho.app.savedata.ItemMetaData
@@ -34,7 +34,7 @@ data class V1SaveData(val tags: List<TagEntry> = listOf(), val items: List<ItemE
         val sdTags = tags.distinctBy(TagEntry::id).map { Tag(it.id, detectTagType(it.data), it.data) }
         val sdTagMap = sdTags.map { it.id to it }.toMap()
         val sdItems = items.distinctBy(ItemEntry::id).map { Item(it.id, it.tags.toItemMetaData(sdTagMap)) }
-        return SaveData(SaveData.Version.VERSION_1, sdTags, sdItems)
+        return SaveData(sdTags, sdItems)
     }
 }
 

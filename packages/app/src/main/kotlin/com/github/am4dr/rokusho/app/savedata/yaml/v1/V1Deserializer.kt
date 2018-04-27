@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.app.savedata.store.yaml.v1
+package com.github.am4dr.rokusho.app.savedata.yaml.v1
 
 
 fun parse(data: Map<*, *>): V1SaveData = V1SaveData(extractTags(data), extractItems(data))
