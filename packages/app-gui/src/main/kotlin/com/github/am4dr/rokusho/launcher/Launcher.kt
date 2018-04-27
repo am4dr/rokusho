@@ -29,10 +29,11 @@ class Launcher : Application() {
     private val rokusho = Rokusho()
     private val fsLoader = createFileSystemLibraryLoader()
     private fun getLibrary(path: Path): RokushoLibrary<ImageUrl> =
-            fsLoader.load(path).apply { autoSaveEnabled = true }
-                    .filter { isSupportedImageFile(it) }
-                    .transform { ImageUrl(it.toUri().toURL()) }
-                    .toRokushoLibrary(path.toString())
+            fsLoader.load(path).let { base ->
+                base.filter { isSupportedImageFile(it) }
+                        .transform { ImageUrl(it.toUri().toURL()) }
+                        .toRokushoLibrary(path.toString(), base::save)
+            }
 
     companion object {
         @JvmStatic fun main(args: Array<String>) = Application.launch(Launcher::class.java, *args)

@@ -12,4 +12,4 @@ class RokushoLibraryWrapper<T>(override val name: String,
     }
 }
 
-fun <T> Library<T>.toRokushoLibrary(name: String): RokushoLibrary<T> = RokushoLibraryWrapper(name, this)
+fun <T> Library<T>.toRokushoLibrary(name: String, save: () -> Unit = {}): RokushoLibrary<T> = RokushoLibraryWrapper(name, this, save)
