@@ -36,7 +36,7 @@ class RecordThumbnailViewer<T>(private val thumbnailFactory: (Record<T>, Double,
 
     private fun createThumbnail(record: Record<T>): ThumbnailFlowPane.Thumbnail {
         val thumbnail = thumbnailFactory(record, thumbnailMaxWidth, thumbnailMaxHeight)
-        return OverlayThumbnailDecorator(thumbnail, parserProperty.get(), tagNodeFactoryProperty.get()).apply {
+        return OverlayThumbnailDecorator(thumbnail, parserProperty.get(), tagNodeFactoryProperty.get(), false).apply {
             tags.setAll(record.itemTags)
             onEditEndedProperty.set { new -> updateTagsProperty.value?.invoke(record, new) }
             setOnMouseClicked {

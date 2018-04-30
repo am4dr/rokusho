@@ -14,11 +14,13 @@ import javafx.collections.ObservableList
 import javafx.scene.layout.Region
 import javafx.scene.layout.StackPane
 import java.util.concurrent.Callable
+import java.util.concurrent.atomic.AtomicBoolean
 
 // TODO extract tag collection editor
 class OverlayThumbnailDecorator(private val content: ThumbnailFlowPane.Thumbnail,
                                 tagParser: (String) -> ItemTag,
-                                tagNodeFactory: (ItemTag) -> TagView) : StackPane(), ThumbnailFlowPane.Thumbnail {
+                                tagNodeFactory: (ItemTag) -> TagView,
+                                applyImmediately: Boolean = true) : StackPane(), ThumbnailFlowPane.Thumbnail {
 
     override val view: OverlayThumbnailDecorator = this
     override val loadedProperty: ReadOnlyBooleanProperty get() = content.loadedProperty
@@ -28,15 +30,15 @@ class OverlayThumbnailDecorator(private val content: ThumbnailFlowPane.Thumbnail
 
     private val pendingTags = observableArrayList<ItemTag>()
     private val allTags = ConcatenatedList.concat(tags, pendingTags)
-    private val tagNodes = TransformedList(allTags) {
+    private val tagNodes by lazy { TransformedList(allTags) {
         tagNodeFactory(it).apply {
             onRemoved = {
                 pendingTags.remove(it) || tags.remove(it)
                 invokeOnEditEnded()
             }
         }
-    }
-    private val overlay = ThumbnailOverlay().apply {
+    } }
+    private val overlay by lazy { ThumbnailOverlay().apply {
         Bindings.bindContent(tagNodes, this@OverlayThumbnailDecorator.tagNodes)
         visibleProperty().bind(this@OverlayThumbnailDecorator.hoverProperty().or(inputFocusedProperty))
         val contentBounds = content.view.boundsInParentProperty()
@@ -45,9 +47,26 @@ class OverlayThumbnailDecorator(private val content: ThumbnailFlowPane.Thumbnail
         setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE)
         onInputCommittedProperty.set { pendingTags.add(tagParser(it)) }
         onEditEndedProperty.bind(createObjectBinding(Callable { { invokeOnEditEnded() } }, this@OverlayThumbnailDecorator.onEditEndedProperty))
+    } }
+    private val overlayApplied = AtomicBoolean(false)
+    private fun applyOverlay() {
+        if (overlayApplied.get()) return
+
+        synchronized(overlayApplied) {
+            children.add(overlay)
+            overlayApplied.set(true)
+        }
     }
     init {
-        children.addAll(content.view, overlay)
+        children.addAll(content.view)
+        if (applyImmediately) {
+            applyOverlay()
+        }
+        else {
+            setOnMouseEntered {
+                applyOverlay()
+            }
+        }
     }
 
     private fun invokeOnEditEnded() {
