@@ -80,26 +80,29 @@ private fun RokushoLibrary<ImageUrl>.toSideMenuIcon(): SideMenuIcon =
             children.add(labels)
         }
 
-private fun createLibraryViewer(library: RokushoLibrary<ImageUrl>): Node {
-    val viewer = RecordsViewerContainer<ImageUrl>()
-
-    val recordFilter = { input: String? ->
-        Predicate { item: Record<*> ->
-            if (input == null || input == "") true
-            else item.itemTags.any { it.tag.id.contains(input) }
-        }
-    }.bindLeft(viewer.filterProperty)
-
-    viewer.apply {
-        records.bind(SimpleListProperty(FilteredList(library.records).apply { predicateProperty().bind(recordFilter) }))
-        totalCount.bind(Bindings.size(library.records))
-        filteredCount.bind(Bindings.size(records))
+private val byTagNameRecordFilterFactory = { input: String? ->
+    Predicate { item: Record<*> ->
+        if (input == null || input == "") true
+        else item.itemTags.any { it.tag.id.contains(input) }
     }
+}
 
-    val listViewer = ListView<Record<Any>>()
-    Bindings.bindContent(listViewer.items, viewer.records)
-    viewer.add("リスト", listViewer)
+private fun createLibraryViewer(library: RokushoLibrary<ImageUrl>): Node = RecordsViewerContainer<ImageUrl>().apply {
+    records.bind(SimpleListProperty(FilteredList(library.records).apply {
+        val recordFilter = byTagNameRecordFilterFactory.bindLeft(filterProperty)
+        predicateProperty().bind(recordFilter)
+    }))
+    totalCount.bind(Bindings.size(library.records))
+    filteredCount.bind(Bindings.size(records))
 
+    add("リスト", createListRecordsViewer(this))
+    add("サムネイル", createThumbnailRecordsViewer(library, this))
+}
+
+private fun <T> createListRecordsViewer(container: RecordsViewerContainer<T>): Node =
+        ListView<Record<T>>().also { Bindings.bindContent(it.items, container.records) }
+
+private fun createThumbnailRecordsViewer(library: RokushoLibrary<ImageUrl>, container: RecordsViewerContainer<ImageUrl>): Node {
     val imageLoader = UrlImageLoader()
     val thumbnailMaxWidth = 500.0
     val thumbnailMaxHeight = 200.0
@@ -108,7 +111,7 @@ private fun createLibraryViewer(library: RokushoLibrary<ImageUrl>): Node {
     })
     val (thumbnailViewer) = ImageOverlay.attach(thumbnailPane).also { (_, thumbnailPane, overlay) ->
         thumbnailPane.apply {
-            records.bindContent(viewer.records)
+            records.bindContent(container.records)
             onActionProperty.set {
                 overlay.imageProperty.value = imageLoader.getImage(it.first().key.url)
                 overlay.isVisible = true
@@ -121,7 +124,5 @@ private fun createLibraryViewer(library: RokushoLibrary<ImageUrl>): Node {
             background = Background(BackgroundFill(Color.rgb(30, 30, 30, 0.75), null, null))
         }
     }
-    viewer.add("サムネイル", thumbnailViewer)
-
-    return viewer
+    return thumbnailViewer
 }
