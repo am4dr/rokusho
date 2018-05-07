@@ -101,8 +101,10 @@ private fun createLibraryViewer(library: RokushoLibrary<ImageUrl>): Node {
     viewer.add("リスト", listViewer)
 
     val imageLoader = UrlImageLoader()
-    val thumbnailPane = RecordThumbnailViewer<ImageUrl>({ record, width, height ->
-        ImageThumbnail(imageLoader.getImage(record.key.url, width, height, true))
+    val thumbnailMaxWidth = 500.0
+    val thumbnailMaxHeight = 200.0
+    val thumbnailPane = RecordThumbnailViewer<ImageUrl>({ record ->
+        ImageThumbnail(imageLoader.getImage(record.key.url, thumbnailMaxWidth, thumbnailMaxHeight, true))
     })
     val (thumbnailViewer) = ImageOverlay.attach(thumbnailPane).also { (_, thumbnailPane, overlay) ->
         thumbnailPane.apply {
