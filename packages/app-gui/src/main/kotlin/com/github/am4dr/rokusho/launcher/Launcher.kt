@@ -3,6 +3,10 @@ package com.github.am4dr.rokusho.launcher
 import com.github.am4dr.rokusho.app.ImageLibraryLoader
 import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.Rokusho
+import com.github.am4dr.rokusho.app.SaveDataStoreProvider
+import com.github.am4dr.rokusho.app.datastore.yaml.YamlSaveDataStore
+import com.github.am4dr.rokusho.app.library.fs.FileSystemLibraryLoader
+import com.github.am4dr.rokusho.app.library.fs.LibraryRootDetector
 import com.github.am4dr.rokusho.dev.gui.RokushoViewer
 import com.github.am4dr.rokusho.gui.RokushoGui
 import javafx.application.Application
@@ -18,7 +22,7 @@ import java.nio.file.Paths
 
 class Launcher : Application() {
 
-    private val rokusho = Rokusho(listOf(ImageLibraryLoader()))
+    private val rokusho = Rokusho(listOf(ImageLibraryLoader(createFileSystemLibraryLoader())))
 
     companion object {
         @JvmStatic fun main(args: Array<String>) = Application.launch(Launcher::class.java, *args)
@@ -51,4 +55,11 @@ class Launcher : Application() {
             }
         }.show()
     }
+}
+
+private fun createFileSystemLibraryLoader(): FileSystemLibraryLoader {
+    val saveFileName = "rokusho.yaml"
+    val libraryRootDetector: LibraryRootDetector = { path -> Files.isRegularFile(path.resolve(saveFileName)) }
+    val saveDataStoreProvider = SaveDataStoreProvider { YamlSaveDataStore(it.resolve(saveFileName)) }
+    return FileSystemLibraryLoader(libraryRootDetector, saveDataStoreProvider::getOrCreate)
 }
