@@ -31,7 +31,7 @@ class RokushoViewer(val rokusho: Rokusho) {
         return Scene(libraryList, w, h)
     }
 
-    private class LibraryListCell<T>(library: RokushoLibrary<T>) : FlowPane() {
+    private class LibraryListCell<T : Any>(library: RokushoLibrary<T>) : FlowPane() {
         init {
             children.addAll(
                     Hyperlink("tags").apply {

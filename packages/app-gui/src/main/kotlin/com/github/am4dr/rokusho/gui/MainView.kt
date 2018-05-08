@@ -21,8 +21,8 @@ import java.lang.ref.SoftReference
 import java.util.*
 import java.util.concurrent.Callable
 
-class MainView<T>(private val libraryIconFactory: (RokushoLibrary<T>) -> SideMenuIcon,
-                  private val libraryViewerFactory: (RokushoLibrary<T>) -> Node) : BorderPane() {
+class MainView<T : Any>(private val libraryIconFactory: (RokushoLibrary<T>) -> SideMenuIcon,
+                        private val libraryViewerFactory: (RokushoLibrary<T>) -> Node) : BorderPane() {
 
     val libraries: ReadOnlyListProperty<RokushoLibrary<T>> = SimpleListProperty(observableArrayList())
     val onSaveClickedProperty: ObjectProperty<() -> Unit> = SimpleObjectProperty { }
