@@ -10,6 +10,7 @@ import com.github.am4dr.rokusho.core.library.helper.LibrarySupport
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyMapProperty
 import java.nio.file.Path
+import kotlin.reflect.KClass
 
 /**
  * a implementation of [Library] based on [java.nio.file.FileSystem]
@@ -18,6 +19,7 @@ class FileSystemLibrary(val root: Path,
                         private val store: DataStore<SaveData>,
                         private val library: Library<Path> = SimpleLibrary()) : RokushoLibrary<Path> {
 
+    override val type: KClass<Path> = Path::class
     override val tags: ReadOnlyMapProperty<String, Tag> get() = library.tags
     override val records: ReadOnlyListProperty<Record<Path>> get() = library.records
     override val name: String = root.toString()
