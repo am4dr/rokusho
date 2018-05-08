@@ -7,7 +7,7 @@ import javafx.collections.FXCollections
 import java.nio.file.Files
 import java.nio.file.Path
 
-class Rokusho {
+class Rokusho(val loaders: List<LibraryLoader<*, ImageUrl>>) {
 
     companion object {
         private val imageFileNameMatcher = Regex(".*\\.(bmp|gif|jpe?g|png)$", RegexOption.IGNORE_CASE)
@@ -22,4 +22,24 @@ class Rokusho {
             _libraries.add(library)
         }
     }
+
+    fun getLibraryLoader(name: String): LibraryLoader<*, ImageUrl>? = loaders.find { it.name == name || it::class.java.name == name }
+
+    fun loadAndAddLibrary(name: String, specifier: String): RokushoLibrary<ImageUrl>? =
+            try {
+                getLibraryLoader(name)?.load(specifier)?.also(::addLibrary)
+            } catch (t: Throwable) {
+                t.printStackTrace()
+                null
+            }
+
+    inline fun <reified T : LibraryLoader<*, *>> getLibraryLoader(): T? = loaders.find { it is T }?.let { it as T }
+
+    inline fun <reified S, reified L : LibraryLoader<S, ImageUrl>> loadAndAddLibrary(specifier: S): RokushoLibrary<ImageUrl>? =
+            try {
+                getLibraryLoader<L>()?.load(specifier)?.also(::addLibrary)
+            } catch (t: Throwable) {
+                t.printStackTrace()
+                null
+            }
 }
