@@ -32,6 +32,7 @@ import java.io.File
 import java.nio.file.Path
 import java.util.concurrent.Callable
 import java.util.function.Predicate
+import kotlin.reflect.KClass
 
 // TODO remove save button
 class RokushoGui(val rokusho: Rokusho, val stage: Stage, val addLibraryFromPath: (Path) -> Unit, val saveLibrary: (RokushoLibrary<*>) -> Unit) {
@@ -62,7 +63,7 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage, val addLibraryFromPath:
 }
 
 // TODO move into SideMenuIcon and redesign
-private fun RokushoLibrary<ImageUrl>.toSideMenuIcon(): SideMenuIcon =
+private fun RokushoLibrary<*>.toSideMenuIcon(): SideMenuIcon =
         SideMenuIcon().apply {
             Tooltip.install(this, Tooltip(name))
             backgroundProperty().bind(When(selectedProperty)
@@ -87,7 +88,13 @@ private val byTagNameRecordFilterFactory = { input: String? ->
     }
 }
 
-private fun createLibraryViewer(library: RokushoLibrary<ImageUrl>): Node = RecordsViewerContainer<ImageUrl>().apply {
+private fun createLibraryViewer(library: RokushoLibrary<*>): Node = createLibraryViewer(library.type, library)
+
+private fun <T : Any> createLibraryViewer(type: KClass<T>, library: RokushoLibrary<*>): Node = RecordsViewerContainer<T>().apply {
+    assert(type == library.type)
+    @Suppress("UNCHECKED_CAST")
+    library as RokushoLibrary<T>
+
     records.bind(SimpleListProperty(FilteredList(library.records).apply {
         val recordFilter = byTagNameRecordFilterFactory.bindLeft(filterProperty)
         predicateProperty().bind(recordFilter)
@@ -96,7 +103,12 @@ private fun createLibraryViewer(library: RokushoLibrary<ImageUrl>): Node = Recor
     filteredCount.bind(Bindings.size(records))
 
     add("リスト", createListRecordsViewer(this))
-    add("サムネイル", createThumbnailRecordsViewer(library, this))
+    @Suppress("UNCHECKED_CAST")
+    if (library.type == ImageUrl::class) {
+        library as RokushoLibrary<ImageUrl>
+        this as RecordsViewerContainer<ImageUrl>
+        add("サムネイル", createThumbnailRecordsViewer(library, this))
+    }
 }
 
 private fun <T> createListRecordsViewer(container: RecordsViewerContainer<T>): Node =

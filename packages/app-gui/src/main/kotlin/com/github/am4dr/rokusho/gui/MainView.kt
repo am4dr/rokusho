@@ -21,14 +21,14 @@ import java.lang.ref.SoftReference
 import java.util.*
 import java.util.concurrent.Callable
 
-class MainView<T : Any>(private val libraryIconFactory: (RokushoLibrary<T>) -> SideMenuIcon,
-                        private val libraryViewerFactory: (RokushoLibrary<T>) -> Node) : BorderPane() {
+class MainView(private val libraryIconFactory: (RokushoLibrary<*>) -> SideMenuIcon,
+                        private val libraryViewerFactory: (RokushoLibrary<*>) -> Node) : BorderPane() {
 
-    val libraries: ReadOnlyListProperty<RokushoLibrary<T>> = SimpleListProperty(observableArrayList())
+    val libraries: ReadOnlyListProperty<RokushoLibrary<*>> = SimpleListProperty(observableArrayList())
     val onSaveClickedProperty: ObjectProperty<() -> Unit> = SimpleObjectProperty { }
     val openLibrarySelectorProperty: ObjectProperty<() -> Unit> = SimpleObjectProperty { }
 
-    val currentLibrary: ReadOnlyObjectProperty<RokushoLibrary<T>> = SimpleObjectProperty()
+    val currentLibrary: ReadOnlyObjectProperty<RokushoLibrary<*>> = SimpleObjectProperty()
 
 
     private val icons = TransformedList(libraries, this::createIcon)
@@ -72,9 +72,9 @@ class MainView<T : Any>(private val libraryIconFactory: (RokushoLibrary<T>) -> S
     }
 
     private val libraryViewCache = WeakHashMap(mutableMapOf<RokushoLibrary<*>, SoftReference<Node>>())
-    private fun getLibraryView(library: RokushoLibrary<T>): Node = libraryViewCache[library]?.get() ?: createLibraryViewAndCache(library)
-    private fun createLibraryViewAndCache(library: RokushoLibrary<T>): Node = libraryViewerFactory(library).also { libraryViewCache[library] = SoftReference(it) }
-    private fun createIcon(library: RokushoLibrary<T>): SideMenuIcon =
+    private fun getLibraryView(library: RokushoLibrary<*>): Node = libraryViewCache[library]?.get() ?: createLibraryViewAndCache(library)
+    private fun createLibraryViewAndCache(library: RokushoLibrary<*>): Node = libraryViewerFactory(library).also { libraryViewCache[library] = SoftReference(it) }
+    private fun createIcon(library: RokushoLibrary<*>): SideMenuIcon =
             libraryIconFactory(library).apply {
                 selectedProperty.bind(currentLibrary.isEqualTo(library))
                 setOnMouseClicked {

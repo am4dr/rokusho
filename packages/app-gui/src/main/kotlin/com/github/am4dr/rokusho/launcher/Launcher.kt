@@ -1,6 +1,7 @@
 package com.github.am4dr.rokusho.launcher
 
 import com.github.am4dr.rokusho.app.ImageLibraryLoader
+import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.Rokusho
 import com.github.am4dr.rokusho.dev.gui.RokushoViewer
 import com.github.am4dr.rokusho.gui.RokushoGui
@@ -24,12 +25,14 @@ class Launcher : Application() {
         private val log = LoggerFactory.getLogger(Launcher::class.java)
     }
 
+    private fun loadImageLibrary(path: Path) { rokusho.loadAndAddLibrary<Path, ImageUrl, ImageLibraryLoader>(path) }
+
     override fun init() {
         log.info("launched with the params: ${parameters.raw}")
         parseArgs(parameters.raw.toTypedArray()).args
                 .map { Paths.get(it) }
                 .filter { Files.isDirectory(it) }
-                .forEach { rokusho.loadAndAddLibrary<Path, ImageLibraryLoader>(it) }
+                .forEach { loadImageLibrary(it) }
     }
 
     private fun parseArgs(args: Array<String>): CommandLine = DefaultParser().parse(Options(), args)
@@ -37,7 +40,7 @@ class Launcher : Application() {
     override fun start(stage: Stage) {
         stage.run {
             title = "Rokusho"
-            val rokushoGui = RokushoGui(rokusho, stage, { path -> rokusho.loadAndAddLibrary<Path, ImageLibraryLoader>(path) }, { it.save() })
+            val rokushoGui = RokushoGui(rokusho, stage, ::loadImageLibrary, { it.save() })
             scene = Scene(rokushoGui.mainParent, 800.0, 500.0)
             show()
         }
