@@ -6,6 +6,7 @@ import javafx.beans.property.ReadOnlyListWrapper
 import javafx.collections.FXCollections
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.reflect.KClass
 
 class Rokusho(val loaders: List<LibraryLoader<*, *>>) {
 
@@ -33,9 +34,9 @@ class Rokusho(val loaders: List<LibraryLoader<*, *>>) {
                 null
             }
 
-    inline fun <reified T : LibraryLoader<*, *>> getLibraryLoader(): T? = loaders.find { it is T }?.let { it as T }
+    inline fun <reified L : LibraryLoader<*, *>> getLibraryLoader(): L? = loaders.find { it is L }?.let { it as L }
 
-    inline fun <S, T : Any, reified L : LibraryLoader<S, T>> loadAndAddLibrary(specifier: S): RokushoLibrary<T>? =
+    inline fun <reified L : LibraryLoader<S, T>, S, T : Any> loadAndAddLibrary(type: KClass<L>, specifier: S): RokushoLibrary<T>? =
             try {
                 getLibraryLoader<L>()?.load(specifier)?.also(::addLibrary)
             } catch (t: Throwable) {
