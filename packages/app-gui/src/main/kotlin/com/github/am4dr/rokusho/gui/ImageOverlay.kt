@@ -14,10 +14,10 @@ import javafx.scene.layout.VBox
 class ImageOverlay : VBox() {
 
     companion object {
-        fun <T : Node> attach(node: T): Triple<StackPane, T, ImageOverlay> {
+        fun <T : Node> attach(node: T): Pair<StackPane, ImageOverlay> {
             val overlay = ImageOverlay()
             val stackPane = StackPane(node, overlay)
-            return Triple(stackPane, node, overlay)
+            return stackPane to overlay
         }
     }
 

@@ -1,23 +1,21 @@
 package com.github.am4dr.rokusho.gui
 
-import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.Rokusho
 import com.github.am4dr.rokusho.app.library.RokushoLibrary
 import com.github.am4dr.rokusho.core.library.Record
 import com.github.am4dr.rokusho.gui.sidemenu.SideMenuIcon
-import com.github.am4dr.rokusho.gui.thumbnail.ImageThumbnail
+import com.github.am4dr.rokusho.gui.viewer.RecordsViewerContainer
+import com.github.am4dr.rokusho.gui.viewer.RecordsViewerFactory
 import com.github.am4dr.rokusho.javafx.function.bindLeft
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.Bindings.createObjectBinding
 import javafx.beans.binding.When
 import javafx.beans.property.SimpleListProperty
 import javafx.collections.transformation.FilteredList
-import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.control.Label
-import javafx.scene.control.ListView
 import javafx.scene.control.Tooltip
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.Background
@@ -35,7 +33,11 @@ import java.util.function.Predicate
 import kotlin.reflect.KClass
 
 // TODO remove save button
-class RokushoGui(val rokusho: Rokusho, val stage: Stage, val addLibraryFromPath: (Path) -> Unit, val saveLibrary: (RokushoLibrary<*>) -> Unit) {
+class RokushoGui(val rokusho: Rokusho,
+                 val stage: Stage,
+                 val addLibraryFromPath: (Path) -> Unit,
+                 val saveLibrary: (RokushoLibrary<*>) -> Unit,
+                 val recordsViewerFactories: List<RecordsViewerFactory>) {
 
     val mainParent: Parent  = createMainScene()
 
@@ -60,6 +62,33 @@ class RokushoGui(val rokusho: Rokusho, val stage: Stage, val addLibraryFromPath:
             }
         }
     }
+
+    private fun createLibraryViewer(library: RokushoLibrary<*>): Node = createLibraryViewer(library.type, library)
+
+    private fun <T : Any> createLibraryViewer(type: KClass<T>, library: RokushoLibrary<*>): Node = RecordsViewerContainer<T>().apply {
+        assert(type == library.type)
+        @Suppress("UNCHECKED_CAST")
+        library as RokushoLibrary<T>
+
+        records.bind(SimpleListProperty(FilteredList(library.records).apply {
+            val recordFilter = byTagNameRecordFilterFactory.bindLeft(filterProperty)
+            predicateProperty().bind(recordFilter)
+        }))
+        totalCount.bind(Bindings.size(library.records))
+        filteredCount.bind(Bindings.size(records))
+
+        recordsViewerFactories
+                .filter { it.acceptable(library.type) }
+                .map { it.create(library, this) }
+                .forEach { add(it) }
+    }
+}
+
+private val byTagNameRecordFilterFactory = { input: String? ->
+    Predicate { item: Record<*> ->
+        if (input == null || input == "") true
+        else item.itemTags.any { it.tag.id.contains(input) }
+    }
 }
 
 // TODO move into SideMenuIcon and redesign
@@ -80,61 +109,3 @@ private fun RokushoLibrary<*>.toSideMenuIcon(): SideMenuIcon =
             val labels = AnchorPane(firstLetter, libLabel)
             children.add(labels)
         }
-
-private val byTagNameRecordFilterFactory = { input: String? ->
-    Predicate { item: Record<*> ->
-        if (input == null || input == "") true
-        else item.itemTags.any { it.tag.id.contains(input) }
-    }
-}
-
-private fun createLibraryViewer(library: RokushoLibrary<*>): Node = createLibraryViewer(library.type, library)
-
-private fun <T : Any> createLibraryViewer(type: KClass<T>, library: RokushoLibrary<*>): Node = RecordsViewerContainer<T>().apply {
-    assert(type == library.type)
-    @Suppress("UNCHECKED_CAST")
-    library as RokushoLibrary<T>
-
-    records.bind(SimpleListProperty(FilteredList(library.records).apply {
-        val recordFilter = byTagNameRecordFilterFactory.bindLeft(filterProperty)
-        predicateProperty().bind(recordFilter)
-    }))
-    totalCount.bind(Bindings.size(library.records))
-    filteredCount.bind(Bindings.size(records))
-
-    add("リスト", createListRecordsViewer(this))
-    @Suppress("UNCHECKED_CAST")
-    if (library.type == ImageUrl::class) {
-        library as RokushoLibrary<ImageUrl>
-        this as RecordsViewerContainer<ImageUrl>
-        add("サムネイル", createThumbnailRecordsViewer(library, this))
-    }
-}
-
-private fun <T> createListRecordsViewer(container: RecordsViewerContainer<T>): Node =
-        ListView<Record<T>>().also { Bindings.bindContent(it.items, container.records) }
-
-private fun createThumbnailRecordsViewer(library: RokushoLibrary<ImageUrl>, container: RecordsViewerContainer<ImageUrl>): Node {
-    val imageLoader = UrlImageLoader()
-    val thumbnailMaxWidth = 500.0
-    val thumbnailMaxHeight = 200.0
-    val thumbnailPane = RecordThumbnailViewer<ImageUrl>({ record ->
-        ImageThumbnail(imageLoader.getImage(record.key.url, thumbnailMaxWidth, thumbnailMaxHeight, true))
-    })
-    val (thumbnailViewer) = ImageOverlay.attach(thumbnailPane).also { (_, thumbnailPane, overlay) ->
-        thumbnailPane.apply {
-            records.bindContent(container.records)
-            onActionProperty.set {
-                overlay.imageProperty.value = imageLoader.getImage(it.first().key.url)
-                overlay.isVisible = true
-            }
-            updateTagsProperty.set({ record, tags -> library.updateItemTags(record.key, tags) })
-        }
-        overlay.apply {
-            isVisible = false
-            onMouseClicked = EventHandler { isVisible = false }
-            background = Background(BackgroundFill(Color.rgb(30, 30, 30, 0.75), null, null))
-        }
-    }
-    return thumbnailViewer
-}

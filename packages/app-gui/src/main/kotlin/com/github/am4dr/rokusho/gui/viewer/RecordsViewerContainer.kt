@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.gui
+package com.github.am4dr.rokusho.gui.viewer
 
 import com.github.am4dr.rokusho.core.library.Record
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
@@ -51,4 +51,8 @@ class RecordsViewerContainer<T> : VBox() {
     fun add(title: String, viewer: Node) {
         viewers.add(Pair(viewer, Button(title).apply { setOnAction { content.center = viewer } }))
     }
+
+    fun add(viewer: RecordsViewer) = add(viewer.label, viewer.node)
 }
+
+data class RecordsViewer(val label: String, val node: Node)

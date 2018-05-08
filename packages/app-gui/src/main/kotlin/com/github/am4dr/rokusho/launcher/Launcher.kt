@@ -8,6 +8,8 @@ import com.github.am4dr.rokusho.app.library.fs.FileSystemLibraryLoader
 import com.github.am4dr.rokusho.app.library.fs.LibraryRootDetector
 import com.github.am4dr.rokusho.dev.gui.RokushoViewer
 import com.github.am4dr.rokusho.gui.RokushoGui
+import com.github.am4dr.rokusho.gui.viewer.ListRecordsViewerFactory
+import com.github.am4dr.rokusho.gui.viewer.ThumbnailRecordsViewerFactory
 import javafx.application.Application
 import javafx.scene.Scene
 import javafx.stage.Stage
@@ -21,12 +23,12 @@ import java.nio.file.Paths
 
 class Launcher : Application() {
 
-    private val rokusho = Rokusho(listOf(ImageLibraryLoader(createFileSystemLibraryLoader())))
-
     companion object {
         @JvmStatic fun main(args: Array<String>) = Application.launch(Launcher::class.java, *args)
         private val log = LoggerFactory.getLogger(Launcher::class.java)
     }
+
+    private lateinit var rokusho: Rokusho
 
     private fun loadImageLibrary(path: Path) { rokusho.loadAndAddLibrary(ImageLibraryLoader::class, path) }
 
@@ -36,6 +38,8 @@ class Launcher : Application() {
                 .map { Paths.get(it) }
                 .filter { Files.isDirectory(it) }
                 .forEach { loadImageLibrary(it) }
+        val libraryLoaders = listOf(ImageLibraryLoader(createFileSystemLibraryLoader()))
+        rokusho = Rokusho(libraryLoaders)
     }
 
     private fun parseArgs(args: Array<String>): CommandLine = DefaultParser().parse(Options(), args)
@@ -43,7 +47,9 @@ class Launcher : Application() {
     override fun start(stage: Stage) {
         stage.run {
             title = "Rokusho"
-            val rokushoGui = RokushoGui(rokusho, stage, ::loadImageLibrary, { it.save() })
+
+            val recordsViewerFactories = listOf(ListRecordsViewerFactory(), ThumbnailRecordsViewerFactory())
+            val rokushoGui = RokushoGui(rokusho, stage, ::loadImageLibrary, { it.save() }, recordsViewerFactories)
             scene = Scene(rokushoGui.mainParent, 800.0, 500.0)
             show()
         }
