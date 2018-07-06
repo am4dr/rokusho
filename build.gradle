@@ -23,6 +23,7 @@ ext {
                     api: 'org.slf4j:slf4j-api:1.7.25',
             ],
             logback: 'ch.qos.logback:logback-classic:1.2.3',
+            sample_viewer: 'com.github.am4dr.javafx:gui-sample-viewer:0.3.0',
     ]
 }
 
@@ -83,8 +84,19 @@ project(':app-gui') {
     }
 }
 project(':gui') {
+    sourceSets {
+        sample
+    }
     dependencies {
         implementation project(':javafx-commons')
+
+        sampleImplementation libraries.sample_viewer
+        sampleImplementation sourceSets.main.runtimeClasspath
+    }
+    task runGuiSamples(type: JavaExec, dependsOn: classes) {
+        classpath sourceSets.sample.runtimeClasspath
+        main = 'com.github.am4dr.javafx.sample_viewer.ui.Launcher'
+        args = ['com.github.am4dr.rokusho.gui.sample.GUISamples', 'build/classes/kotlin/main', 'build/classes/kotlin/sample']
     }
 }
 project(':core') {
