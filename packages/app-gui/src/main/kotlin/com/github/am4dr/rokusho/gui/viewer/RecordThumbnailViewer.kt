@@ -1,10 +1,10 @@
 package com.github.am4dr.rokusho.gui.viewer
 
-import com.github.am4dr.rokusho.core.library.ItemTag
-import com.github.am4dr.rokusho.core.library.Record
 import com.github.am4dr.rokusho.gui.thumbnail.OverlayThumbnailDecorator
 import com.github.am4dr.rokusho.gui.thumbnail.ThumbnailFlowPane
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
+import com.github.am4dr.rokusho.old.core.library.ItemTag
+import com.github.am4dr.rokusho.old.core.library.Record
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.SimpleListProperty

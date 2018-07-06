@@ -2,11 +2,11 @@ package com.github.am4dr.rokusho.gui
 
 import com.github.am4dr.rokusho.app.Rokusho
 import com.github.am4dr.rokusho.app.library.RokushoLibrary
-import com.github.am4dr.rokusho.core.library.Record
 import com.github.am4dr.rokusho.gui.sidemenu.SideMenuIcon
 import com.github.am4dr.rokusho.gui.viewer.RecordsViewerContainer
 import com.github.am4dr.rokusho.gui.viewer.RecordsViewerFactory
 import com.github.am4dr.rokusho.javafx.function.bindLeft
+import com.github.am4dr.rokusho.old.core.library.Record
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.Bindings.createObjectBinding
 import javafx.beans.binding.When

@@ -2,10 +2,10 @@ package com.github.am4dr.rokusho.gui.viewer
 
 import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.library.RokushoLibrary
-import com.github.am4dr.rokusho.core.library.Record
 import com.github.am4dr.rokusho.gui.ImageOverlay
 import com.github.am4dr.rokusho.gui.UrlImageLoader
 import com.github.am4dr.rokusho.gui.thumbnail.ImageThumbnail
+import com.github.am4dr.rokusho.old.core.library.Record
 import javafx.event.EventHandler
 import javafx.scene.Node
 import javafx.scene.layout.Background

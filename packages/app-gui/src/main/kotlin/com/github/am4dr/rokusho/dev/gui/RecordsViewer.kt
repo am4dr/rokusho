@@ -1,6 +1,6 @@
 package com.github.am4dr.rokusho.dev.gui
 
-import com.github.am4dr.rokusho.core.library.Record
+import com.github.am4dr.rokusho.old.core.library.Record
 import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList

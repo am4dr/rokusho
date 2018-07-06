@@ -1,11 +1,11 @@
 package com.github.am4dr.rokusho.gui.thumbnail
 
-import com.github.am4dr.rokusho.core.library.ItemTag
-import com.github.am4dr.rokusho.core.library.Tag
 import com.github.am4dr.rokusho.gui.tag.TagNode
 import com.github.am4dr.rokusho.gui.tag.TagView
 import com.github.am4dr.rokusho.javafx.collection.ConcatenatedList
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
+import com.github.am4dr.rokusho.old.core.library.ItemTag
+import com.github.am4dr.rokusho.old.core.library.Tag
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.Bindings.createObjectBinding
 import javafx.beans.property.ObjectProperty

@@ -1,6 +1,6 @@
 package com.github.am4dr.rokusho.app.library
 
-import com.github.am4dr.rokusho.core.library.Library
+import com.github.am4dr.rokusho.old.core.library.Library
 import kotlin.reflect.KClass
 
 class RokushoLibraryWrapper<T : Any>(override val type: KClass<T>,

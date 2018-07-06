@@ -9,6 +9,7 @@ ext {
     libraries = [
             kotlin: [
                     stdlib: 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.51',
+                    reflect: 'org.jetbrains.kotlin:kotlin-reflect:1.2.51',
             ],
             junit: [
                     api: ['org.junit.jupiter:junit-jupiter-api:5.2.0',
@@ -62,6 +63,7 @@ configure(packageProjects) {
     }
     dependencies {
         api libraries.kotlin.stdlib
+        implementation libraries.kotlin.reflect
 
         testImplementation libraries.junit.api
         testRuntimeOnly libraries.junit.engine
@@ -90,12 +92,12 @@ project(':gui') {
 project(':core') {
     dependencies {
         implementation project(':javafx-commons')
+        implementation libraries.snakeyaml
     }
 }
 project(':app') {
     dependencies {
         api project(':core')
         implementation project(':javafx-commons')
-        implementation libraries.snakeyaml
     }
 }

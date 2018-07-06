@@ -1,7 +1,7 @@
 package com.github.am4dr.rokusho.gui.viewer
 
 import com.github.am4dr.rokusho.app.library.RokushoLibrary
-import com.github.am4dr.rokusho.core.library.Record
+import com.github.am4dr.rokusho.old.core.library.Record
 import javafx.beans.binding.Bindings
 import javafx.scene.Node
 import javafx.scene.control.ListView

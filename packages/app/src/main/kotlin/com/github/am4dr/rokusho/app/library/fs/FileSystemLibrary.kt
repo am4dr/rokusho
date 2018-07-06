@@ -1,12 +1,12 @@
 package com.github.am4dr.rokusho.app.library.fs
 
-import com.github.am4dr.rokusho.app.datastore.DataStore
 import com.github.am4dr.rokusho.app.library.RokushoLibrary
-import com.github.am4dr.rokusho.app.savedata.Item
-import com.github.am4dr.rokusho.app.savedata.ItemMetaData
-import com.github.am4dr.rokusho.app.savedata.SaveData
-import com.github.am4dr.rokusho.core.library.*
-import com.github.am4dr.rokusho.core.library.helper.LibrarySupport
+import com.github.am4dr.rokusho.core.datastore.DataStore
+import com.github.am4dr.rokusho.old.core.library.*
+import com.github.am4dr.rokusho.old.core.library.helper.LibrarySupport
+import com.github.am4dr.rokusho.old.savedata.Item
+import com.github.am4dr.rokusho.old.savedata.ItemMetaData
+import com.github.am4dr.rokusho.old.savedata.SaveData
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyMapProperty
 import java.nio.file.Path

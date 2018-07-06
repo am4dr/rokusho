@@ -3,13 +3,13 @@ package com.github.am4dr.rokusho.launcher
 import com.github.am4dr.rokusho.app.ImageLibraryLoader
 import com.github.am4dr.rokusho.app.Rokusho
 import com.github.am4dr.rokusho.app.SaveDataStoreProvider
-import com.github.am4dr.rokusho.app.datastore.yaml.YamlSaveDataStore
 import com.github.am4dr.rokusho.app.library.fs.FileSystemLibraryLoader
 import com.github.am4dr.rokusho.app.library.fs.LibraryRootDetector
 import com.github.am4dr.rokusho.dev.gui.RokushoViewer
 import com.github.am4dr.rokusho.gui.RokushoGui
 import com.github.am4dr.rokusho.gui.viewer.ListRecordsViewerFactory
 import com.github.am4dr.rokusho.gui.viewer.ThumbnailRecordsViewerFactory
+import com.github.am4dr.rokusho.old.datastore.file.yaml.YamlSaveDataStore
 import javafx.application.Application
 import javafx.scene.Scene
 import javafx.stage.Stage
@@ -63,7 +63,7 @@ class Launcher : Application() {
 }
 
 private fun createFileSystemLibraryLoader(): FileSystemLibraryLoader {
-    val saveFileName = "rokusho.yaml"
+    val saveFileName = "rokusho.com.github.am4dr.rokusho.old.savedata.yaml"
     val libraryRootDetector: LibraryRootDetector = { path -> Files.isRegularFile(path.resolve(saveFileName)) }
     val saveDataStoreProvider = SaveDataStoreProvider { YamlSaveDataStore(it.resolve(saveFileName)) }
     return FileSystemLibraryLoader(libraryRootDetector, saveDataStoreProvider::getOrCreate)

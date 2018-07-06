@@ -1,7 +1,7 @@
 package com.github.am4dr.rokusho.gui.tag
 
-import com.github.am4dr.rokusho.core.library.ItemTag
-import com.github.am4dr.rokusho.core.library.Tag
+import com.github.am4dr.rokusho.old.core.library.ItemTag
+import com.github.am4dr.rokusho.old.core.library.Tag
 
 class TagNode(itemTag: ItemTag) {
     companion object {
