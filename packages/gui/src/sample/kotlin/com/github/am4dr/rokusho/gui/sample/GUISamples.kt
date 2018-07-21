@@ -24,17 +24,24 @@ class GUISamples : SampleApplicationSupport() {
         }.show()
     }
 
+    private val ftStates = FittingTextFieldSample.createStates()
+    private val ttStates = TagTipSample.createStates()
     private fun createView(): Parent {
         addSample<SampleSample>("sample")
-        addSample<FittingTextFieldSample>()
+        addSample<FittingTextFieldSample>(ftStates)
+        addSample<TagTipSample>(ttStates)
         return viewer.view
     }
 
-    private inline fun <reified T : Node> addSample(noinline initializer: (T) -> Unit = {}) {
-        addSample(T::class.java.simpleName, initializer)
+    private inline fun <reified T : Node> addSample(context: Map<String, Any> = mapOf()) {
+        addSample<T>(T::class.java.simpleName, context)
     }
-    private inline fun <reified T : Node> addSample(title: String, noinline initializer: (T) -> Unit = {}) {
-        val node = UpdateAwareNode.build<T> { b -> b.type(T::class.java).classloader(this::createWatcher).initializer(initializer::invoke) }
+    private inline fun <reified T : Node> addSample(title: String, context: Map<String, Any> = mapOf()) {
+        val node = UpdateAwareNode.build<T> { b ->
+            b.type(T::class.java)
+                    .classloader { createWatcher() }
+                    .context(context)
+        }
         val statusBorderedPane = StatusBorderedPane(node)
         samples.addSample(title, statusBorderedPane)
     }
