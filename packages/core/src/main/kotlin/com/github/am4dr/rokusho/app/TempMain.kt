@@ -1,5 +1,6 @@
 package com.github.am4dr.rokusho.app
 
+import com.github.am4dr.rokusho.core.LibraryProvider
 import com.github.am4dr.rokusho.core.LibraryProviderCollection
 import java.nio.file.Paths
 
@@ -13,19 +14,17 @@ import java.nio.file.Paths
 
 class TempMain {
     companion object {
+        const val TEMP_MAIN_TARGET_DIR: String = "TEMP_MAIN_TARGET_DIR"
         @JvmStatic
         fun main(args: Array<String>) {
-            val providers = setOf(FileSystemBasedLibraryProvider())
-            val libraryProviders = LibraryProviderCollection(providers)
+            val targetDir = System.getenv(TEMP_MAIN_TARGET_DIR) ?: error("env $TEMP_MAIN_TARGET_DIR not found")
 
-            if (libraryProviders.providers.isEmpty()) {
-                println("providers not found!")
-            }
-            else {
-                libraryProviders.providers.forEach { println("${it.javaClass.name}: ${it.description}") }
-            }
-            val homeURI = Paths.get(System.getenv("TEMP_MAIN_TARGET_DIR")).toUri()
-            val lib = libraryProviders.get(FileSystemBasedLibraryProvider.createDescriptor(homeURI))
+
+            val libraryProvider = LibraryProviderCollection(loadProviders())
+
+            val descriptor = FileSystemBasedLibraryProvider.createDescriptor(Paths.get(targetDir).toUri())
+            val lib = libraryProvider.get(descriptor)
+
             lib?.let {
                 println(lib)
                 println("""
@@ -39,6 +38,17 @@ class TempMain {
                     |${lib.items}
                     """.trimMargin())
             } ?: println("lib is null")
+        }
+
+        private fun loadProviders(): Set<LibraryProvider> {
+            val providers = setOf(FileSystemBasedLibraryProvider())
+            if (providers.isEmpty()) {
+                println("providers not found!")
+            }
+            else {
+                providers.forEach { println("${it.javaClass.name}: ${it.description}") }
+            }
+            return providers
         }
     }
 }
