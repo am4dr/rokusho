@@ -22,6 +22,10 @@ class LibraryImpl<T : Any>(val metaDataRepository: MetaDataRepository,
         val tags = recordTags.map(::recordTagToTag).toSet()
         return TaggedItem(item, tags)
     }
-    private fun recordTagToTag(recordTag: RecordTag): Tag = Tag(recordTag.name, recordTag.data)
+    private fun recordTagToTag(recordTag: RecordTag): Tag {
+        val tag = metaDataRepository.get(recordTag.name)
+        val data = tag?.let { tag.defaultData.merge(recordTag.data) } ?: recordTag.data
+        return Tag(recordTag.name, data)
+    }
     override fun getTags(): Set<Tag> = metaDataRepository.getTags()
 }

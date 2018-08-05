@@ -6,6 +6,8 @@ class DefaultMetaDataRepositoryImpl(tags: Set<Tag> = setOf(), records: Set<Recor
     private val records = records.associateByTo(mutableMapOf(), Record::id)
 
 
+    override fun getTagNames(): Set<TagName> = tags.keys
+    override fun get(name: TagName): Tag? = tags[name]
     override fun getTags(): Set<Tag> = tags.values.toSet()
     override fun updateTagDataDefaultValues(name: TagName, data: TagData): Tag? = tags.replace(name, Tag(name, data))
 
