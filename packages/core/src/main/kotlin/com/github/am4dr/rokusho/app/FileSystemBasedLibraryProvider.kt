@@ -3,7 +3,7 @@ package com.github.am4dr.rokusho.app
 import com.github.am4dr.rokusho.core.Library
 import com.github.am4dr.rokusho.core.LibraryDescriptor
 import com.github.am4dr.rokusho.core.LibraryProvider
-import com.github.am4dr.rokusho.core.provider.ProviderDescriptor
+import com.github.am4dr.rokusho.core.provider.DefaultProviderDescriptors
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URI
@@ -16,7 +16,7 @@ class FileSystemBasedLibraryProvider : LibraryProvider {
         const val descriptorString: String = "rokusho.filesystem.files"
         val log: Logger = LoggerFactory.getLogger(FileSystemBasedLibraryProvider::class.java)
         fun createDescriptor(uri: URI): LibraryDescriptor =
-                LibraryDescriptor(ProviderDescriptor.of(descriptorString), uri.toString())
+                LibraryDescriptor(DefaultProviderDescriptors.of(descriptorString), uri.toString())
     }
 
     override val name: String = "FileSystem-based Library provider"
@@ -24,11 +24,12 @@ class FileSystemBasedLibraryProvider : LibraryProvider {
 
     override fun isAcceptable(descriptor: LibraryDescriptor): Boolean =
             descriptor.providerDescriptor.let { desc ->
+                if (desc !is DefaultProviderDescriptors) return false
                 when (desc) {
-                    is ProviderDescriptor.FQCNDescriptor -> {
+                    is DefaultProviderDescriptors.FQCNDescriptor -> {
                         desc.value == this::class.qualifiedName
                     }
-                    is ProviderDescriptor.StringDescriptor -> {
+                    is DefaultProviderDescriptors.StringDescriptor -> {
                         desc.value == descriptorString
                     }
                 }
