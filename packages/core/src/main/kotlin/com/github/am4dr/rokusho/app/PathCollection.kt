@@ -7,7 +7,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.util.stream.Collectors
 
-class PathCollection(val collectionRoot: Path, val path: Path = collectionRoot) : ItemCollection {
+class PathCollection(val collectionRoot: Path, val path: Path = collectionRoot) : ItemCollection<Path> {
 
     companion object {
         const val idPathSeparator: String = "/"
@@ -20,9 +20,9 @@ class PathCollection(val collectionRoot: Path, val path: Path = collectionRoot) 
     }
 
     override val ids: Set<ItemID> by lazy { paths.keys }
-    override val items: Set<Item<*>> by lazy { paths.values.toSet() }
+    override val items: Set<Item<Path>> by lazy { paths.values.toSet() }
 
-    override fun get(id: ItemID): Item<*>? = paths[id]
+    override fun get(id: ItemID): Item<Path>? = paths[id]
 
     private fun Path.toItem(): Item<Path> = Item(ItemID(collectionRoot.relativize(this).joinToString(idPathSeparator)), this)
 }

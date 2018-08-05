@@ -1,16 +1,14 @@
 package com.github.am4dr.rokusho.app
 
-import com.github.am4dr.rokusho.core.Library
-import com.github.am4dr.rokusho.core.LibraryDescriptor
-import com.github.am4dr.rokusho.core.LibraryProvider
-import com.github.am4dr.rokusho.core.provider.DefaultProviderDescriptors
+import com.github.am4dr.rokusho.core.library.*
+import com.github.am4dr.rokusho.core.metadata.RecordID
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.nio.file.Path
 import java.nio.file.Paths
 
-class FileSystemBasedLibraryProvider : LibraryProvider {
+class FileSystemBasedLibraryProvider : LibraryProvider<Path> {
 
     companion object {
         const val descriptorString: String = "rokusho.filesystem.files"
@@ -37,14 +35,14 @@ class FileSystemBasedLibraryProvider : LibraryProvider {
 
     private val metaDataRepositories = MetaDataRepositories()
 
-    override fun get(descriptor: LibraryDescriptor): Library? {
+    override fun get(descriptor: LibraryDescriptor): Library<Path>? {
         if (!isAcceptable(descriptor)) return null
 
         val uri = URI(descriptor.libraryCoordinates)
         val path = getPath(uri) ?: return null
         val (savefile, metaRepo) = metaDataRepositories.getOrCreate(path)
         val items = PathCollection(savefile.parent, path)
-        return Library(createDescriptor(uri), metaRepo, items)
+        return LibraryImpl(metaRepo, items, { RecordID(it.id) }, Path::class)
     }
 
     internal fun getPath(uri: URI): Path? = try {

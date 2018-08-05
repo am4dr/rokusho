@@ -1,7 +1,7 @@
 package com.github.am4dr.rokusho.app
 
-import com.github.am4dr.rokusho.core.LibraryProvider
-import com.github.am4dr.rokusho.core.LibraryProviderCollection
+import com.github.am4dr.rokusho.core.library.LibraryProvider
+import com.github.am4dr.rokusho.core.library.LibraryProviderCollection
 import java.nio.file.Paths
 
 /**
@@ -31,16 +31,13 @@ class TempMain {
                     |TAGS::
                     |${lib.getTags()}
                     |
-                    |RECORDS::
-                    |${lib.getRecords()}
-                    |
                     |ITEMS::
-                    |${lib.items}
+                    |${lib.getIDs().mapNotNull(lib::get)}
                     """.trimMargin())
             } ?: println("lib is null")
         }
 
-        private fun loadProviders(): Set<LibraryProvider> {
+        private fun loadProviders(): Set<LibraryProvider<*>> {
             val providers = setOf(FileSystemBasedLibraryProvider())
             if (providers.isEmpty()) {
                 println("providers not found!")

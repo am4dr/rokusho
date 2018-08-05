@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.core.provider
+package com.github.am4dr.rokusho.core.library
 
 interface ProviderDescriptor {
 
