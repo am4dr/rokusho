@@ -30,6 +30,7 @@ class GUISamples : SampleApplicationSupport() {
         addSample<SampleSample>("sample")
         addSample<FittingTextFieldSample>(ftStates)
         addSample<TagTipSample>(ttStates)
+        addSample<DummySkinSample>()
         return viewer.view
     }
 
