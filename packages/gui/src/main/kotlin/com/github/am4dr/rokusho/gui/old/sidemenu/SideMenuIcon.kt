@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.gui.sidemenu
+package com.github.am4dr.rokusho.gui.old.sidemenu
 
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.DoubleProperty

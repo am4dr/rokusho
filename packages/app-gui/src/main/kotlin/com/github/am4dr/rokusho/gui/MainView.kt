@@ -1,8 +1,8 @@
 package com.github.am4dr.rokusho.gui
 
 import com.github.am4dr.rokusho.app.library.RokushoLibrary
-import com.github.am4dr.rokusho.gui.sidemenu.SideMenuIcon
-import com.github.am4dr.rokusho.gui.sidemenu.SimpleSideMenu
+import com.github.am4dr.rokusho.gui.old.sidemenu.SideMenuIcon
+import com.github.am4dr.rokusho.gui.old.sidemenu.SimpleSideMenu
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import javafx.beans.InvalidationListener
 import javafx.beans.binding.Bindings.createObjectBinding
@@ -22,7 +22,7 @@ import java.util.*
 import java.util.concurrent.Callable
 
 class MainView(private val libraryIconFactory: (RokushoLibrary<*>) -> SideMenuIcon,
-                        private val libraryViewerFactory: (RokushoLibrary<*>) -> Node) : BorderPane() {
+               private val libraryViewerFactory: (RokushoLibrary<*>) -> Node) : BorderPane() {
 
     val libraries: ReadOnlyListProperty<RokushoLibrary<*>> = SimpleListProperty(observableArrayList())
     val onSaveClickedProperty: ObjectProperty<() -> Unit> = SimpleObjectProperty { }

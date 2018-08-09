@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.gui.tag
+package com.github.am4dr.rokusho.gui.old.tag
 
 import javafx.beans.binding.When
 import javafx.beans.property.SimpleStringProperty

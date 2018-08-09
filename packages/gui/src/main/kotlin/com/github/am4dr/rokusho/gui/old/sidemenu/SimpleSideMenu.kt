@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.gui.sidemenu
+package com.github.am4dr.rokusho.gui.old.sidemenu
 
 import javafx.beans.binding.Bindings
 import javafx.beans.property.*

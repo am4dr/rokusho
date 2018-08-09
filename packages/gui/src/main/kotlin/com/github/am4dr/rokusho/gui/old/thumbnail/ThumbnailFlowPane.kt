@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.gui.thumbnail
+package com.github.am4dr.rokusho.gui.old.thumbnail
 
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import javafx.beans.binding.Bindings
