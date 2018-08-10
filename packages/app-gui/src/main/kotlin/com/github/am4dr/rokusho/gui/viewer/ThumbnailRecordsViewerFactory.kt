@@ -3,7 +3,6 @@ package com.github.am4dr.rokusho.gui.viewer
 import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.library.RokushoLibrary
 import com.github.am4dr.rokusho.core.library.Record
-import com.github.am4dr.rokusho.gui.RecordsViewerFactory
 import com.github.am4dr.rokusho.gui.old.ImageOverlay
 import com.github.am4dr.rokusho.gui.old.thumbnail.ImageThumbnail
 import javafx.event.EventHandler

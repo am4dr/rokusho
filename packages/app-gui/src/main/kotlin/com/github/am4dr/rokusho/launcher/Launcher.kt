@@ -9,6 +9,7 @@ import com.github.am4dr.rokusho.app.library.fs.LibraryRootDetector
 import com.github.am4dr.rokusho.dev.gui.RokushoViewer
 import com.github.am4dr.rokusho.gui.GUIModel
 import com.github.am4dr.rokusho.gui.PathChooser
+import com.github.am4dr.rokusho.gui.RokushoLibraryCollection
 import com.github.am4dr.rokusho.gui.old.sidemenu.SimpleSideMenu
 import com.github.am4dr.rokusho.gui.scene.MainPane
 import com.github.am4dr.rokusho.gui.viewer.LibraryViewerRepositoryImpl
@@ -70,11 +71,12 @@ class Launcher : Application() {
 private fun createGUIModel(rokusho: Rokusho, stage: Stage): GUIModel {
     val recordsViewerFactories = listOf(ListRecordsViewerFactory(), ThumbnailRecordsViewerFactory())
     val libraryViewerRepository = LibraryViewerRepositoryImpl(recordsViewerFactories)
-    return GUIModel(rokusho, PathChooser(stage), libraryViewerRepository)
+    val libraryCollection = RokushoLibraryCollection(rokusho, PathChooser(stage))
+    return GUIModel(libraryCollection, libraryViewerRepository)
 }
 
 private fun createMainPane(model: GUIModel): Parent {
-    val simpleSideMenu = SimpleSideMenu(model::addLibrary).apply {
+    val simpleSideMenu = SimpleSideMenu(model.libraryCollection::addLibraryViaGUI).apply {
         width.value = 40.0
         setIcons(model.libraryIcons)
         model.libraryIcons.addListener(InvalidationListener {
@@ -83,7 +85,7 @@ private fun createMainPane(model: GUIModel): Parent {
     }
     return MainPane().apply {
         sideMenu.set(simpleSideMenu)
-        addLibraryEventHandler.set(model::addLibrary)
+        addLibraryEventHandler.set(model.libraryCollection::addLibraryViaGUI)
         libraryViewer.bind(model.currentLibraryViewer)
         showAddLibrarySuggestion.bind(model.libraryCollection.selectedProperty().isNull)
     }

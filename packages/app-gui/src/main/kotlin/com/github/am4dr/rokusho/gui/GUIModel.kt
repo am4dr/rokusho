@@ -1,12 +1,9 @@
 package com.github.am4dr.rokusho.gui
 
-import com.github.am4dr.rokusho.app.ImageLibraryLoader
-import com.github.am4dr.rokusho.app.Rokusho
 import com.github.am4dr.rokusho.app.library.RokushoLibrary
 import com.github.am4dr.rokusho.gui.old.sidemenu.SideMenuIcon
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import javafx.beans.binding.Bindings
-import javafx.beans.binding.Bindings.bindContent
 import javafx.beans.binding.When
 import javafx.beans.value.ObservableValue
 import javafx.collections.ObservableList
@@ -22,33 +19,21 @@ import javafx.scene.paint.Color
 import javafx.scene.text.Font
 import java.util.concurrent.Callable
 
-class GUIModel(private val rokusho: Rokusho,
-               private val libraryPathProvider: LibraryPathProvider,
+class GUIModel(val libraryCollection: LibraryCollection,
                private val libraryViewerRepository: LibraryViewerRepository) {
 
-    val libraryCollection: LibraryCollection = LibraryCollection().apply {
-        bindContent(libraries, rokusho.libraries)
-    }
-    val libraries: ObservableList<RokushoLibrary<*>> get() = libraryCollection.libraries
-
-    val libraryIcons: ObservableList<SideMenuIcon> = TransformedList(libraries) { library ->
-        library.toSideMenuIcon().also { icon ->
-            icon.setOnMouseClicked {
+    val libraryIcons: ObservableList<SideMenuIcon> = TransformedList(libraryCollection.libraries) { library ->
+        library.toSideMenuIcon().apply {
+            setOnMouseClicked {
                 libraryCollection.select(library)
             }
-            icon.selectedProperty.bind(libraryCollection.selectedProperty().isEqualTo(library))
+            selectedProperty.bind(libraryCollection.selectedProperty().isEqualTo(library))
         }
     }
 
     val currentLibraryViewer: ObservableValue<Node?> = Bindings.createObjectBinding({
         libraryCollection.selectedProperty().get()?.let(libraryViewerRepository::get)
     }, arrayOf(libraryCollection.selectedProperty()))
-
-    fun addLibrary() {
-        libraryPathProvider.get()?.let {
-            rokusho.loadAndAddLibrary(ImageLibraryLoader::class, it)
-        }
-    }
 
     // TODO separate data and styling
     private fun RokushoLibrary<*>.toSideMenuIcon(): SideMenuIcon =
