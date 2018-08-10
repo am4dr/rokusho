@@ -7,10 +7,16 @@ import com.github.am4dr.rokusho.app.datastore.yaml.YamlSaveDataStore
 import com.github.am4dr.rokusho.app.library.fs.FileSystemLibraryLoader
 import com.github.am4dr.rokusho.app.library.fs.LibraryRootDetector
 import com.github.am4dr.rokusho.dev.gui.RokushoViewer
-import com.github.am4dr.rokusho.gui.RokushoGui
+import com.github.am4dr.rokusho.gui.GUIModel
+import com.github.am4dr.rokusho.gui.PathChooser
+import com.github.am4dr.rokusho.gui.old.sidemenu.SimpleSideMenu
+import com.github.am4dr.rokusho.gui.scene.MainPane
+import com.github.am4dr.rokusho.gui.viewer.LibraryViewerRepositoryImpl
 import com.github.am4dr.rokusho.gui.viewer.ListRecordsViewerFactory
 import com.github.am4dr.rokusho.gui.viewer.ThumbnailRecordsViewerFactory
 import javafx.application.Application
+import javafx.beans.InvalidationListener
+import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.stage.Stage
 import org.apache.commons.cli.CommandLine
@@ -34,31 +40,52 @@ class Launcher : Application() {
 
     override fun init() {
         log.info("launched with the params: ${parameters.raw}")
+        val libraryLoaders = listOf(ImageLibraryLoader(createFileSystemLibraryLoader()))
+        rokusho = Rokusho(libraryLoaders)
         parseArgs(parameters.raw.toTypedArray()).args
                 .map { Paths.get(it) }
                 .filter { Files.isDirectory(it) }
                 .forEach { loadImageLibrary(it) }
-        val libraryLoaders = listOf(ImageLibraryLoader(createFileSystemLibraryLoader()))
-        rokusho = Rokusho(libraryLoaders)
     }
 
     private fun parseArgs(args: Array<String>): CommandLine = DefaultParser().parse(Options(), args)
 
     override fun start(stage: Stage) {
+        val model = createGUIModel(rokusho, stage)
+        val pane = createMainPane(model)
         stage.run {
             title = "Rokusho"
-
-            val recordsViewerFactories = listOf(ListRecordsViewerFactory(), ThumbnailRecordsViewerFactory())
-            val rokushoGui = RokushoGui(rokusho, stage, ::loadImageLibrary, { it.save() }, recordsViewerFactories)
-            scene = Scene(rokushoGui.mainParent, 800.0, 500.0)
+            scene = Scene(pane, 800.0, 500.0)
             show()
         }
-        RokushoViewer(rokusho).also { devViewer ->
-            devViewer.stage.apply {
+        RokushoViewer(rokusho).also {
+            it.stage.apply {
                 x = stage.x - RokushoViewer.initialWidth - 2.0
                 y = stage.y
             }
         }.show()
+    }
+}
+
+private fun createGUIModel(rokusho: Rokusho, stage: Stage): GUIModel {
+    val recordsViewerFactories = listOf(ListRecordsViewerFactory(), ThumbnailRecordsViewerFactory())
+    val libraryViewerRepository = LibraryViewerRepositoryImpl(recordsViewerFactories)
+    return GUIModel(rokusho, PathChooser(stage), libraryViewerRepository)
+}
+
+private fun createMainPane(model: GUIModel): Parent {
+    val simpleSideMenu = SimpleSideMenu(model::addLibrary).apply {
+        width.value = 40.0
+        setIcons(model.libraryIcons)
+        model.libraryIcons.addListener(InvalidationListener {
+            setIcons(model.libraryIcons)
+        })
+    }
+    return MainPane().apply {
+        sideMenu.set(simpleSideMenu)
+        addLibraryEventHandler.set(model::addLibrary)
+        libraryViewer.bind(model.currentLibraryViewer)
+        showAddLibrarySuggestion.bind(model.libraryCollection.selectedProperty().isNull)
     }
 }
 
