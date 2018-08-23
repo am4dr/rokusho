@@ -70,7 +70,8 @@ class Launcher : Application() {
 
 private fun createGUIModel(rokusho: Rokusho, stage: Stage): GUIModel {
     val recordsViewerFactories = listOf(ListRecordsViewerFactory(), ThumbnailRecordsViewerFactory())
-    val libraryViewerRepository = LibraryViewerRepositoryImpl(recordsViewerFactories)
+    val viewerFactory = LibraryViewerRepositoryImpl.RecordsViewersLibraryViewerFactory(recordsViewerFactories)
+    val libraryViewerRepository = LibraryViewerRepositoryImpl(viewerFactory)
     val libraryCollection = RokushoLibraryCollection(rokusho, PathChooser(stage))
     return GUIModel(libraryCollection, libraryViewerRepository)
 }
