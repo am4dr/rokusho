@@ -16,7 +16,7 @@ import com.github.am4dr.rokusho.gui.viewer.LibraryViewerRepositoryImpl
 import com.github.am4dr.rokusho.gui.viewer.ListRecordsViewerFactory
 import com.github.am4dr.rokusho.gui.viewer.ThumbnailRecordsViewerFactory
 import javafx.application.Application
-import javafx.beans.InvalidationListener
+import javafx.beans.binding.Bindings
 import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.stage.Stage
@@ -77,12 +77,10 @@ private fun createGUIModel(rokusho: Rokusho, stage: Stage): GUIModel {
 }
 
 private fun createMainPane(model: GUIModel): Parent {
-    val simpleSideMenu = SimpleSideMenu(model.libraryCollection::addLibraryViaGUI).apply {
+    val simpleSideMenu = SimpleSideMenu().apply {
+        onAddClicked.set(model.libraryCollection::addLibraryViaGUI)
         width.value = 40.0
-        setIcons(model.libraryIcons)
-        model.libraryIcons.addListener(InvalidationListener {
-            setIcons(model.libraryIcons)
-        })
+        Bindings.bindContent(icons, model.libraryIcons)
     }
     return MainPane().apply {
         sideMenu.set(simpleSideMenu)

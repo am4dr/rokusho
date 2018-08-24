@@ -49,7 +49,8 @@ class MainPane : BorderPane() {
             )
 
     private fun createSideMenu(): Node =
-            SimpleSideMenu { addLibraryEventHandler.get()?.invoke() }.apply {
+            SimpleSideMenu().apply {
+                onAddClicked.set { addLibraryEventHandler.get()?.invoke() }
                 width.set(40.0)
             }
 
