@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.gui.viewer
+package com.github.am4dr.rokusho.gui.viewer.factory
 
 import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.library.RokushoLibrary
@@ -17,13 +17,14 @@ class ThumbnailRecordsViewerFactory : RecordsViewerFactory {
 
     private val imageLoader = UrlImageLoader()
 
-    override fun acceptable(type: KClass<*>): Boolean = type == ImageUrl::class
+    override fun isAcceptable(type: KClass<*>): Boolean = type == ImageUrl::class
 
-    @Suppress("UNCHECKED_CAST")
-    override fun create(library: RokushoLibrary<*>, container: RecordsViewerContainer<*>): RecordsViewer {
+    override fun create(library: RokushoLibrary<*>): RecordsViewer<*>? {
+        if (library.type != ImageUrl::class) return null
+        @Suppress("UNCHECKED_CAST")
         library as RokushoLibrary<ImageUrl>
-        container as RecordsViewerContainer<ImageUrl>
-        return RecordsViewer("サムネイル", createThumbnailRecordsViewer(library, container, imageLoader))
+        val (view, node) = createThumbnailRecordsViewer(library, imageLoader)
+        return RecordsViewer("サムネイル", node, view.records)
     }
 }
 
@@ -34,8 +35,7 @@ private fun UrlImageLoader.getImageThumbnail(record: Record<ImageUrl>): ImageThu
         ImageThumbnail(getImage(record.key.url, thumbnailMaxWidth, thumbnailMaxHeight, true))
 
 private fun createThumbnailRecordsViewer(library: RokushoLibrary<ImageUrl>,
-                                         container: RecordsViewerContainer<ImageUrl>,
-                                         imageLoader: UrlImageLoader): Node {
+                                         imageLoader: UrlImageLoader): Pair<RecordThumbnailViewer<ImageUrl>, Node> {
     val thumbnailViewer = RecordThumbnailViewer(imageLoader::getImageThumbnail)
     val overlay = ImageOverlay().apply {
         isVisible = false
@@ -43,12 +43,11 @@ private fun createThumbnailRecordsViewer(library: RokushoLibrary<ImageUrl>,
         background = Background(BackgroundFill(Color.rgb(30, 30, 30, 0.75), null, null))
     }
     thumbnailViewer.apply {
-        records.bindContent(container.records)
         updateTagsProperty.set { record, tags -> library.updateItemTags(record.key, tags) }
         onActionProperty.set { selected ->
             overlay.imageProperty.value = imageLoader.getImage(selected.first().key.url)
             overlay.isVisible = true
         }
     }
-    return StackPane(thumbnailViewer, overlay)
+    return thumbnailViewer to StackPane(thumbnailViewer, overlay)
 }

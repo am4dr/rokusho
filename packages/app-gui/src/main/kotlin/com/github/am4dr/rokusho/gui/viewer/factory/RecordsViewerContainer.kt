@@ -1,9 +1,10 @@
-package com.github.am4dr.rokusho.gui.viewer
+package com.github.am4dr.rokusho.gui.viewer.factory
 
 import com.github.am4dr.rokusho.core.library.Record
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import javafx.beans.InvalidationListener
 import javafx.beans.binding.Bindings
+import javafx.beans.binding.Bindings.bindContent
 import javafx.beans.property.*
 import javafx.collections.FXCollections.observableArrayList
 import javafx.scene.Node
@@ -48,11 +49,8 @@ class RecordsViewerContainer<T> : VBox() {
         })
     }
 
-    fun add(title: String, viewer: Node) {
-        viewers.add(Pair(viewer, Button(title).apply { setOnAction { content.center = viewer } }))
+    fun add(viewer: RecordsViewer<*>) {
+        bindContent(viewer.records, records)
+        viewers.add(Pair(viewer.viewer, Button(viewer.label).apply { setOnAction { content.center = viewer.viewer } }))
     }
-
-    fun add(viewer: RecordsViewer) = add(viewer.label, viewer.node)
 }
-
-data class RecordsViewer(val label: String, val node: Node)

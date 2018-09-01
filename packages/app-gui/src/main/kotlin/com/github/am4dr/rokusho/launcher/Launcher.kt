@@ -13,8 +13,9 @@ import com.github.am4dr.rokusho.gui.RokushoLibraryCollection
 import com.github.am4dr.rokusho.gui.old.sidemenu.SimpleSideMenu
 import com.github.am4dr.rokusho.gui.scene.MainPane
 import com.github.am4dr.rokusho.gui.viewer.LibraryViewerRepositoryImpl
-import com.github.am4dr.rokusho.gui.viewer.ListRecordsViewerFactory
-import com.github.am4dr.rokusho.gui.viewer.ThumbnailRecordsViewerFactory
+import com.github.am4dr.rokusho.gui.viewer.factory.ListRecordsViewerFactory
+import com.github.am4dr.rokusho.gui.viewer.factory.RecordsViewersLibraryViewerFactory
+import com.github.am4dr.rokusho.gui.viewer.factory.ThumbnailRecordsViewerFactory
 import javafx.application.Application
 import javafx.beans.binding.Bindings
 import javafx.scene.Parent
@@ -70,7 +71,7 @@ class Launcher : Application() {
 
 private fun createGUIModel(rokusho: Rokusho, stage: Stage): GUIModel {
     val recordsViewerFactories = listOf(ListRecordsViewerFactory(), ThumbnailRecordsViewerFactory())
-    val viewerFactory = LibraryViewerRepositoryImpl.RecordsViewersLibraryViewerFactory(recordsViewerFactories)
+    val viewerFactory = RecordsViewersLibraryViewerFactory(recordsViewerFactories)
     val libraryViewerRepository = LibraryViewerRepositoryImpl(viewerFactory)
     val libraryCollection = RokushoLibraryCollection(rokusho, PathChooser(stage))
     return GUIModel(libraryCollection, libraryViewerRepository)

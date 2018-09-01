@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.gui.viewer
+package com.github.am4dr.rokusho.gui.viewer.factory
 
 import javafx.scene.image.Image
 import java.lang.ref.SoftReference
