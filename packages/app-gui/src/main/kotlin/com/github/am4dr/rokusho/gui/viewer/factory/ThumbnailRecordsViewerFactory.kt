@@ -2,52 +2,59 @@ package com.github.am4dr.rokusho.gui.viewer.factory
 
 import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.library.RokushoLibrary
+import com.github.am4dr.rokusho.core.library.ItemTag
 import com.github.am4dr.rokusho.core.library.Record
 import com.github.am4dr.rokusho.gui.old.ImageOverlay
 import com.github.am4dr.rokusho.gui.old.thumbnail.ImageThumbnail
 import javafx.event.EventHandler
-import javafx.scene.Node
+import javafx.scene.image.Image
 import javafx.scene.layout.Background
 import javafx.scene.layout.BackgroundFill
-import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
 import kotlin.reflect.KClass
 
-class ThumbnailRecordsViewerFactory : RecordsViewerFactory {
-
-    private val imageLoader = UrlImageLoader()
-
-    override fun isAcceptable(type: KClass<*>): Boolean = type == ImageUrl::class
-
-    override fun create(library: RokushoLibrary<*>): RecordsViewer<*>? {
-        if (library.type != ImageUrl::class) return null
-        @Suppress("UNCHECKED_CAST")
-        library as RokushoLibrary<ImageUrl>
-        val (view, node) = createThumbnailRecordsViewer(library, imageLoader)
-        return RecordsViewer("サムネイル", node, view.records)
-    }
-}
 
 private const val thumbnailMaxWidth = 500.0
 private const val thumbnailMaxHeight = 200.0
 
-private fun UrlImageLoader.getImageThumbnail(record: Record<ImageUrl>): ImageThumbnail =
-        ImageThumbnail(getImage(record.key.url, thumbnailMaxWidth, thumbnailMaxHeight, true))
+class ThumbnailRecordsViewerFactory : RecordsViewerFactory {
 
-private fun createThumbnailRecordsViewer(library: RokushoLibrary<ImageUrl>,
-                                         imageLoader: UrlImageLoader): Pair<RecordThumbnailViewer<ImageUrl>, Node> {
-    val thumbnailViewer = RecordThumbnailViewer(imageLoader::getImageThumbnail)
-    val overlay = ImageOverlay().apply {
-        isVisible = false
-        onMouseClicked = EventHandler { isVisible = false }
-        background = Background(BackgroundFill(Color.rgb(30, 30, 30, 0.75), null, null))
-    }
-    thumbnailViewer.apply {
-        updateTagsProperty.set { record, tags -> library.updateItemTags(record.key, tags) }
-        onActionProperty.set { selected ->
-            overlay.imageProperty.value = imageLoader.getImage(selected.first().key.url)
-            overlay.isVisible = true
-        }
-    }
-    return thumbnailViewer to StackPane(thumbnailViewer, overlay)
+    private val imageLoader = UrlImageLoader()
+    private val supportedTypes = listOf(ImageUrl::class)
+
+    override fun isAcceptable(type: KClass<*>): Boolean = supportedTypes.contains(type)
+
+    override fun create(library: RokushoLibrary<*>): RecordsViewer<*>? =
+            @Suppress("UNCHECKED_CAST")
+            when (library.type) {
+                ImageUrl::class -> {
+                    library as RokushoLibrary<ImageUrl>
+                    createImageRecordsViewer<ImageUrl>("サムネイル",
+                            { imageLoader.getImage(it.key.url) },
+                            { imageLoader.getImage(it.key.url, thumbnailMaxWidth, thumbnailMaxHeight, true) },
+                            { record, tags -> library.updateItemTags(record.key, tags) })
+                }
+                else -> null
+            }
 }
+
+private fun <T> createImageRecordsViewer(label: String,
+                                         getImage: (Record<T>) -> Image,
+                                         getThumbnailImage: (Record<T>) -> Image,
+                                         updateItemTags: (Record<T>, List<ItemTag>) -> Unit): RecordsViewer<T> {
+    val thumbnailFactory = { it: Record<T> -> ImageThumbnail(getThumbnailImage(it)) }
+    val imageViewer = createImageViewer()
+    val viewer = RecordThumbnailViewer(thumbnailFactory).apply {
+        children.add(imageViewer)
+        onActionProperty.set { selected -> imageViewer.show(getImage(selected.first())) }
+        updateTagsProperty.set(updateItemTags)
+    }
+    return RecordsViewer(label, viewer, viewer.records)
+}
+
+private fun createImageViewer(): ImageOverlay =
+        ImageOverlay().apply {
+            isVisible = false
+            background = Background(BackgroundFill(Color.rgb(30, 30, 30, 0.75), null, null))
+            onMouseClicked = EventHandler { hide() }
+        }
