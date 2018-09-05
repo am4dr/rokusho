@@ -24,8 +24,11 @@ class ViewSelectorPaneWithSearchBox : VBox() {
 
     val selections: ObservableList<Selection> = FXCollections.observableArrayList()
 
-    fun filterPassedCountProperty(): LongProperty = SimpleLongProperty(0)
-    fun totalCountProperty(): LongProperty = SimpleLongProperty(0)
+    private val passedCount = SimpleLongProperty(0)
+    private val totalCount = SimpleLongProperty(0)
+    fun filterPassedCountProperty(): LongProperty = passedCount
+    fun totalCountProperty(): LongProperty = totalCount
+
     fun filterTextProperty(): ReadOnlyStringProperty = filterInputNode.textProperty()
 
 
@@ -38,7 +41,7 @@ class ViewSelectorPaneWithSearchBox : VBox() {
         val buttonsPane = HBox().apply { bindContent(children, buttons) }
         val filterPane = HBox(
                 Label("フィルター", filterInputNode).apply { contentDisplay = ContentDisplay.RIGHT },
-                Label().apply { textProperty().bind(Bindings.concat("[", filterPassedCountProperty(),  " / ", totalCountProperty(), "]")) }
+                Label().apply { textProperty().bind(Bindings.concat("[", passedCount,  " / ", totalCount, "]")) }
         ).apply { alignment = Pos.BASELINE_LEFT }
         val topPanePadding = Pane().apply {
             prefWidth = 0.0
