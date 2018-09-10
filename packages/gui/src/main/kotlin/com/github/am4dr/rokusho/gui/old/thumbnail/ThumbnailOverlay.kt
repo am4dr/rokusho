@@ -21,6 +21,7 @@ import javafx.scene.layout.FlowPane
 import javafx.scene.paint.Color
 import javafx.scene.text.Font
 
+// TODO ThumbnailTagEditorとの役割分担が不明瞭なのを改善する
 class ThumbnailOverlay : FlowPane() {
 
     val tagNodes: ObservableList<Node> = FXCollections.observableArrayList()

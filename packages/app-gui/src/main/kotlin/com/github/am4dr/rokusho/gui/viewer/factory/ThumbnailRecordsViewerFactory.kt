@@ -4,8 +4,14 @@ import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.library.RokushoLibrary
 import com.github.am4dr.rokusho.core.library.ItemTag
 import com.github.am4dr.rokusho.core.library.Record
+import com.github.am4dr.rokusho.core.library.Tag
+import com.github.am4dr.rokusho.gui.control.RemovableTag
 import com.github.am4dr.rokusho.gui.old.ImageOverlay
+import com.github.am4dr.rokusho.gui.old.thumbnail.CachedThumbnailFlowPane
 import com.github.am4dr.rokusho.gui.old.thumbnail.ImageThumbnail
+import com.github.am4dr.rokusho.gui.old.thumbnail.StackedThumbnail
+import com.github.am4dr.rokusho.gui.old.thumbnail.ThumbnailTagEditor
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.event.EventHandler
 import javafx.scene.image.Image
 import javafx.scene.layout.Background
@@ -42,13 +48,40 @@ private fun <T> createImageRecordsViewer(label: String,
                                          getImage: (Record<T>) -> Image,
                                          getThumbnailImage: (Record<T>) -> Image,
                                          updateItemTags: (Record<T>, List<ItemTag>) -> Unit): RecordsViewer<T> {
-    val thumbnailFactory = { it: Record<T> -> ImageThumbnail(getThumbnailImage(it)) }
     val imageViewer = createImageViewer()
-    val viewer = RecordThumbnailViewer(thumbnailFactory).apply {
-        children.add(imageViewer)
-        onActionProperty.set { selected -> imageViewer.show(getImage(selected.first())) }
-        updateTagsProperty.set(updateItemTags)
+    val thumbnailFactory = { record: Record<T> ->
+        val base = ImageThumbnail(getThumbnailImage(record))
+        val overlayInputFocused = SimpleBooleanProperty(false)
+        val overlaySupplier = {
+            ThumbnailTagEditor<ItemTag>().apply {
+                tags.setAll(record.itemTags)
+                onEditEndedProperty.set { new -> updateItemTags(record, new) }
+                inputParserProperty.set { text: String -> ItemTag(Tag(text, Tag.Type.TEXT, mapOf("value" to text)), null) }
+                tagNodeFactoryProperty.set { itemTag: ItemTag ->
+                    val text = itemTag.run {
+                        when (tag.type) {
+                            Tag.Type.TEXT -> value ?: tag.id
+                            Tag.Type.VALUE -> "${tag.id} | ${value?.takeIf { it.isNotBlank() } ?: "-"}"
+                            Tag.Type.SELECTION -> "${tag.id} | ${value?.takeIf { it.isNotBlank() } ?: "-"}"
+                            Tag.Type.OTHERS -> tag.id
+                        }
+                    }
+                    RemovableTag().apply {
+                        textProperty().set(text)
+                        onRemoved.set {
+                            remove(itemTag)
+                        }
+                    }
+                }
+                overlayInputFocused.bind(inputFocusedProperty())
+            }
+        }
+        StackedThumbnail(base, overlaySupplier).apply {
+            setOnMouseClicked { imageViewer.show(getImage(record)) }
+            overlayVisibilityProperty().bind(hoverProperty().or(overlayInputFocused))
+        }
     }
+    val viewer = CachedThumbnailFlowPane(thumbnailFactory).apply { children.add(imageViewer) }
     return RecordsViewer(label, viewer, viewer.records)
 }
 
