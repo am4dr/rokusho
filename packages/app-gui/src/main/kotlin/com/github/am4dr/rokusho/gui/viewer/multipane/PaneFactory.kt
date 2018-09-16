@@ -3,9 +3,9 @@ package com.github.am4dr.rokusho.gui.viewer.multipane
 import com.github.am4dr.rokusho.app.library.RokushoLibrary
 import kotlin.reflect.KClass
 
-interface RecordsViewerFactory {
+interface PaneFactory {
 
     fun isAcceptable(type: KClass<*>): Boolean
 
-    fun create(library: RokushoLibrary<*>): RecordsViewer<*>?
+    fun create(library: RokushoLibrary<*>): MultiPaneLibraryViewer.Pane<*>?
 }

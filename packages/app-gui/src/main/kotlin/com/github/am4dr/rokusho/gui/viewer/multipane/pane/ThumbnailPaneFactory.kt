@@ -11,8 +11,8 @@ import com.github.am4dr.rokusho.gui.old.thumbnail.CachedThumbnailFlowPane
 import com.github.am4dr.rokusho.gui.old.thumbnail.ImageThumbnail
 import com.github.am4dr.rokusho.gui.old.thumbnail.StackedThumbnail
 import com.github.am4dr.rokusho.gui.old.thumbnail.ThumbnailTagEditor
-import com.github.am4dr.rokusho.gui.viewer.multipane.RecordsViewer
-import com.github.am4dr.rokusho.gui.viewer.multipane.RecordsViewerFactory
+import com.github.am4dr.rokusho.gui.viewer.multipane.MultiPaneLibraryViewer
+import com.github.am4dr.rokusho.gui.viewer.multipane.PaneFactory
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.event.EventHandler
 import javafx.scene.image.Image
@@ -25,14 +25,14 @@ import kotlin.reflect.KClass
 private const val thumbnailMaxWidth = 500.0
 private const val thumbnailMaxHeight = 200.0
 
-class ThumbnailRecordsViewerFactory : RecordsViewerFactory {
+class ThumbnailPaneFactory : PaneFactory {
 
     private val imageLoader = UrlImageLoader()
     private val supportedTypes = listOf(ImageUrl::class)
 
     override fun isAcceptable(type: KClass<*>): Boolean = supportedTypes.contains(type)
 
-    override fun create(library: RokushoLibrary<*>): RecordsViewer<*>? =
+    override fun create(library: RokushoLibrary<*>): MultiPaneLibraryViewer.Pane<*>? =
             @Suppress("UNCHECKED_CAST")
             when (library.type) {
                 ImageUrl::class -> {
@@ -49,7 +49,7 @@ class ThumbnailRecordsViewerFactory : RecordsViewerFactory {
 private fun <T> createImageRecordsViewer(label: String,
                                          getImage: (Record<T>) -> Image,
                                          getThumbnailImage: (Record<T>) -> Image,
-                                         updateItemTags: (Record<T>, List<ItemTag>) -> Unit): RecordsViewer<T> {
+                                         updateItemTags: (Record<T>, List<ItemTag>) -> Unit): MultiPaneLibraryViewer.Pane<T> {
     val imageViewer = createImageViewer()
     val thumbnailFactory = { record: Record<T> ->
         val base = ImageThumbnail(getThumbnailImage(record))
@@ -84,7 +84,7 @@ private fun <T> createImageRecordsViewer(label: String,
         }
     }
     val viewer = CachedThumbnailFlowPane(thumbnailFactory).apply { children.add(imageViewer) }
-    return RecordsViewer(label, viewer, viewer.records)
+    return MultiPaneLibraryViewer.Pane(label, viewer, viewer.records)
 }
 
 private fun createImageViewer(): ImageOverlay =
