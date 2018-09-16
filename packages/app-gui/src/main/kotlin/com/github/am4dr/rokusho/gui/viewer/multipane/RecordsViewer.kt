@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.gui.viewer.factory
+package com.github.am4dr.rokusho.gui.viewer.multipane
 
 import com.github.am4dr.rokusho.core.library.Record
 import javafx.collections.FXCollections

@@ -17,7 +17,7 @@ import javafx.scene.layout.CornerRadii
 import javafx.scene.paint.Color
 
 class GUIModel(val libraryCollection: LibraryCollection,
-               private val libraryViewerRepository: LibraryViewerRepository) {
+               private val libraryViewerCache: LibraryViewerCache) {
 
     val libraryIcons: ObservableList<SideMenuIcon> = TransformedList(libraryCollection.libraries) { library ->
         library.toSideMenuIcon().apply {
@@ -29,8 +29,15 @@ class GUIModel(val libraryCollection: LibraryCollection,
     }
 
     val currentLibraryViewer: ObservableValue<Node?> = Bindings.createObjectBinding({
-        libraryCollection.selectedProperty().get()?.let(libraryViewerRepository::get)
+        libraryCollection.selectedProperty().get()?.let(this::getOrCreateLibraryViewer)?.node
     }, arrayOf(libraryCollection.selectedProperty()))
+
+    private fun getOrCreateLibraryViewer(library: RokushoLibrary<*>): LibraryViewer<*> {
+        libraryViewerCache.getOrNull(library)?.let { return it }
+        return libraryViewerCache.getOrCreate(library).also {
+            Bindings.bindContent(it.records, library.records)
+        }
+    }
 
     private fun RokushoLibrary<*>.toSideMenuIcon(): SideMenuIcon =
             CharacterIcon().apply {

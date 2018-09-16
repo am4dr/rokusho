@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.gui.viewer.factory
+package com.github.am4dr.rokusho.gui.viewer.multipane.pane
 
 import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.library.RokushoLibrary
@@ -11,6 +11,8 @@ import com.github.am4dr.rokusho.gui.old.thumbnail.CachedThumbnailFlowPane
 import com.github.am4dr.rokusho.gui.old.thumbnail.ImageThumbnail
 import com.github.am4dr.rokusho.gui.old.thumbnail.StackedThumbnail
 import com.github.am4dr.rokusho.gui.old.thumbnail.ThumbnailTagEditor
+import com.github.am4dr.rokusho.gui.viewer.multipane.RecordsViewer
+import com.github.am4dr.rokusho.gui.viewer.multipane.RecordsViewerFactory
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.event.EventHandler
 import javafx.scene.image.Image
