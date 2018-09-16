@@ -4,22 +4,33 @@ import com.github.am4dr.rokusho.app.ImageLibraryLoader
 import com.github.am4dr.rokusho.app.Rokusho
 import com.github.am4dr.rokusho.app.SaveDataStoreProvider
 import com.github.am4dr.rokusho.app.datastore.yaml.YamlSaveDataStore
+import com.github.am4dr.rokusho.app.library.RokushoLibrary
 import com.github.am4dr.rokusho.app.library.fs.FileSystemLibraryLoader
 import com.github.am4dr.rokusho.app.library.fs.LibraryRootDetector
 import com.github.am4dr.rokusho.dev.gui.RokushoViewer
-import com.github.am4dr.rokusho.gui.GUIModel
-import com.github.am4dr.rokusho.gui.LibraryViewerCache
+import com.github.am4dr.rokusho.gui.LibraryCollection
+import com.github.am4dr.rokusho.gui.LibraryViewerCollection
 import com.github.am4dr.rokusho.gui.PathChooser
 import com.github.am4dr.rokusho.gui.RokushoLibraryCollection
+import com.github.am4dr.rokusho.gui.old.sidemenu.CharacterIcon
+import com.github.am4dr.rokusho.gui.old.sidemenu.SideMenuIcon
 import com.github.am4dr.rokusho.gui.old.sidemenu.SimpleSideMenu
 import com.github.am4dr.rokusho.gui.scene.MainPane
 import com.github.am4dr.rokusho.gui.viewer.multipane.MultiPaneLibraryViewerFactory
 import com.github.am4dr.rokusho.gui.viewer.multipane.pane.ListPaneFactory
 import com.github.am4dr.rokusho.gui.viewer.multipane.pane.ThumbnailPaneFactory
+import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import javafx.application.Application
 import javafx.beans.binding.Bindings
-import javafx.scene.Parent
+import javafx.beans.binding.When
+import javafx.collections.ObservableList
+import javafx.geometry.Insets
 import javafx.scene.Scene
+import javafx.scene.control.Tooltip
+import javafx.scene.layout.Background
+import javafx.scene.layout.BackgroundFill
+import javafx.scene.layout.CornerRadii
+import javafx.scene.paint.Color
 import javafx.stage.Stage
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.DefaultParser
@@ -32,13 +43,17 @@ import java.nio.file.Paths
 class Launcher : Application() {
 
     companion object {
-        @JvmStatic fun main(args: Array<String>) = Application.launch(Launcher::class.java, *args)
+        @JvmStatic
+        fun main(args: Array<String>) = Application.launch(Launcher::class.java, *args)
+
         private val log = LoggerFactory.getLogger(Launcher::class.java)
     }
 
     private lateinit var rokusho: Rokusho
 
-    private fun loadImageLibrary(path: Path) { rokusho.loadAndAddLibrary(ImageLibraryLoader::class, path) }
+    private fun loadImageLibrary(path: Path) {
+        rokusho.loadAndAddLibrary(ImageLibraryLoader::class, path)
+    }
 
     override fun init() {
         log.info("launched with the params: ${parameters.raw}")
@@ -53,8 +68,23 @@ class Launcher : Application() {
     private fun parseArgs(args: Array<String>): CommandLine = DefaultParser().parse(Options(), args)
 
     override fun start(stage: Stage) {
-        val model = createGUIModel(rokusho, stage)
-        val pane = createMainPane(model)
+        val libraryCollection = RokushoLibraryCollection(rokusho, PathChooser(stage))
+        val libraryIcons = createIcons(libraryCollection, ::createSideMenuIcon)
+        val viewerFactory = MultiPaneLibraryViewerFactory(listOf(ListPaneFactory(), ThumbnailPaneFactory()))
+        val viewerCollection = LibraryViewerCollection(libraryCollection, viewerFactory)
+
+        val sideMenu = SimpleSideMenu().apply {
+            width.value = 40.0
+            onAddClicked.set(libraryCollection::addLibraryViaGUI)
+            Bindings.bindContent(icons, libraryIcons)
+        }
+        val pane = MainPane().apply {
+            this.sideMenu.set(sideMenu)
+            addLibraryEventHandler.set(libraryCollection::addLibraryViaGUI)
+            libraryViewer.bind(viewerCollection.currentLibraryViewer)
+            showAddLibrarySuggestion.bind(libraryCollection.selectedProperty().isNull)
+        }
+
         stage.run {
             title = "Rokusho"
             scene = Scene(pane, 800.0, 500.0)
@@ -69,27 +99,26 @@ class Launcher : Application() {
     }
 }
 
-private fun createGUIModel(rokusho: Rokusho, stage: Stage): GUIModel {
-    val recordsViewerFactories = listOf(ListPaneFactory(), ThumbnailPaneFactory())
-    val viewerFactory = MultiPaneLibraryViewerFactory(recordsViewerFactories)
-    val libraryViewerRepository = LibraryViewerCache(viewerFactory)
-    val libraryCollection = RokushoLibraryCollection(rokusho, PathChooser(stage))
-    return GUIModel(libraryCollection, libraryViewerRepository)
-}
+private fun createSideMenuIcon(library: RokushoLibrary<*>): SideMenuIcon =
+        CharacterIcon().apply {
+            Tooltip.install(this, Tooltip(library.name))
+            backgroundProperty().bind(When(selectedProperty)
+                    .then(Background(BackgroundFill(Color.INDIANRED, CornerRadii(4.0), Insets.EMPTY)))
+                    .otherwise(Background(BackgroundFill(Color.ANTIQUEWHITE, CornerRadii(4.0), Insets.EMPTY))))
+            character.set(library.shortName.first().toString())
+        }
 
-private fun createMainPane(model: GUIModel): Parent {
-    val simpleSideMenu = SimpleSideMenu().apply {
-        onAddClicked.set(model.libraryCollection::addLibraryViaGUI)
-        width.value = 40.0
-        Bindings.bindContent(icons, model.libraryIcons)
-    }
-    return MainPane().apply {
-        sideMenu.set(simpleSideMenu)
-        addLibraryEventHandler.set(model.libraryCollection::addLibraryViaGUI)
-        libraryViewer.bind(model.currentLibraryViewer)
-        showAddLibrarySuggestion.bind(model.libraryCollection.selectedProperty().isNull)
-    }
-}
+private fun createIcons(libraryCollection: LibraryCollection,
+                iconFactory: (RokushoLibrary<*>) -> SideMenuIcon): ObservableList<SideMenuIcon> =
+        TransformedList(libraryCollection.libraries) { library ->
+            val libraryIsSelected = libraryCollection.selectedProperty().isEqualTo(library)
+            iconFactory(library).apply {
+                setOnMouseClicked {
+                    libraryCollection.select(library)
+                }
+                selectedProperty.bind(libraryIsSelected)
+            }
+        }
 
 private fun createFileSystemLibraryLoader(): FileSystemLibraryLoader {
     val saveFileName = "rokusho.yaml"
