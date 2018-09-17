@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.gui.old
+package com.github.am4dr.rokusho.gui.control
 
 import javafx.beans.property.DoubleProperty
 import javafx.beans.property.ObjectProperty

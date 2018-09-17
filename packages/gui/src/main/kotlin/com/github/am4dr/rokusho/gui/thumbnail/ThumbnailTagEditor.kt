@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.gui.old.thumbnail
+package com.github.am4dr.rokusho.gui.thumbnail
 
 import com.github.am4dr.rokusho.gui.control.RemovableTag
 import com.github.am4dr.rokusho.javafx.collection.ConcatenatedList

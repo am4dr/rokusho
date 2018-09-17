@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.gui.old.sidemenu
+package com.github.am4dr.rokusho.gui.sidemenu
 
 import javafx.beans.InvalidationListener
 import javafx.beans.binding.Bindings

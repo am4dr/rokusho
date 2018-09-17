@@ -5,12 +5,12 @@ import com.github.am4dr.rokusho.app.library.RokushoLibrary
 import com.github.am4dr.rokusho.core.library.ItemTag
 import com.github.am4dr.rokusho.core.library.Record
 import com.github.am4dr.rokusho.core.library.Tag
+import com.github.am4dr.rokusho.gui.control.ImageOverlay
 import com.github.am4dr.rokusho.gui.control.RemovableTag
-import com.github.am4dr.rokusho.gui.old.ImageOverlay
-import com.github.am4dr.rokusho.gui.old.thumbnail.CachedThumbnailFlowPane
-import com.github.am4dr.rokusho.gui.old.thumbnail.ImageThumbnail
-import com.github.am4dr.rokusho.gui.old.thumbnail.StackedThumbnail
-import com.github.am4dr.rokusho.gui.old.thumbnail.ThumbnailTagEditor
+import com.github.am4dr.rokusho.gui.thumbnail.CachedThumbnailFlowPane
+import com.github.am4dr.rokusho.gui.thumbnail.ImageThumbnail
+import com.github.am4dr.rokusho.gui.thumbnail.StackedThumbnail
+import com.github.am4dr.rokusho.gui.thumbnail.ThumbnailTagEditor
 import com.github.am4dr.rokusho.gui.viewer.multipane.MultiPaneLibraryViewer
 import com.github.am4dr.rokusho.gui.viewer.multipane.PaneFactory
 import javafx.beans.property.SimpleBooleanProperty

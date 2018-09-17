@@ -12,10 +12,10 @@ import com.github.am4dr.rokusho.gui.LibraryCollection
 import com.github.am4dr.rokusho.gui.LibraryViewerCollection
 import com.github.am4dr.rokusho.gui.PathChooser
 import com.github.am4dr.rokusho.gui.RokushoLibraryCollection
-import com.github.am4dr.rokusho.gui.old.sidemenu.CharacterIcon
-import com.github.am4dr.rokusho.gui.old.sidemenu.SideMenuIcon
-import com.github.am4dr.rokusho.gui.old.sidemenu.SimpleSideMenu
 import com.github.am4dr.rokusho.gui.scene.MainPane
+import com.github.am4dr.rokusho.gui.sidemenu.CharacterIcon
+import com.github.am4dr.rokusho.gui.sidemenu.SideMenuIcon
+import com.github.am4dr.rokusho.gui.sidemenu.SimpleSideMenu
 import com.github.am4dr.rokusho.gui.viewer.multipane.MultiPaneLibraryViewerFactory
 import com.github.am4dr.rokusho.gui.viewer.multipane.pane.ListPaneFactory
 import com.github.am4dr.rokusho.gui.viewer.multipane.pane.ThumbnailPaneFactory

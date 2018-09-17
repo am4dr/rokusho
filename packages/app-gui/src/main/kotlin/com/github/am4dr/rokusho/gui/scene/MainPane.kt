@@ -1,6 +1,6 @@
 package com.github.am4dr.rokusho.gui.scene
 
-import com.github.am4dr.rokusho.gui.old.sidemenu.SimpleSideMenu
+import com.github.am4dr.rokusho.gui.sidemenu.SimpleSideMenu
 import javafx.beans.binding.ObjectBinding
 import javafx.beans.binding.When
 import javafx.beans.property.BooleanProperty

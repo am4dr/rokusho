@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.gui.old.thumbnail
+package com.github.am4dr.rokusho.gui.thumbnail
 
 import javafx.beans.property.ReadOnlyBooleanProperty
 import javafx.beans.property.ReadOnlyBooleanWrapper
