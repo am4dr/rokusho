@@ -1,7 +1,7 @@
 package com.github.am4dr.rokusho.core.library
 
 import com.github.am4dr.rokusho.core.item.ItemID
-import com.github.am4dr.rokusho.core.metadata.Tag
+import com.github.am4dr.rokusho.core.metadata.BaseTag
 import kotlin.reflect.KClass
 
 interface Library<T : Any> {
@@ -11,5 +11,5 @@ interface Library<T : Any> {
     fun getIDs(): Set<ItemID>
     fun get(id: ItemID): TaggedItem<out T>?
 
-    fun getTags(): Set<Tag>
+    fun getTags(): Set<BaseTag>
 }

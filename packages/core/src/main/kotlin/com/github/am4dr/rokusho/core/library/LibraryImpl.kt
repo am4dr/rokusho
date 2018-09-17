@@ -5,7 +5,7 @@ import com.github.am4dr.rokusho.core.item.ItemID
 import com.github.am4dr.rokusho.core.metadata.MetaDataRepository
 import com.github.am4dr.rokusho.core.metadata.RecordID
 import com.github.am4dr.rokusho.core.metadata.RecordTag
-import com.github.am4dr.rokusho.core.metadata.Tag
+import com.github.am4dr.rokusho.core.metadata.BaseTag
 import kotlin.reflect.KClass
 
 class LibraryImpl<T : Any>(val metaDataRepository: MetaDataRepository,
@@ -22,10 +22,10 @@ class LibraryImpl<T : Any>(val metaDataRepository: MetaDataRepository,
         val tags = recordTags.map(::recordTagToTag).toSet()
         return TaggedItem(item, tags)
     }
-    private fun recordTagToTag(recordTag: RecordTag): Tag {
-        val tag = metaDataRepository.get(recordTag.name)
-        val data = tag?.let { tag.defaultData.merge(recordTag.data) } ?: recordTag.data
-        return Tag(recordTag.name, data)
+    private fun recordTagToTag(recordTag: RecordTag): BaseTag {
+        val tag = metaDataRepository.get(recordTag.base)
+        val data = tag?.let { tag.data.merge(recordTag.data) } ?: recordTag.data
+        return BaseTag(recordTag.base, data)
     }
-    override fun getTags(): Set<Tag> = metaDataRepository.getTags()
+    override fun getTags(): Set<BaseTag> = metaDataRepository.getTags()
 }

@@ -19,7 +19,7 @@ class ParserTest {
     }
 
     @Nested
-    class TagParserTest {
+    class BaseTagParserTest {
         companion object {
             fun tags(vararg pairs: Pair<*, *>): Map<*, *> = mapOf("tags" to mapOf(*pairs))
             fun tag(name: Any, vararg data: Pair<*, *>): Pair<*, *> = name to mapOf(*data)

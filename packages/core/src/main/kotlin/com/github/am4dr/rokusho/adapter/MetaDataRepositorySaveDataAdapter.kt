@@ -15,7 +15,7 @@ fun SaveData?.toMetaDataRepository(): MetaDataRepository {
 }
 
 // TODO 情報を落とさないようにする
-internal fun OldTagToTag(tag: OldTag): Tag = Tag(tag.id, tag.data.entries
+internal fun OldTagToTag(tag: OldTag): BaseTag = BaseTag(tag.id, tag.data.entries
         .filter { it.value is String }
         .map { it.toPair() as Pair<String, String> }
         .toMap())
