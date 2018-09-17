@@ -1,5 +1,7 @@
 package com.github.am4dr.rokusho.core.metadata
 
+import com.github.am4dr.rokusho.core.util.DataObject
+
 class DefaultMetaDataRepositoryImpl(baseTags: Set<BaseTag> = setOf(), records: Set<Record> = setOf()) : MetaDataRepository {
 
     private val tags = baseTags.associateByTo(mutableMapOf(), BaseTag::name)
@@ -9,7 +11,7 @@ class DefaultMetaDataRepositoryImpl(baseTags: Set<BaseTag> = setOf(), records: S
     override fun getTagNames(): Set<BaseTagName> = tags.keys
     override fun get(name: BaseTagName): BaseTag? = tags[name]
     override fun getTags(): Set<BaseTag> = tags.values.toSet()
-    override fun updateTagData(name: BaseTagName, data: TagData): BaseTag? = tags.replace(name, BaseTag(name, data))
+    override fun updateTagData(name: BaseTagName, data: DataObject): BaseTag? = tags.replace(name, BaseTag(name, data))
 
 
     override fun getRecordIDs(): Set<RecordID> = records.keys.toSet()
