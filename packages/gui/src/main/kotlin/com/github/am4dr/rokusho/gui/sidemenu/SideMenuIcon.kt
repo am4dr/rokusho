@@ -6,7 +6,7 @@ import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.scene.layout.Pane
 
-class SideMenuIcon : Pane() {
+open class SideMenuIcon : Pane() {
 
     val size: DoubleProperty = SimpleDoubleProperty(10.0)
     val selectedProperty: BooleanProperty = SimpleBooleanProperty(false)
