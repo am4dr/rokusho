@@ -28,6 +28,17 @@ class TagData(data: Map<String, String>) {
                 return Diff(lk.subtract(rk), rk.subtract(lk), lk.intersect(rk).filter { left[it] != right[it] }.toSet())
             }
         }
+        fun isFound(): Boolean = !isNotFound()
+        fun isNotFound(): Boolean = leftOnlyKeys.isEmpty() && rightOnlyKeys.isEmpty() && conflictedKeys.isEmpty()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        other as? TagData ?: return false
+        return diff(other).isNotFound()
+    }
+
+    override fun hashCode(): Int {
+        return data.hashCode()
     }
 
     override fun toString(): String = data.toString()
