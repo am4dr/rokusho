@@ -12,19 +12,19 @@ class LibraryImpl<T : Any>(val metaDataRepository: MetaDataRepository,
 
     override fun getTags(): Set<BaseTag> = metaDataRepository.getTags()
     override fun getIDs(): Set<ItemID> = itemCollection.ids
-    override fun get(id: ItemID): TaggedItem<out T>? {
+    override fun get(id: ItemID): LibraryItem<out T>? {
         val item = itemCollection.get(id) ?: return null
 
         val record = idConverter(item.id)?.let { metaDataRepository.get(it) }
         val recordTags = record?.tags ?: setOf()
         val tags = recordTags.mapNotNullTo(mutableSetOf(), ::recordTagToItemTag)
-        return TaggedItem(item, tags)
+        return LibraryItem(item, tags)
     }
-    private fun recordTagToItemTag(recordTag: RecordTag): ItemTag? {
+    private fun recordTagToItemTag(recordTag: RecordTag): LibraryItemTag? {
         val base = metaDataRepository.get(recordTag.base) ?: return null
-        return ItemTag(base, recordTag.data)
+        return LibraryItemTag(base, recordTag.data)
     }
-    override fun add(item: TaggedItem<out T>): TaggedItem<out T>? {
+    override fun add(item: LibraryItem<out T>): LibraryItem<out T>? {
         val recordID = idConverter(item.id) ?: return null
         val record = Record(recordID, item.tags.mapTo(mutableSetOf()) { RecordTag(it.base.name, it.patch) })
         val rollbackRecord = getRecordRollback(recordID)
@@ -42,7 +42,7 @@ class LibraryImpl<T : Any>(val metaDataRepository: MetaDataRepository,
             else metaDataRepository.add(oldRecord)
         }
     }
-    override fun remove(id: ItemID): TaggedItem<out T>? {
+    override fun remove(id: ItemID): LibraryItem<out T>? {
         val removedItem = get(id)
         val recordID = idConverter(id) ?: return null
         val rollbackRecord = getRecordRollback(recordID)

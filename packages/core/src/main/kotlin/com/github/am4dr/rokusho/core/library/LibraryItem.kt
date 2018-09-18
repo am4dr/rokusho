@@ -3,12 +3,12 @@ package com.github.am4dr.rokusho.core.library
 import com.github.am4dr.rokusho.core.item.Item
 import com.github.am4dr.rokusho.core.item.ItemID
 
-data class TaggedItem<T : Any>(val item: Item<T>, val tags: Set<ItemTag>) {
+data class LibraryItem<T : Any>(val item: Item<T>, val tags: Set<LibraryItemTag>) {
 
     val id: ItemID get() = item.id
 
     fun get(): T = item.get()
 
-    override fun equals(other: Any?): Boolean = other is TaggedItem<*> && id == other.id
+    override fun equals(other: Any?): Boolean = other is LibraryItem<*> && id == other.id
     override fun hashCode(): Int = id.hashCode()
 }

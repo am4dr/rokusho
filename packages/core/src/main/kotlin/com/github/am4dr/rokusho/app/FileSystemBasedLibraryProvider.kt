@@ -14,20 +14,20 @@ class FileSystemBasedLibraryProvider : LibraryProvider<Path> {
         const val descriptorString: String = "rokusho.filesystem.files"
         val log: Logger = LoggerFactory.getLogger(FileSystemBasedLibraryProvider::class.java)
         fun createDescriptor(uri: URI): LibraryDescriptor =
-                LibraryDescriptor(DefaultProviderDescriptors.of(descriptorString), uri.toString())
+                LibraryDescriptor(StandardLibraryProviderDescriptors.of(descriptorString), uri.toString())
     }
 
     override val name: String = "FileSystem-based Library provider"
     override val description: String = "FileSystemに基づいたLibraryを提供する"
 
     override fun isAcceptable(descriptor: LibraryDescriptor): Boolean =
-            descriptor.providerDescriptor.let { desc ->
-                if (desc !is DefaultProviderDescriptors) return false
+            descriptor.libraryProviderDescriptor.let { desc ->
+                if (desc !is StandardLibraryProviderDescriptors) return false
                 when (desc) {
-                    is DefaultProviderDescriptors.FQCNDescriptor -> {
+                    is StandardLibraryProviderDescriptors.FQCNDescriptor -> {
                         desc.value == this::class.qualifiedName
                     }
-                    is DefaultProviderDescriptors.StringDescriptor -> {
+                    is StandardLibraryProviderDescriptors.StringDescriptor -> {
                         desc.value == descriptorString
                     }
                 }
