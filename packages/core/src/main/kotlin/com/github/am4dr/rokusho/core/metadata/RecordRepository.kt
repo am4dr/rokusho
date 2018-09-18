@@ -4,6 +4,8 @@ interface RecordRepository {
 
     fun getRecordIDs(): Set<RecordID>
     fun getRecords(): Set<Record>
-    fun getRecord(id: RecordID): Record?
-    fun updateRecordTags(id: RecordID, tags: Set<RecordTag>): Record?
+    fun get(id: RecordID): Record?
+    fun add(record: Record): Record?
+    fun remove(id: RecordID): Record?
+    fun has(id: RecordID): Boolean
 }

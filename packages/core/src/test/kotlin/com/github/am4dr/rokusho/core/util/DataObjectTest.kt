@@ -1,6 +1,7 @@
 package com.github.am4dr.rokusho.core.util
 
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 internal class DataObjectTest {

@@ -12,17 +12,21 @@ class PathCollection(val collectionRoot: Path, val path: Path = collectionRoot) 
     companion object {
         const val idPathSeparator: String = "/"
     }
-    private val paths: Map<ItemID, Item<Path>> by lazy {
+    private val paths: MutableMap<ItemID, Item<out Path>> by lazy {
         Files.list(path)
                 .filter { Files.isRegularFile(it) }
-                .map { it.toItem() }
-                .collect(Collectors.toUnmodifiableMap(Item<Path>::id, { it }))
+                .map { pathToItem(it) }
+                .collect(Collectors.toMap(Item<out Path>::id, { it }))
     }
+    private fun pathToItem(path: Path): Item<Path> =
+            Item(ItemID(collectionRoot.relativize(path).joinToString(idPathSeparator)), path)
 
-    override val ids: Set<ItemID> by lazy { paths.keys }
-    override val items: Set<Item<Path>> by lazy { paths.values.toSet() }
 
-    override fun get(id: ItemID): Item<Path>? = paths[id]
+    override val ids: Set<ItemID> get() = paths.keys
+    override val items: Set<Item<out Path>> get() = paths.values.toSet()
 
-    private fun Path.toItem(): Item<Path> = Item(ItemID(collectionRoot.relativize(this).joinToString(idPathSeparator)), this)
+    override fun get(id: ItemID): Item<out Path>? = paths[id]
+    override fun add(item: Item<out Path>): Item<out Path>? = item.also { if (paths[it.id]?.get() != item.get()) paths[it.id] = it }
+    override fun remove(id: ItemID): Item<out Path>? = paths.remove(id)
+    override fun has(id: ItemID): Boolean = paths.containsKey(id)
 }

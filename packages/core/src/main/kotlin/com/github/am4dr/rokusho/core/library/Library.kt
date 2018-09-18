@@ -10,6 +10,9 @@ interface Library<T : Any> {
 
     fun getIDs(): Set<ItemID>
     fun get(id: ItemID): TaggedItem<out T>?
+    fun add(item: TaggedItem<out T>): TaggedItem<out T>?
+    fun remove(id: ItemID): TaggedItem<out T>?
+    fun has(id: ItemID): Boolean
 
     fun getTags(): Set<BaseTag>
 }
