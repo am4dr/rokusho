@@ -22,7 +22,7 @@ class LibraryImpl<T : Any>(val metaDataRepository: MetaDataRepository,
     }
     private fun recordTagToItemTag(recordTag: RecordTag): LibraryItemTag? {
         val base = metaDataRepository.get(recordTag.base) ?: return null
-        return LibraryItemTag(base, recordTag.data)
+        return LibraryItemTag(base, recordTag.patchData)
     }
     override fun add(item: LibraryItem<out T>): LibraryItem<out T>? {
         val recordID = idConverter(item.id) ?: return null
