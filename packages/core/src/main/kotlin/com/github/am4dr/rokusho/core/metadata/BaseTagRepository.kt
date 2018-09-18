@@ -1,6 +1,6 @@
 package com.github.am4dr.rokusho.core.metadata
 
-interface TagRepository {
+interface BaseTagRepository {
 
     fun getTagNames(): Set<BaseTagName>
     fun getTags(): Set<BaseTag>
