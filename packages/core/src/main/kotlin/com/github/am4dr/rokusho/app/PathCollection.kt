@@ -26,7 +26,5 @@ class PathCollection(val collectionRoot: Path, val path: Path = collectionRoot) 
     override val items: Set<Item<out Path>> get() = paths.values.toSet()
 
     override fun get(id: ItemID): Item<out Path>? = paths[id]
-    override fun add(item: Item<out Path>): Item<out Path>? = item.also { if (paths[it.id]?.get() != item.get()) paths[it.id] = it }
-    override fun remove(id: ItemID): Item<out Path>? = paths.remove(id)
     override fun has(id: ItemID): Boolean = paths.containsKey(id)
 }
