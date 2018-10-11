@@ -7,6 +7,6 @@ internal class ItemTest {
 
     @Test
     fun itemTypeTest() {
-        assertEquals(String::class, Item(ItemID(""), "").type)
+        assertEquals(String::class, Item(Item.ID(""), "").type)
     }
 }

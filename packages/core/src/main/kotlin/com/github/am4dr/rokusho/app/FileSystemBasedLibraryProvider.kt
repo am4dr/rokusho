@@ -5,7 +5,7 @@ import com.github.am4dr.rokusho.core.library.LibraryImpl
 import com.github.am4dr.rokusho.core.library.provider.LibraryDescriptor
 import com.github.am4dr.rokusho.core.library.provider.LibraryProvider
 import com.github.am4dr.rokusho.core.library.provider.StandardLibraryProviderDescriptors
-import com.github.am4dr.rokusho.core.metadata.RecordID
+import com.github.am4dr.rokusho.core.metadata.Record
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URI
@@ -46,7 +46,7 @@ class FileSystemBasedLibraryProvider : LibraryProvider<Path> {
         val path = getPath(uri) ?: return null
         val (savefile, metaRepo) = metaDataRepositories.getOrCreate(path)
         val items = PathCollection(savefile.parent, path)
-        return LibraryImpl(metaRepo, items, { RecordID(it.id) }, Path::class)
+        return LibraryImpl(metaRepo, items, { Record.Key(it.id) }, Path::class)
     }
 
     internal fun getPath(uri: URI): Path? = try {

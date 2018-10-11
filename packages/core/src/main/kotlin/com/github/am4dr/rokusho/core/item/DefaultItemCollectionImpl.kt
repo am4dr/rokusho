@@ -4,9 +4,9 @@ class DefaultItemCollectionImpl<T : Any>(items: Collection<Item<out T>>) : ItemC
 
     private val byID = items.associateByTo(mutableMapOf(), Item<*>::id)
 
-    override val ids: Set<ItemID> get() = byID.keys
+    override val ids: Set<Item.ID> get() = byID.keys
     override val items: Set<Item<out T>> get() = byID.values.toSet()
 
-    override fun get(id: ItemID): Item<out T>? = byID[id]
-    override fun has(id: ItemID): Boolean = byID.containsKey(id)
+    override fun get(id: Item.ID): Item<out T>? = byID[id]
+    override fun has(id: Item.ID): Boolean = byID.containsKey(id)
 }
