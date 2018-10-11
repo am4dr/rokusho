@@ -1,6 +1,10 @@
 package com.github.am4dr.rokusho.app
 
-import com.github.am4dr.rokusho.core.library.*
+import com.github.am4dr.rokusho.core.library.Library
+import com.github.am4dr.rokusho.core.library.LibraryImpl
+import com.github.am4dr.rokusho.core.library.provider.LibraryDescriptor
+import com.github.am4dr.rokusho.core.library.provider.LibraryProvider
+import com.github.am4dr.rokusho.core.library.provider.StandardLibraryProviderDescriptors
 import com.github.am4dr.rokusho.core.metadata.RecordID
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

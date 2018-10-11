@@ -1,7 +1,7 @@
 package com.github.am4dr.rokusho.app
 
-import com.github.am4dr.rokusho.core.library.LibraryProvider
-import com.github.am4dr.rokusho.core.library.LibraryProviderCollection
+import com.github.am4dr.rokusho.core.library.provider.LibraryProvider
+import com.github.am4dr.rokusho.core.library.provider.LibraryProviderCollection
 import java.nio.file.Paths
 
 /**
