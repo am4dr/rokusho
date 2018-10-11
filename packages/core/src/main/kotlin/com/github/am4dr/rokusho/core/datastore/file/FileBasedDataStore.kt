@@ -14,7 +14,7 @@ class FileBasedDataStore<T>(private val path: Path,
 
     override fun save(data: T) {
         if (saveEnabled) {
-            Files.write(getTargetFile(path), serializer.serialize(data))
+            Files.write(getOrCreateTargetFile(path), serializer.serialize(data))
         }
     }
 
@@ -24,7 +24,7 @@ class FileBasedDataStore<T>(private val path: Path,
         return result.result.also { if (it == null) saveEnabled = false }
     }
 
-    private fun getTargetFile(path: Path): Path {
+    private fun getOrCreateTargetFile(path: Path): Path {
         return if (Files.exists(path)) {
             path
         } else {
