@@ -1,11 +1,11 @@
-package com.github.am4dr.rokusho.gui
+package com.github.am4dr.rokusho.app.gui
 
 import javafx.stage.DirectoryChooser
 import javafx.stage.Stage
 import java.io.File
 import java.nio.file.Path
 
-class PathChooser(private val stage: Stage) : LibraryPathProvider {
+class GUIPopupPathChooser(private val stage: Stage) : LibraryPathProvider {
 
     override fun get(): Path? {
         return selectLibraryDirectory()

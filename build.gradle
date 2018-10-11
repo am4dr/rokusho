@@ -41,7 +41,7 @@ project(':application') {
     apply plugin: 'application'
     archivesBaseName = "rokusho-$it.name"
 
-    mainClassName = 'com.github.am4dr.rokusho.launcher.Launcher'
+    mainClassName = 'com.github.am4dr.rokusho.launcher.GUILauncher'
     dependencies {
         runtimeOnly packageProjects
     }

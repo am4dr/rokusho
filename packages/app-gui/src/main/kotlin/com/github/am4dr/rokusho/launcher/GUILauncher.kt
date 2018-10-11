@@ -4,21 +4,21 @@ import com.github.am4dr.rokusho.app.ImageLibraryLoader
 import com.github.am4dr.rokusho.app.Rokusho
 import com.github.am4dr.rokusho.app.SaveDataStoreProvider
 import com.github.am4dr.rokusho.app.datastore.yaml.YamlSaveDataStore
+import com.github.am4dr.rokusho.app.gui.GUIPopupPathChooser
+import com.github.am4dr.rokusho.app.gui.LibraryCollection
+import com.github.am4dr.rokusho.app.gui.LibraryViewerCollection
+import com.github.am4dr.rokusho.app.gui.RokushoLibraryCollection
+import com.github.am4dr.rokusho.app.gui.dev.RokushoViewer
+import com.github.am4dr.rokusho.app.gui.viewer.multipane.MultiPaneLibraryViewerFactory
+import com.github.am4dr.rokusho.app.gui.viewer.multipane.pane.ListPaneFactory
+import com.github.am4dr.rokusho.app.gui.viewer.multipane.pane.ThumbnailPaneFactory
 import com.github.am4dr.rokusho.app.library.RokushoLibrary
 import com.github.am4dr.rokusho.app.library.fs.FileSystemLibraryLoader
 import com.github.am4dr.rokusho.app.library.fs.LibraryRootDetector
-import com.github.am4dr.rokusho.dev.gui.RokushoViewer
-import com.github.am4dr.rokusho.gui.LibraryCollection
-import com.github.am4dr.rokusho.gui.LibraryViewerCollection
-import com.github.am4dr.rokusho.gui.PathChooser
-import com.github.am4dr.rokusho.gui.RokushoLibraryCollection
 import com.github.am4dr.rokusho.gui.scene.MainPane
 import com.github.am4dr.rokusho.gui.sidemenu.CharacterIcon
 import com.github.am4dr.rokusho.gui.sidemenu.SideMenuIcon
 import com.github.am4dr.rokusho.gui.sidemenu.SimpleSideMenu
-import com.github.am4dr.rokusho.gui.viewer.multipane.MultiPaneLibraryViewerFactory
-import com.github.am4dr.rokusho.gui.viewer.multipane.pane.ListPaneFactory
-import com.github.am4dr.rokusho.gui.viewer.multipane.pane.ThumbnailPaneFactory
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import javafx.application.Application
 import javafx.beans.binding.Bindings
@@ -40,13 +40,13 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
-class Launcher : Application() {
+class GUILauncher : Application() {
 
     companion object {
         @JvmStatic
-        fun main(args: Array<String>) = Application.launch(Launcher::class.java, *args)
+        fun main(args: Array<String>) = Application.launch(GUILauncher::class.java, *args)
 
-        private val log = LoggerFactory.getLogger(Launcher::class.java)
+        private val log = LoggerFactory.getLogger(GUILauncher::class.java)
     }
 
     private lateinit var rokusho: Rokusho
@@ -68,7 +68,7 @@ class Launcher : Application() {
     private fun parseArgs(args: Array<String>): CommandLine = DefaultParser().parse(Options(), args)
 
     override fun start(stage: Stage) {
-        val libraryCollection = RokushoLibraryCollection(rokusho, PathChooser(stage))
+        val libraryCollection = RokushoLibraryCollection(rokusho, GUIPopupPathChooser(stage))
         val libraryIcons = createIcons(libraryCollection, ::createSideMenuIcon)
         val viewerFactory = MultiPaneLibraryViewerFactory(listOf(ListPaneFactory(), ThumbnailPaneFactory()))
         val viewerCollection = LibraryViewerCollection(libraryCollection, viewerFactory)
@@ -109,7 +109,7 @@ private fun createSideMenuIcon(library: RokushoLibrary<*>): SideMenuIcon =
         }
 
 private fun createIcons(libraryCollection: LibraryCollection,
-                iconFactory: (RokushoLibrary<*>) -> SideMenuIcon): ObservableList<SideMenuIcon> =
+                        iconFactory: (RokushoLibrary<*>) -> SideMenuIcon): ObservableList<SideMenuIcon> =
         TransformedList(libraryCollection.libraries) { library ->
             val libraryIsSelected = libraryCollection.selectedProperty().isEqualTo(library)
             iconFactory(library).apply {

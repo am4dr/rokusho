@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.gui
+package com.github.am4dr.rokusho.app.gui
 
 import com.github.am4dr.rokusho.core.library.Record
 import javafx.collections.ObservableList

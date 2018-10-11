@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.dev.gui
+package com.github.am4dr.rokusho.app.gui.dev
 
 import com.github.am4dr.rokusho.app.Rokusho
 import com.github.am4dr.rokusho.app.library.RokushoLibrary
@@ -29,7 +29,7 @@ class RokushoViewer(val rokusho: Rokusho) {
 
     fun show() = stage.show()
     private fun createScene(w: Double, h: Double): Scene {
-        val libraryList = ListView(TransformedList(rokusho.libraries, ::LibraryListCell))
+        val libraryList = ListView(TransformedList(rokusho.libraries, RokushoViewer::LibraryListCell))
         return Scene(libraryList, w, h)
     }
 

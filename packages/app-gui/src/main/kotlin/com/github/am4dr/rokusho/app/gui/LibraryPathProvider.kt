@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.gui
+package com.github.am4dr.rokusho.app.gui
 
 import java.nio.file.Path
 

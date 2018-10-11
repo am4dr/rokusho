@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.gui.viewer.multipane
+package com.github.am4dr.rokusho.app.gui.viewer.multipane
 
 import com.github.am4dr.rokusho.app.library.RokushoLibrary
 import kotlin.reflect.KClass

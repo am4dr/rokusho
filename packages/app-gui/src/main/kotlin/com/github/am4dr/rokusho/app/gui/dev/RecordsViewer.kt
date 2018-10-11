@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.dev.gui
+package com.github.am4dr.rokusho.app.gui.dev
 
 import com.github.am4dr.rokusho.core.library.Record
 import javafx.collections.FXCollections
