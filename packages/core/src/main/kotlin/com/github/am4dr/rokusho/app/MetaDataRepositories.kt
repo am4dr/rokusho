@@ -1,6 +1,7 @@
 package com.github.am4dr.rokusho.app
 
-import com.github.am4dr.rokusho.adapter.toMetaDataRepository
+import com.github.am4dr.rokusho.adapter.DataStoreConverter
+import com.github.am4dr.rokusho.core.metadata.DefaultMetaDataRepositoryImpl
 import com.github.am4dr.rokusho.core.metadata.MetaDataRepository
 import com.github.am4dr.rokusho.old.datastore.file.yaml.YamlSaveDataStore
 import java.nio.file.Files
@@ -28,8 +29,8 @@ class MetaDataRepositories {
 
         val location = findLibraryRoot(savefileParent) ?: savefileParent
         val savefile = location.resolve(defaultSavefileName)
-        val store = YamlSaveDataStore(savefile)
-        val repo = store.load().toMetaDataRepository()
+        val store = DataStoreConverter(YamlSaveDataStore(savefile))
+        val repo = store.load() ?: DefaultMetaDataRepositoryImpl()
         knownRepositories[savefile] = repo
         return savefile to repo
     }

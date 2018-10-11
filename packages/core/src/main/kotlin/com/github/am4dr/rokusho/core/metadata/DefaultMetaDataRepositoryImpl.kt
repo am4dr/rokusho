@@ -1,6 +1,12 @@
 package com.github.am4dr.rokusho.core.metadata
 
-class DefaultMetaDataRepositoryImpl(baseTags: Set<BaseTag> = setOf(), records: Set<Record> = setOf()) : MetaDataRepository {
+import com.github.am4dr.rokusho.core.datastore.DataStore
+import com.github.am4dr.rokusho.core.datastore.NullDataStore
+
+// TODO use store to save the changes
+class DefaultMetaDataRepositoryImpl(baseTags: Set<BaseTag> = setOf(),
+                                    records: Set<Record> = setOf(),
+                                    store: DataStore<MetaDataRepository> = NullDataStore()) : MetaDataRepository {
 
     private val tags = baseTags.associateByTo(mutableMapOf(), BaseTag::name)
     private val records = records.associateByTo(mutableMapOf(), Record::key)
