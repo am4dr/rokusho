@@ -4,6 +4,7 @@ package com.github.am4dr.rokusho.core.util
 class DataObject(data: Map<String, String> = mapOf()) {
 
     private val data: Map<String, String> = data.toMap()
+    fun asMap(): Map<String, String> = data
 
     val keys: Set<String> get() = data.keys
     val entries: Set<Pair<String, String>> by lazy { data.entries.map { it.key to it.value }.toSet() }
