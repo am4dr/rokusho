@@ -8,6 +8,8 @@ import kotlin.reflect.KClass
 interface Library<T : Any> {
 
     val type: KClass<T>
+    val name: String
+    val shortName: String
 
     fun getIDs(): Set<Item.ID>
     fun get(id: Item.ID): LibraryItem<out T>?

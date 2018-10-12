@@ -8,6 +8,7 @@ import javafx.beans.property.ReadOnlyListWrapper
 import javafx.beans.property.ReadOnlyMapProperty
 import javafx.beans.property.ReadOnlyMapWrapper
 import javafx.collections.FXCollections
+import kotlin.reflect.KClass
 import com.github.am4dr.rokusho.old.core.library.ItemTag as OldItemTag
 import com.github.am4dr.rokusho.old.core.library.Library as OldLibrary
 import com.github.am4dr.rokusho.old.core.library.Record as OldRecord
@@ -20,6 +21,10 @@ import com.github.am4dr.rokusho.old.core.library.Tag as OldTag
  * TODO 移行中の一時的な実装なので機能不足であり、いち早く削除する
  */
 class OldLibraryWrapper<T : Any>(val library: Library<T>) : OldLibrary<T> {
+
+    override val type: KClass<T> get() = library.type
+    override val name: String get() = library.name
+    override val shortName: String get() = library.shortName
 
     override val tags: ReadOnlyMapProperty<String, OldTag> =
             ReadOnlyMapWrapper(library.getTags().associateByTo(

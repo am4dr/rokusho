@@ -1,6 +1,5 @@
 package com.github.am4dr.rokusho.launcher
 
-import com.github.am4dr.rokusho.adapter.RokushoLibrary
 import com.github.am4dr.rokusho.app.FileSystemBasedLibraryProvider
 import com.github.am4dr.rokusho.app.gui.GUIPopupPathChooser
 import com.github.am4dr.rokusho.app.gui.LibraryCollection
@@ -15,6 +14,7 @@ import com.github.am4dr.rokusho.gui.sidemenu.CharacterIcon
 import com.github.am4dr.rokusho.gui.sidemenu.SideMenuIcon
 import com.github.am4dr.rokusho.gui.sidemenu.SimpleSideMenu
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
+import com.github.am4dr.rokusho.old.core.library.Library
 import javafx.application.Application
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.When
@@ -57,21 +57,21 @@ class GUILauncher : Application() {
     private fun parseArgs(args: Array<String>): CommandLine = DefaultParser().parse(Options(), args)
 
     override fun start(stage: Stage) {
-        val rokushoLibraryCollection = RokushoLibraryCollection(libraryCollection, GUIPopupPathChooser(stage))
-        val libraryIcons = createIcons(rokushoLibraryCollection, ::createSideMenuIcon)
+        val oldLibraryCollection = RokushoLibraryCollection(libraryCollection, GUIPopupPathChooser(stage))
+        val libraryIcons = createIcons(oldLibraryCollection, ::createSideMenuIcon)
         val viewerFactory = MultiPaneLibraryViewerFactory(listOf(ListPaneFactory(), ThumbnailPaneFactory()))
-        val viewerCollection = LibraryViewerCollection(rokushoLibraryCollection, viewerFactory)
+        val viewerCollection = LibraryViewerCollection(oldLibraryCollection, viewerFactory)
 
         val sideMenu = SimpleSideMenu().apply {
             width.value = 40.0
-            onAddClicked.set(rokushoLibraryCollection::addPathLibraryViaGUI)
+            onAddClicked.set(oldLibraryCollection::addPathLibraryViaGUI)
             Bindings.bindContent(icons, libraryIcons)
         }
         val pane = MainPane().apply {
             this.sideMenu.set(sideMenu)
-            addLibraryEventHandler.set(rokushoLibraryCollection::addPathLibraryViaGUI)
+            addLibraryEventHandler.set(oldLibraryCollection::addPathLibraryViaGUI)
             libraryViewer.bind(viewerCollection.currentLibraryViewer)
-            showAddLibrarySuggestion.bind(rokushoLibraryCollection.selectedProperty().isNull)
+            showAddLibrarySuggestion.bind(oldLibraryCollection.selectedProperty().isNull)
         }
 
         stage.run {
@@ -79,7 +79,7 @@ class GUILauncher : Application() {
             scene = Scene(pane, 800.0, 500.0)
             show()
         }
-        RokushoViewer(rokushoLibraryCollection.libraries).also {
+        RokushoViewer(oldLibraryCollection.libraries).also {
             it.stage.apply {
                 x = stage.x - RokushoViewer.initialWidth - 2.0
                 y = stage.y
@@ -88,7 +88,7 @@ class GUILauncher : Application() {
     }
 }
 
-private fun createSideMenuIcon(library: RokushoLibrary<*>): SideMenuIcon =
+private fun createSideMenuIcon(library: Library<*>): SideMenuIcon =
         CharacterIcon().apply {
             Tooltip.install(this, Tooltip(library.name))
             backgroundProperty().bind(When(selectedProperty)
@@ -98,7 +98,7 @@ private fun createSideMenuIcon(library: RokushoLibrary<*>): SideMenuIcon =
         }
 
 private fun createIcons(libraryCollection: LibraryCollection,
-                        iconFactory: (RokushoLibrary<*>) -> SideMenuIcon): ObservableList<SideMenuIcon> =
+                        iconFactory: (Library<*>) -> SideMenuIcon): ObservableList<SideMenuIcon> =
         TransformedList(libraryCollection.libraries) { library ->
             val libraryIsSelected = libraryCollection.selectedProperty().isEqualTo(library)
             iconFactory(library).apply {

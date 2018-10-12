@@ -1,6 +1,6 @@
 package com.github.am4dr.rokusho.app.gui
 
-import com.github.am4dr.rokusho.adapter.RokushoLibrary
+import com.github.am4dr.rokusho.old.core.library.Library
 import javafx.beans.binding.Bindings
 import javafx.beans.value.ObservableValue
 import javafx.scene.Node
@@ -14,24 +14,24 @@ class LibraryViewerCollection(private val libraryCollection: LibraryCollection,
         libraryCollection.selectedProperty().get()?.let(this::getOrCreateLibraryViewer)?.node
     }, arrayOf(libraryCollection.selectedProperty()))
 
-    private fun getOrCreateLibraryViewer(library: RokushoLibrary<*>): LibraryViewer<*> =
+    private fun getOrCreateLibraryViewer(library: Library<*>): LibraryViewer<*> =
             getOrNull(library) ?: createLibraryViewerAndBindRecords(library)
 
-    private fun createLibraryViewerAndBindRecords(library: RokushoLibrary<*>): LibraryViewer<*> =
+    private fun createLibraryViewerAndBindRecords(library: Library<*>): LibraryViewer<*> =
             getOrCreate(library).also {
                 Bindings.bindContent(it.records, library.records)
             }
 
 
-    private val libraryViewCache = WeakHashMap(mutableMapOf<RokushoLibrary<*>, SoftReference<out LibraryViewer<*>>>())
+    private val libraryViewCache = WeakHashMap(mutableMapOf<Library<*>, SoftReference<out LibraryViewer<*>>>())
 
     @Suppress("UNCHECKED_CAST")
-    private fun <T : Any> getOrNull(library: RokushoLibrary<T>) =
+    private fun <T : Any> getOrNull(library: Library<T>) =
             libraryViewCache[library]?.get()?.let { it as? LibraryViewer<T> }
 
-    private fun <T : Any> getOrCreate(library: RokushoLibrary<T>): LibraryViewer<T> =
+    private fun <T : Any> getOrCreate(library: Library<T>): LibraryViewer<T> =
             getOrNull(library) ?: createLibraryViewAndCache(library)
 
-    private fun <T : Any> createLibraryViewAndCache(library: RokushoLibrary<T>): LibraryViewer<T> =
+    private fun <T : Any> createLibraryViewAndCache(library: Library<T>): LibraryViewer<T> =
             viewerFactory.create(library).also { libraryViewCache[library] = SoftReference(it) }
 }

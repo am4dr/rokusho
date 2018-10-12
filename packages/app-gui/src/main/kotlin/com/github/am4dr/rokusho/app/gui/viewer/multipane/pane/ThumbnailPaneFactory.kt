@@ -1,6 +1,5 @@
 package com.github.am4dr.rokusho.app.gui.viewer.multipane.pane
 
-import com.github.am4dr.rokusho.adapter.RokushoLibrary
 import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.gui.viewer.multipane.MultiPaneLibraryViewer
 import com.github.am4dr.rokusho.app.gui.viewer.multipane.PaneFactory
@@ -11,6 +10,7 @@ import com.github.am4dr.rokusho.gui.thumbnail.ImageThumbnail
 import com.github.am4dr.rokusho.gui.thumbnail.StackedThumbnail
 import com.github.am4dr.rokusho.gui.thumbnail.ThumbnailTagEditor
 import com.github.am4dr.rokusho.old.core.library.ItemTag
+import com.github.am4dr.rokusho.old.core.library.Library
 import com.github.am4dr.rokusho.old.core.library.Record
 import com.github.am4dr.rokusho.old.core.library.Tag
 import javafx.beans.property.SimpleBooleanProperty
@@ -32,11 +32,11 @@ class ThumbnailPaneFactory : PaneFactory {
 
     override fun isAcceptable(type: KClass<*>): Boolean = supportedTypes.contains(type)
 
-    override fun create(library: RokushoLibrary<*>): MultiPaneLibraryViewer.Pane<*>? =
+    override fun create(library: Library<*>): MultiPaneLibraryViewer.Pane<*>? =
             @Suppress("UNCHECKED_CAST")
             when (library.type) {
                 ImageUrl::class -> {
-                    library as RokushoLibrary<ImageUrl>
+                    library as Library<ImageUrl>
                     createImageRecordsViewer<ImageUrl>("サムネイル",
                             { imageLoader.getImage(it.key.url) },
                             { imageLoader.getImage(it.key.url, thumbnailMaxWidth, thumbnailMaxHeight, true) },

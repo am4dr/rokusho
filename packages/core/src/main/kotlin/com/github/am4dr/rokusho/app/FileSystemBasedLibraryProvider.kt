@@ -46,7 +46,7 @@ class FileSystemBasedLibraryProvider : LibraryProvider<Path> {
         val path = getPath(uri) ?: return null
         val (savefile, metaRepo) = metaDataRepositories.getOrCreate(path)
         val items = PathCollection(savefile.parent, path)
-        return LibraryImpl(metaRepo, items, { Record.Key(it.id) }, Path::class)
+        return LibraryImpl("Path Library: $path", path.fileName.toString(), Path::class, items, metaRepo) { Record.Key(it.id) }
     }
 
     internal fun getPath(uri: URI): Path? = try {

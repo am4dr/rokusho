@@ -8,10 +8,12 @@ import com.github.am4dr.rokusho.core.metadata.PatchedTag
 import com.github.am4dr.rokusho.core.metadata.Record
 import kotlin.reflect.KClass
 
-class LibraryImpl<T : Any>(val metaDataRepository: MetaDataRepository,
+class LibraryImpl<T : Any>(override val name: String,
+                           override val shortName: String,
+                           override val type: KClass<T>,
                            val itemCollection: ItemCollection<T>,
-                           val keyConverter: (Item.ID) -> Record.Key?,
-                           override val type: KClass<T>) : Library<T> {
+                           val metaDataRepository: MetaDataRepository,
+                           val keyConverter: (Item.ID) -> Record.Key?) : Library<T> {
 
     override fun getTags(): Set<BaseTag> = metaDataRepository.getTags()
     override fun getIDs(): Set<Item.ID> = itemCollection.ids

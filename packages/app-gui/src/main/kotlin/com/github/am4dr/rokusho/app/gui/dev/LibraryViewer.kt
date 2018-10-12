@@ -11,7 +11,7 @@ import javafx.scene.control.ListView
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
 
-class LibraryViewer<T>(val library: Library<T>) {
+class LibraryViewer<T : Any>(val library: Library<T>) {
     companion object {
         const val initialWidth: Double  = 300.0
         const val initialHeight: Double = 300.0
