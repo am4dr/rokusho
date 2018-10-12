@@ -1,7 +1,7 @@
 package com.github.am4dr.rokusho.app
 
-import com.github.am4dr.rokusho.app.datastore.DataStore
-import com.github.am4dr.rokusho.app.savedata.SaveData
+import com.github.am4dr.rokusho.core.datastore.DataStore
+import com.github.am4dr.rokusho.old.savedata.SaveData
 import java.nio.file.Path
 
 

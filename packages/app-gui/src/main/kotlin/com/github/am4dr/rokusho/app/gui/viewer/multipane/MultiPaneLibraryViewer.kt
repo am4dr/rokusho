@@ -1,9 +1,9 @@
 package com.github.am4dr.rokusho.app.gui.viewer.multipane
 
 import com.github.am4dr.rokusho.app.gui.LibraryViewer
-import com.github.am4dr.rokusho.core.library.Record
 import com.github.am4dr.rokusho.gui.scene.ViewSelectorPaneWithSearchBox
 import com.github.am4dr.rokusho.javafx.function.bindLeft
+import com.github.am4dr.rokusho.old.core.library.Record
 import javafx.beans.binding.Bindings
 import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections

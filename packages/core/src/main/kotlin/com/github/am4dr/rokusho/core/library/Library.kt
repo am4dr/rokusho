@@ -1,11 +1,18 @@
 package com.github.am4dr.rokusho.core.library
 
-import javafx.beans.property.ReadOnlyListProperty
-import javafx.beans.property.ReadOnlyMapProperty
+import com.github.am4dr.rokusho.core.item.Item
+import com.github.am4dr.rokusho.core.metadata.BaseTag
+import com.github.am4dr.rokusho.core.metadata.PatchedTag
+import kotlin.reflect.KClass
 
-interface Library<T> {
-    val tags: ReadOnlyMapProperty<String, Tag>
-    val records: ReadOnlyListProperty<Record<T>>
+interface Library<T : Any> {
 
-    fun updateItemTags(key: T, tags: Iterable<ItemTag>)
+    val type: KClass<T>
+
+    fun getIDs(): Set<Item.ID>
+    fun get(id: Item.ID): LibraryItem<out T>?
+    fun update(id: Item.ID, tags: Set<PatchedTag>): Boolean
+    fun has(id: Item.ID): Boolean
+
+    fun getTags(): Set<BaseTag>
 }

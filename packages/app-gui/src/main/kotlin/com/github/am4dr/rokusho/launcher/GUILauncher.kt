@@ -3,7 +3,6 @@ package com.github.am4dr.rokusho.launcher
 import com.github.am4dr.rokusho.app.ImageLibraryLoader
 import com.github.am4dr.rokusho.app.Rokusho
 import com.github.am4dr.rokusho.app.SaveDataStoreProvider
-import com.github.am4dr.rokusho.app.datastore.yaml.YamlSaveDataStore
 import com.github.am4dr.rokusho.app.gui.GUIPopupPathChooser
 import com.github.am4dr.rokusho.app.gui.LibraryCollection
 import com.github.am4dr.rokusho.app.gui.LibraryViewerCollection
@@ -20,6 +19,7 @@ import com.github.am4dr.rokusho.gui.sidemenu.CharacterIcon
 import com.github.am4dr.rokusho.gui.sidemenu.SideMenuIcon
 import com.github.am4dr.rokusho.gui.sidemenu.SimpleSideMenu
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
+import com.github.am4dr.rokusho.old.datastore.file.yaml.YamlSaveDataStore
 import javafx.application.Application
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.When

@@ -1,0 +1,6 @@
+package com.github.am4dr.rokusho.core.datastore
+
+interface DataStore<T> {
+    fun save(data: T)
+    fun load(): T?
+}
