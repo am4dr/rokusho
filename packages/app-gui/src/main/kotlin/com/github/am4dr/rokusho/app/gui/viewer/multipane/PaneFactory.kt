@@ -1,6 +1,6 @@
 package com.github.am4dr.rokusho.app.gui.viewer.multipane
 
-import com.github.am4dr.rokusho.app.library.RokushoLibrary
+import com.github.am4dr.rokusho.adapter.RokushoLibrary
 import kotlin.reflect.KClass
 
 interface PaneFactory {

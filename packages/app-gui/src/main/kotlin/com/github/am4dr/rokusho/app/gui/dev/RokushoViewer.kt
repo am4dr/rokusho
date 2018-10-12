@@ -1,6 +1,6 @@
 package com.github.am4dr.rokusho.app.gui.dev
 
-import com.github.am4dr.rokusho.app.library.RokushoLibrary
+import com.github.am4dr.rokusho.adapter.RokushoLibrary
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import com.github.am4dr.rokusho.old.core.library.Record
 import javafx.collections.ObservableList

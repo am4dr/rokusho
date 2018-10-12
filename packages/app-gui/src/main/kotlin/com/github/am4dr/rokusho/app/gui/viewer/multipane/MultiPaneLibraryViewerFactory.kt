@@ -1,8 +1,8 @@
 package com.github.am4dr.rokusho.app.gui.viewer.multipane
 
+import com.github.am4dr.rokusho.adapter.RokushoLibrary
 import com.github.am4dr.rokusho.app.gui.LibraryViewer
 import com.github.am4dr.rokusho.app.gui.LibraryViewerFactory
-import com.github.am4dr.rokusho.app.library.RokushoLibrary
 
 class MultiPaneLibraryViewerFactory(private val paneFactories: List<PaneFactory>) : LibraryViewerFactory {
 

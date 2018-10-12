@@ -1,8 +1,8 @@
 package com.github.am4dr.rokusho.app.gui.viewer.multipane.pane
 
+import com.github.am4dr.rokusho.adapter.RokushoLibrary
 import com.github.am4dr.rokusho.app.gui.viewer.multipane.MultiPaneLibraryViewer
 import com.github.am4dr.rokusho.app.gui.viewer.multipane.PaneFactory
-import com.github.am4dr.rokusho.app.library.RokushoLibrary
 import com.github.am4dr.rokusho.old.core.library.Record
 import javafx.scene.control.ListView
 import kotlin.reflect.KClass

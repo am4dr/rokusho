@@ -1,8 +1,8 @@
 package com.github.am4dr.rokusho.app.gui
 
 import com.github.am4dr.rokusho.adapter.OldLibraryWrapper
-import com.github.am4dr.rokusho.app.library.RokushoLibrary
-import com.github.am4dr.rokusho.app.library.toRokushoLibrary
+import com.github.am4dr.rokusho.adapter.RokushoLibrary
+import com.github.am4dr.rokusho.adapter.toRokushoLibrary
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import com.github.am4dr.rokusho.old.core.library.Library
 import javafx.beans.InvalidationListener

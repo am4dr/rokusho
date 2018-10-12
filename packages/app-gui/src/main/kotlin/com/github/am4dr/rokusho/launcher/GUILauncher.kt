@@ -1,9 +1,7 @@
 package com.github.am4dr.rokusho.launcher
 
+import com.github.am4dr.rokusho.adapter.RokushoLibrary
 import com.github.am4dr.rokusho.app.FileSystemBasedLibraryProvider
-import com.github.am4dr.rokusho.app.ImageLibraryLoader
-import com.github.am4dr.rokusho.app.Rokusho
-import com.github.am4dr.rokusho.app.SaveDataStoreProvider
 import com.github.am4dr.rokusho.app.gui.GUIPopupPathChooser
 import com.github.am4dr.rokusho.app.gui.LibraryCollection
 import com.github.am4dr.rokusho.app.gui.LibraryViewerCollection
@@ -12,15 +10,11 @@ import com.github.am4dr.rokusho.app.gui.dev.RokushoViewer
 import com.github.am4dr.rokusho.app.gui.viewer.multipane.MultiPaneLibraryViewerFactory
 import com.github.am4dr.rokusho.app.gui.viewer.multipane.pane.ListPaneFactory
 import com.github.am4dr.rokusho.app.gui.viewer.multipane.pane.ThumbnailPaneFactory
-import com.github.am4dr.rokusho.app.library.RokushoLibrary
-import com.github.am4dr.rokusho.app.library.fs.FileSystemLibraryLoader
-import com.github.am4dr.rokusho.app.library.fs.LibraryRootDetector
 import com.github.am4dr.rokusho.gui.scene.MainPane
 import com.github.am4dr.rokusho.gui.sidemenu.CharacterIcon
 import com.github.am4dr.rokusho.gui.sidemenu.SideMenuIcon
 import com.github.am4dr.rokusho.gui.sidemenu.SimpleSideMenu
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
-import com.github.am4dr.rokusho.old.datastore.file.yaml.YamlSaveDataStore
 import javafx.application.Application
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.When
@@ -38,7 +32,6 @@ import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.Options
 import org.slf4j.LoggerFactory
 import java.nio.file.Files
-import java.nio.file.Path
 import java.nio.file.Paths
 
 class GUILauncher : Application() {
@@ -50,27 +43,20 @@ class GUILauncher : Application() {
         private val log = LoggerFactory.getLogger(GUILauncher::class.java)
     }
 
-    private lateinit var rokusho: Rokusho
     private lateinit var libraryCollection: com.github.am4dr.rokusho.app.LibraryCollection
-
-    private fun loadImageLibrary(path: Path) {
-        rokusho.loadAndAddLibrary(ImageLibraryLoader::class, path)
-    }
 
     override fun init() {
         log.info("launched with the params: ${parameters.raw}")
-        val libraryLoaders = listOf(ImageLibraryLoader(createFileSystemLibraryLoader()))
-        rokusho = Rokusho(libraryLoaders)
+        libraryCollection = com.github.am4dr.rokusho.app.LibraryCollection(listOf(FileSystemBasedLibraryProvider()))
         parseArgs(parameters.raw.toTypedArray()).args
                 .map { Paths.get(it) }
                 .filter { Files.isDirectory(it) }
-                .forEach { loadImageLibrary(it) }
+                .forEach { libraryCollection.loadPathLibrary(it) }
     }
 
     private fun parseArgs(args: Array<String>): CommandLine = DefaultParser().parse(Options(), args)
 
     override fun start(stage: Stage) {
-        libraryCollection = com.github.am4dr.rokusho.app.LibraryCollection(listOf(FileSystemBasedLibraryProvider()))
         val rokushoLibraryCollection = RokushoLibraryCollection(libraryCollection, GUIPopupPathChooser(stage))
         val libraryIcons = createIcons(rokushoLibraryCollection, ::createSideMenuIcon)
         val viewerFactory = MultiPaneLibraryViewerFactory(listOf(ListPaneFactory(), ThumbnailPaneFactory()))
@@ -122,10 +108,3 @@ private fun createIcons(libraryCollection: LibraryCollection,
                 selectedProperty.bind(libraryIsSelected)
             }
         }
-
-private fun createFileSystemLibraryLoader(): FileSystemLibraryLoader {
-    val saveFileName = "rokusho.yaml"
-    val libraryRootDetector: LibraryRootDetector = { path -> Files.isRegularFile(path.resolve(saveFileName)) }
-    val saveDataStoreProvider = SaveDataStoreProvider { YamlSaveDataStore(it.resolve(saveFileName)) }
-    return FileSystemLibraryLoader(libraryRootDetector, saveDataStoreProvider::getOrCreate)
-}

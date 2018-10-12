@@ -1,6 +1,6 @@
 package com.github.am4dr.rokusho.app.gui
 
-import com.github.am4dr.rokusho.app.library.RokushoLibrary
+import com.github.am4dr.rokusho.adapter.RokushoLibrary
 import javafx.beans.property.ReadOnlyObjectProperty
 import javafx.collections.ObservableList
 

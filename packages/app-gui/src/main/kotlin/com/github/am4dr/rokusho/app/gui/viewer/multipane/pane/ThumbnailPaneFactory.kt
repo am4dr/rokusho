@@ -1,9 +1,9 @@
 package com.github.am4dr.rokusho.app.gui.viewer.multipane.pane
 
+import com.github.am4dr.rokusho.adapter.RokushoLibrary
 import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.gui.viewer.multipane.MultiPaneLibraryViewer
 import com.github.am4dr.rokusho.app.gui.viewer.multipane.PaneFactory
-import com.github.am4dr.rokusho.app.library.RokushoLibrary
 import com.github.am4dr.rokusho.gui.control.ImageOverlay
 import com.github.am4dr.rokusho.gui.control.RemovableTag
 import com.github.am4dr.rokusho.gui.thumbnail.CachedThumbnailFlowPane
