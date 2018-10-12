@@ -38,7 +38,7 @@ fun toSaveData(metadataRepository: MetaDataRepository): SaveData {
     val idToTag = oldTags.associateBy(OldTag::id)
     val records = metadataRepository.getRecords()
     return SaveData(oldTags, records.map {
-        OldItem(it.key.id, ItemMetaData(it.tags.mapNotNull { patchedTagToOldItemTag(idToTag::get, it) }))
+        OldItem(it.key.id, ItemMetaData(it.tags.mapNotNull { tag -> patchedTagToOldItemTag(idToTag::get, tag) }))
     })
 }
 internal fun baseTagToOldTag(tag: BaseTag): OldTag {
@@ -46,7 +46,6 @@ internal fun baseTagToOldTag(tag: BaseTag): OldTag {
     return OldTag(tag.name.name, type, tag.data.remove("type").asMap())
 }
 internal fun patchedTagToOldItemTag(idToTag: (String) -> OldTag?, tag: PatchedTag): OldItemTag? {
-    val value = tag.patchData["value"] ?: return null
     val oldTag = idToTag(tag.base.name.name) ?: return null
-    return OldItemTag(oldTag, value)
+    return OldItemTag(oldTag, tag.patchData["value"])
 }

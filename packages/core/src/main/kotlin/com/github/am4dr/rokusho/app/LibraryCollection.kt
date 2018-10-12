@@ -17,7 +17,7 @@ class LibraryCollection(libraryProviders: Collection<LibraryProvider<*>>) {
     private val libraryProvider = LibraryProviderCollection(libraryProviders.toSet())
 
     private val libraries: ObservableList<Library<*>> = FXCollections.observableArrayList()
-    fun getLibraries(): ReadOnlyListProperty<Library<*>> = SimpleListProperty<Library<*>>(libraries)
+    fun getLibraries(): ReadOnlyListProperty<Library<*>> = SimpleListProperty<Library<*>>(FXCollections.observableArrayList()).apply { bindContent(libraries) }
 
     /**
      * path以下のPathを再帰的に集めたLibrary<Path>を読み込む

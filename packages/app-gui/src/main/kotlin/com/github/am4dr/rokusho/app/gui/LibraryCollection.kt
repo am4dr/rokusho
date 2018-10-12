@@ -6,7 +6,7 @@ import javafx.collections.ObservableList
 
 interface LibraryCollection {
     val libraries: ObservableList<RokushoLibrary<*>>
-    fun addLibraryViaGUI()
+    fun addPathLibraryViaGUI()
     fun selectedProperty(): ReadOnlyObjectProperty<RokushoLibrary<*>?>
     fun select(library: RokushoLibrary<*>)
     fun select(index: Int)

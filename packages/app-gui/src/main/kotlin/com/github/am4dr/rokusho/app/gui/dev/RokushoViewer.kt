@@ -1,6 +1,5 @@
 package com.github.am4dr.rokusho.app.gui.dev
 
-import com.github.am4dr.rokusho.app.Rokusho
 import com.github.am4dr.rokusho.app.library.RokushoLibrary
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import com.github.am4dr.rokusho.old.core.library.Record
@@ -12,7 +11,7 @@ import javafx.scene.control.ListView
 import javafx.scene.layout.FlowPane
 import javafx.stage.Stage
 
-class RokushoViewer(val rokusho: Rokusho) {
+class RokushoViewer(val libraries: ObservableList<RokushoLibrary<*>>) {
     companion object {
         const val initialWidth: Double = 300.0
         const val initialHeight: Double = 500.0
@@ -29,7 +28,7 @@ class RokushoViewer(val rokusho: Rokusho) {
 
     fun show() = stage.show()
     private fun createScene(w: Double, h: Double): Scene {
-        val libraryList = ListView(TransformedList(rokusho.libraries, RokushoViewer::LibraryListCell))
+        val libraryList = ListView(TransformedList(libraries, RokushoViewer::LibraryListCell))
         return Scene(libraryList, w, h)
     }
 

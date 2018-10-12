@@ -24,7 +24,7 @@ class OldLibraryWrapper<T : Any>(val library: Library<T>) : OldLibrary<T> {
     override val tags: ReadOnlyMapProperty<String, OldTag> =
             ReadOnlyMapWrapper(library.getTags().associateByTo(
                     FXCollections.observableHashMap(),
-                    { it.name.toString() },
+                    { it.name.name },
                     { baseTagToOldTag(it) }))
 
     override val records: ReadOnlyListProperty<OldRecord<T>> =
@@ -37,7 +37,7 @@ class OldLibraryWrapper<T : Any>(val library: Library<T>) : OldLibrary<T> {
         library.update(id , patchedTags)
     }
     private fun getOldRecordByItemID(id: Item.ID): OldRecord<T>? {
-        val item = library.get(id) ?: return null
+        val item = library.get(id) ?: throw IllegalStateException()
         val tags = item.tags.mapNotNull { patchedTagToOldItemTag(tags::get, it) }
         return OldRecord(item.get(), tags)
     }

@@ -1,5 +1,6 @@
 package com.github.am4dr.rokusho.launcher
 
+import com.github.am4dr.rokusho.app.FileSystemBasedLibraryProvider
 import com.github.am4dr.rokusho.app.ImageLibraryLoader
 import com.github.am4dr.rokusho.app.Rokusho
 import com.github.am4dr.rokusho.app.SaveDataStoreProvider
@@ -50,6 +51,7 @@ class GUILauncher : Application() {
     }
 
     private lateinit var rokusho: Rokusho
+    private lateinit var libraryCollection: com.github.am4dr.rokusho.app.LibraryCollection
 
     private fun loadImageLibrary(path: Path) {
         rokusho.loadAndAddLibrary(ImageLibraryLoader::class, path)
@@ -68,21 +70,22 @@ class GUILauncher : Application() {
     private fun parseArgs(args: Array<String>): CommandLine = DefaultParser().parse(Options(), args)
 
     override fun start(stage: Stage) {
-        val libraryCollection = RokushoLibraryCollection(rokusho, GUIPopupPathChooser(stage))
-        val libraryIcons = createIcons(libraryCollection, ::createSideMenuIcon)
+        libraryCollection = com.github.am4dr.rokusho.app.LibraryCollection(listOf(FileSystemBasedLibraryProvider()))
+        val rokushoLibraryCollection = RokushoLibraryCollection(libraryCollection, GUIPopupPathChooser(stage))
+        val libraryIcons = createIcons(rokushoLibraryCollection, ::createSideMenuIcon)
         val viewerFactory = MultiPaneLibraryViewerFactory(listOf(ListPaneFactory(), ThumbnailPaneFactory()))
-        val viewerCollection = LibraryViewerCollection(libraryCollection, viewerFactory)
+        val viewerCollection = LibraryViewerCollection(rokushoLibraryCollection, viewerFactory)
 
         val sideMenu = SimpleSideMenu().apply {
             width.value = 40.0
-            onAddClicked.set(libraryCollection::addLibraryViaGUI)
+            onAddClicked.set(rokushoLibraryCollection::addPathLibraryViaGUI)
             Bindings.bindContent(icons, libraryIcons)
         }
         val pane = MainPane().apply {
             this.sideMenu.set(sideMenu)
-            addLibraryEventHandler.set(libraryCollection::addLibraryViaGUI)
+            addLibraryEventHandler.set(rokushoLibraryCollection::addPathLibraryViaGUI)
             libraryViewer.bind(viewerCollection.currentLibraryViewer)
-            showAddLibrarySuggestion.bind(libraryCollection.selectedProperty().isNull)
+            showAddLibrarySuggestion.bind(rokushoLibraryCollection.selectedProperty().isNull)
         }
 
         stage.run {
@@ -90,7 +93,7 @@ class GUILauncher : Application() {
             scene = Scene(pane, 800.0, 500.0)
             show()
         }
-        RokushoViewer(rokusho).also {
+        RokushoViewer(rokushoLibraryCollection.libraries).also {
             it.stage.apply {
                 x = stage.x - RokushoViewer.initialWidth - 2.0
                 y = stage.y

@@ -1,17 +1,26 @@
 package com.github.am4dr.rokusho.app.gui
 
-import com.github.am4dr.rokusho.app.ImageLibraryLoader
-import com.github.am4dr.rokusho.app.Rokusho
+import com.github.am4dr.rokusho.adapter.OldLibraryWrapper
 import com.github.am4dr.rokusho.app.library.RokushoLibrary
+import com.github.am4dr.rokusho.app.library.toRokushoLibrary
+import com.github.am4dr.rokusho.javafx.collection.TransformedList
+import com.github.am4dr.rokusho.old.core.library.Library
 import javafx.beans.InvalidationListener
 import javafx.beans.property.ReadOnlyObjectProperty
 import javafx.beans.property.ReadOnlyObjectWrapper
 import javafx.collections.ObservableList
+import java.nio.file.Path
+import com.github.am4dr.rokusho.app.LibraryCollection as CoreLibraryCollection
 
-class RokushoLibraryCollection(private val rokusho: Rokusho,
+class RokushoLibraryCollection(private val libraryCollection: CoreLibraryCollection,
                                private val libraryPathProvider: LibraryPathProvider) : LibraryCollection {
 
-    override val libraries: ObservableList<RokushoLibrary<*>> get() = rokusho.libraries
+    private val libs = libraryCollection.getLibraries()
+    override val libraries: ObservableList<RokushoLibrary<*>> = TransformedList(libs) {
+        // TODO 問題のあるキャスト
+        val oldLibraryWrapper = OldLibraryWrapper(it) as Library<Path>
+        oldLibraryWrapper.toRokushoLibrary("Name", "ShortName")
+    }
     private val selected = ReadOnlyObjectWrapper<RokushoLibrary<*>?>()
 
     init {
@@ -23,9 +32,9 @@ class RokushoLibraryCollection(private val rokusho: Rokusho,
         })
     }
 
-    override fun addLibraryViaGUI() {
+    override fun addPathLibraryViaGUI() {
         libraryPathProvider.get()?.let {
-            rokusho.loadAndAddLibrary(ImageLibraryLoader::class, it)
+            libraryCollection.loadPathLibrary(it)
         }
     }
 

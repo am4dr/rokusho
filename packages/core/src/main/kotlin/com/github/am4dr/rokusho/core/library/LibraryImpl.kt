@@ -17,8 +17,9 @@ class LibraryImpl<T : Any>(val metaDataRepository: MetaDataRepository,
     override fun getIDs(): Set<Item.ID> = itemCollection.ids
     override fun get(id: Item.ID): LibraryItem<out T>? {
         val item = itemCollection.get(id) ?: return null
-        val record = keyConverter(item.id)?.let { metaDataRepository.get(it) } ?: return null
-        return LibraryItem(item, record.tags)
+        val recordKey = keyConverter(item.id)
+        val record = recordKey?.let { metaDataRepository.get(it) }
+        return LibraryItem(item, record?.tags ?: setOf())
     }
 
     override fun update(id: Item.ID, tags: Set<PatchedTag>): Boolean {
