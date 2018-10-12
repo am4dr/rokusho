@@ -1,6 +1,7 @@
 package com.github.am4dr.rokusho.core.metadata
 
-class Record(val key: Key, val tags: Set<PatchedTag> = setOf()) {
+data class Record(val key: Key, val tags: Set<PatchedTag> = setOf()) {
+    constructor(key: String, tags: Set<PatchedTag> = setOf()) : this(Key(key), tags)
 
     override fun equals(other: Any?): Boolean = other is Record && other.key == key
     override fun hashCode(): Int = key.hashCode()

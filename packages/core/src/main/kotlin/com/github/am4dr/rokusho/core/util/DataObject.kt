@@ -1,7 +1,7 @@
 package com.github.am4dr.rokusho.core.util
 
 // TODO StringTagData, MapTagDataからなるsealed class化
-class DataObject(data: Map<String, String>) {
+class DataObject(data: Map<String, String> = mapOf()) {
 
     private val data: Map<String, String> = data.toMap()
 

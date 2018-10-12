@@ -9,7 +9,7 @@ interface MetaDataRepository {
     fun remove(name: BaseTag.Name): BaseTag?
     fun has(name: BaseTag.Name): Boolean
 
-    fun getRecordIDs(): Set<Record.Key>
+    fun getRecordKeys(): Set<Record.Key>
     fun getRecords(): Set<Record>
     fun get(key: Record.Key): Record?
     fun add(record: Record): Record?
