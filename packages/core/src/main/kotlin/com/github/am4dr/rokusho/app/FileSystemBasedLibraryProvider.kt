@@ -37,7 +37,7 @@ class FileSystemBasedLibraryProvider : LibraryProvider<Path> {
                 }
             }
 
-    private val metaDataRepositories = MetaDataRepositories()
+    private val metaDataRepositories = FileBasedMetaDataRepositories()
 
     override fun get(descriptor: LibraryDescriptor): Library<Path>? {
         if (!isAcceptable(descriptor)) return null

@@ -1,6 +1,7 @@
 package com.github.am4dr.rokusho.app
 
 import com.github.am4dr.rokusho.adapter.DataStoreConverter
+import com.github.am4dr.rokusho.core.datastore.DataStore
 import com.github.am4dr.rokusho.core.metadata.DefaultMetaDataRepositoryImpl
 import com.github.am4dr.rokusho.core.metadata.MetaDataRepository
 import com.github.am4dr.rokusho.old.datastore.file.yaml.YamlSaveDataStore
@@ -8,7 +9,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.PathMatcher
 
-class MetaDataRepositories {
+class FileBasedMetaDataRepositories {
 
     companion object {
         private const val defaultSavefileName: String = "rokusho.yaml"
@@ -29,10 +30,14 @@ class MetaDataRepositories {
 
         val location = findLibraryRoot(savefileParent) ?: savefileParent
         val savefile = location.resolve(defaultSavefileName)
-        val store = DataStoreConverter(YamlSaveDataStore(savefile))
+        val store = createDataStoreByPath(savefile)
         val repo = store.load() ?: DefaultMetaDataRepositoryImpl()
         knownRepositories[savefile] = repo
         return savefile to repo
+    }
+
+    private fun createDataStoreByPath(savefile: Path): DataStore<MetaDataRepository> {
+        return DataStoreConverter(YamlSaveDataStore(savefile))
     }
 
     internal tailrec fun findLibraryRoot(path: Path): Path? =
