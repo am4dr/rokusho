@@ -1,8 +1,9 @@
 package com.github.am4dr.rokusho.core.library
 
 import com.github.am4dr.rokusho.core.item.Item
+import com.github.am4dr.rokusho.core.metadata.PatchedTag
 
-data class LibraryItem<T : Any>(val item: Item<T>, val tags: Set<LibraryItemTag>) {
+data class LibraryItem<T : Any>(val item: Item<T>, val tags: Set<PatchedTag>) {
 
     val id: Item.ID get() = item.id
 

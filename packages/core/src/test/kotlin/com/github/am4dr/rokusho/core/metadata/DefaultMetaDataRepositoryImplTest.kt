@@ -2,10 +2,9 @@ package com.github.am4dr.rokusho.core.metadata
 
 import com.github.am4dr.rokusho.core.datastore.DataStore
 import com.github.am4dr.rokusho.core.util.DataObject
-import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 internal class DefaultMetaDataRepositoryImplTest {
 
