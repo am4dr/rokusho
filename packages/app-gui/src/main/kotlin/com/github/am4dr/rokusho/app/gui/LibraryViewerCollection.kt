@@ -7,12 +7,12 @@ import javafx.scene.Node
 import java.lang.ref.SoftReference
 import java.util.*
 
-class LibraryViewerCollection(private val libraryCollection: LibraryCollection,
+class LibraryViewerCollection(private val librarySelector: LibrarySelector,
                               private val viewerFactory: LibraryViewerFactory) {
 
     val currentLibraryViewer: ObservableValue<Node?> = Bindings.createObjectBinding({
-        libraryCollection.selectedProperty().get()?.let(this::getOrCreateLibraryViewer)?.node
-    }, arrayOf(libraryCollection.selectedProperty()))
+        librarySelector.selectedProperty().get()?.let(this::getOrCreateLibraryViewer)?.node
+    }, arrayOf(librarySelector.selectedProperty()))
 
     private fun getOrCreateLibraryViewer(library: Library<*>): LibraryViewer<*> =
             getOrNull(library) ?: createLibraryViewerAndBindRecords(library)

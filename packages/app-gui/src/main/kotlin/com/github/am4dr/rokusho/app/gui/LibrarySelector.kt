@@ -4,10 +4,9 @@ import com.github.am4dr.rokusho.old.core.library.Library
 import javafx.beans.property.ReadOnlyObjectProperty
 import javafx.collections.ObservableList
 
-interface LibraryCollection {
+interface LibrarySelector {
 
     val libraries: ObservableList<Library<*>>
-    fun addPathLibraryViaGUI()
     fun selectedProperty(): ReadOnlyObjectProperty<Library<*>?>
     fun select(library: Library<*>)
     fun select(index: Int)

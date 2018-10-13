@@ -1,19 +1,15 @@
 package com.github.am4dr.rokusho.app.gui
 
-import com.github.am4dr.rokusho.adapter.OldLibraryWrapper
-import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import com.github.am4dr.rokusho.old.core.library.Library
 import javafx.beans.InvalidationListener
 import javafx.beans.property.ReadOnlyObjectProperty
 import javafx.beans.property.ReadOnlyObjectWrapper
+import javafx.collections.FXCollections
 import javafx.collections.ObservableList
-import com.github.am4dr.rokusho.app.LibraryCollection as CoreLibraryCollection
 
-class RokushoLibraryCollection(private val libraryCollection: CoreLibraryCollection,
-                               private val libraryPathProvider: LibraryPathProvider) : LibraryCollection {
+class LibrarySelectorImpl : LibrarySelector {
 
-    private val libs = libraryCollection.getLibraries()
-    override val libraries: ObservableList<Library<*>> = TransformedList(libs) { OldLibraryWrapper(it) }
+    override val libraries: ObservableList<Library<*>> = FXCollections.observableArrayList()
     private val selected = ReadOnlyObjectWrapper<Library<*>?>()
 
     init {
@@ -23,12 +19,6 @@ class RokushoLibraryCollection(private val libraryCollection: CoreLibraryCollect
                 0 -> clearSelection()
             }
         })
-    }
-
-    override fun addPathLibraryViaGUI() {
-        libraryPathProvider.get()?.let {
-            libraryCollection.loadPathLibrary(it)
-        }
     }
 
     override fun selectedProperty(): ReadOnlyObjectProperty<Library<*>?> = selected.readOnlyProperty

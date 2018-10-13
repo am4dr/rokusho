@@ -5,16 +5,16 @@ import javafx.stage.Stage
 import java.io.File
 import java.nio.file.Path
 
-class GUIPopupPathChooser(private val stage: Stage) : LibraryPathProvider {
+class GUIPopupPathChooser(private val stage: Stage, val defaultTitle: String = "") {
 
-    override fun get(): Path? {
-        return selectLibraryDirectory()
+    fun get(title: String = defaultTitle): Path? {
+        return selectLibraryDirectory(title)
     }
 
     private var lastSelectedDirectory: File? = null
-    private fun selectLibraryDirectory(): Path? {
+    private fun selectLibraryDirectory(title: String): Path? {
         DirectoryChooser().run {
-            title = "画像があるディレクトリを選択してください"
+            this.title = title
             initialDirectory = lastSelectedDirectory
             return showDialog(stage)?.also {
                 lastSelectedDirectory = it
