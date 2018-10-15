@@ -10,19 +10,19 @@ import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.collections.transformation.FilteredList
 import javafx.scene.Node
-import javafx.scene.layout.StackPane
 import java.util.function.Predicate
 
-class MultiPaneLibraryViewer<T : Any>(panes: List<Pane<T>>) : StackPane(), LibraryViewer<T> {
+class MultiPaneLibraryViewer<T : Any>(panes: List<Pane<T>>) : LibraryViewer<T> {
 
-    override val node: Node get() = this
+    private val view = ViewSelectorPaneWithSearchBox()
+    override val node: Node get() = view
     override val records: ObservableList<Record<T>> = FXCollections.observableArrayList()
 
-    val filteredList = FilteredList(records)
-    val filteredRecords = SimpleListProperty(filteredList)
+    private val filteredList = FilteredList(records)
+    private val filteredRecords = SimpleListProperty(filteredList)
 
     init {
-        val view = ViewSelectorPaneWithSearchBox().apply {
+        view.apply {
             totalCountProperty().bind(Bindings.size(records))
             filterPassedCountProperty().bind(Bindings.size(filteredRecords))
         }
@@ -38,7 +38,6 @@ class MultiPaneLibraryViewer<T : Any>(panes: List<Pane<T>>) : StackPane(), Libra
             Bindings.bindContent(it.records, filteredRecords)
             view.selections.add(ViewSelectorPaneWithSearchBox.Selection(it.label, it.viewer))
         }
-        children.add(view)
     }
 
     class Pane<T>(val label: String, val viewer: Node, val records: ObservableList<Record<T>> = FXCollections.observableArrayList())
