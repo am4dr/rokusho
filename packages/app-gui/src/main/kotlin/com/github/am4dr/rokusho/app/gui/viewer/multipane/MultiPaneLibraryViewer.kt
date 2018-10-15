@@ -20,6 +20,7 @@ class MultiPaneLibraryViewer<T : Any>(panes: List<Pane<T>>) : LibraryViewer<T> {
 
     private val filteredList = FilteredList(records)
     private val filteredRecords = SimpleListProperty(filteredList)
+    private val filteredPaneRecords: MutableMap<Pane<T>, ObservableList<Record<T>>> = mutableMapOf()
 
     init {
         val filterPredicate = Predicate { item: Record<*> ->
@@ -34,11 +35,15 @@ class MultiPaneLibraryViewer<T : Any>(panes: List<Pane<T>>) : LibraryViewer<T> {
             totalCountProperty().bind(Bindings.size(records))
             filterPassedCountProperty().bind(Bindings.size(filteredRecords))
         }
+
         panes.forEach {
-            Bindings.bindContent(it.records, filteredRecords)
+            filteredPaneRecords[it] =
+                    if (it.filter != null) { FilteredList(filteredList, it.filter) }
+                    else { filteredList }
+            Bindings.bindContent(it.records, filteredPaneRecords[it])
             view.selections.add(ViewSelectorPaneWithSearchBox.Selection(it.label, it.viewer))
         }
     }
 
-    class Pane<T>(val label: String, val viewer: Node, val records: ObservableList<Record<T>> = FXCollections.observableArrayList())
+    class Pane<T>(val label: String, val viewer: Node, val records: ObservableList<Record<T>> = FXCollections.observableArrayList(), val filter: ((Record<T>)->Boolean)? = null)
 }

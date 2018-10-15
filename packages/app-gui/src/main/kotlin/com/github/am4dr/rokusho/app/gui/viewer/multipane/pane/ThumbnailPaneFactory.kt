@@ -19,6 +19,8 @@ import javafx.scene.image.Image
 import javafx.scene.layout.Background
 import javafx.scene.layout.BackgroundFill
 import javafx.scene.paint.Color
+import java.nio.file.Files
+import java.nio.file.Path
 import kotlin.reflect.KClass
 
 
@@ -27,8 +29,12 @@ private const val thumbnailMaxHeight = 200.0
 
 class ThumbnailPaneFactory : PaneFactory {
 
+    companion object {
+        private val imageFileNameMatcher = Regex(".*\\.(bmp|gif|jpe?g|png)$", RegexOption.IGNORE_CASE)
+        fun isSupportedImageFile(path: Path) = Files.isRegularFile(path) && imageFileNameMatcher.matches(path.fileName.toString())
+    }
     private val imageLoader = UrlImageLoader()
-    private val supportedTypes = listOf(ImageUrl::class)
+    private val supportedTypes = listOf(ImageUrl::class, Path::class)
 
     override fun isAcceptable(type: KClass<*>): Boolean = supportedTypes.contains(type)
 
@@ -37,19 +43,27 @@ class ThumbnailPaneFactory : PaneFactory {
             when (library.type) {
                 ImageUrl::class -> {
                     library as Library<ImageUrl>
-                    createImageRecordsViewer<ImageUrl>("サムネイル",
+                    val viewer = createImageRecordsViewer<ImageUrl>(
                             { imageLoader.getImage(it.key.url) },
                             { imageLoader.getImage(it.key.url, thumbnailMaxWidth, thumbnailMaxHeight, true) },
                             { record, tags -> library.updateItemTags(record.key, tags) })
+                    MultiPaneLibraryViewer.Pane("サムネイル", viewer, viewer.records)
+                }
+                Path::class -> {
+                    library as Library<Path>
+                    val viewer = createImageRecordsViewer<Path>(
+                            { imageLoader.getImage(it.key.toUri().toURL()) },
+                            { imageLoader.getImage(it.key.toUri().toURL(), thumbnailMaxWidth, thumbnailMaxHeight, true) },
+                            { record, tags -> library.updateItemTags(record.key, tags) })
+                    MultiPaneLibraryViewer.Pane("サムネイル", viewer, viewer.records) { isSupportedImageFile(it.key) }
                 }
                 else -> null
             }
 }
 
-private fun <T> createImageRecordsViewer(label: String,
-                                         getImage: (Record<T>) -> Image,
+private fun <T> createImageRecordsViewer(getImage: (Record<T>) -> Image,
                                          getThumbnailImage: (Record<T>) -> Image,
-                                         updateItemTags: (Record<T>, List<ItemTag>) -> Unit): MultiPaneLibraryViewer.Pane<T> {
+                                         updateItemTags: (Record<T>, List<ItemTag>) -> Unit): CachedThumbnailFlowPane<Record<T>> {
     val imageViewer = createImageViewer()
     val thumbnailFactory = { record: Record<T> ->
         val base = ImageThumbnail(getThumbnailImage(record))
@@ -83,8 +97,7 @@ private fun <T> createImageRecordsViewer(label: String,
             overlayVisibilityProperty().bind(hoverProperty().or(overlayInputFocused))
         }
     }
-    val viewer = CachedThumbnailFlowPane(thumbnailFactory).apply { children.add(imageViewer) }
-    return MultiPaneLibraryViewer.Pane(label, viewer, viewer.records)
+    return CachedThumbnailFlowPane(thumbnailFactory).apply { children.add(imageViewer) }
 }
 
 private fun createImageViewer(): ImageOverlay =
