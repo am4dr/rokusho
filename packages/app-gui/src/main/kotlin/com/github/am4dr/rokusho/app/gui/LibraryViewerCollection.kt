@@ -1,6 +1,6 @@
 package com.github.am4dr.rokusho.app.gui
 
-import com.github.am4dr.rokusho.old.core.library.Library
+import com.github.am4dr.rokusho.core.library.Library
 import javafx.beans.binding.Bindings
 import javafx.beans.value.ObservableValue
 import javafx.scene.Node
@@ -19,7 +19,7 @@ class LibraryViewerCollection(private val librarySelector: LibrarySelector,
 
     private fun createLibraryViewerAndBindRecords(library: Library<*>): LibraryViewer<*> =
             getOrCreate(library).also {
-                Bindings.bindContent(it.records, library.records)
+                Bindings.bindContent(it.items, library.getItems())
             }
 
 

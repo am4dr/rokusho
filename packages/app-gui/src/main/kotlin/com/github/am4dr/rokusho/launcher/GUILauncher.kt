@@ -1,6 +1,5 @@
 package com.github.am4dr.rokusho.launcher
 
-import com.github.am4dr.rokusho.adapter.OldLibraryWrapper
 import com.github.am4dr.rokusho.app.FileSystemBasedLibraryProvider
 import com.github.am4dr.rokusho.app.LibraryCollection
 import com.github.am4dr.rokusho.app.gui.GUIPopupPathChooser
@@ -11,6 +10,7 @@ import com.github.am4dr.rokusho.app.gui.dev.RokushoViewer
 import com.github.am4dr.rokusho.app.gui.viewer.multipane.MultiPaneLibraryViewerFactory
 import com.github.am4dr.rokusho.app.gui.viewer.multipane.pane.ListPaneFactory
 import com.github.am4dr.rokusho.app.gui.viewer.multipane.pane.ThumbnailPaneFactory
+import com.github.am4dr.rokusho.core.library.Library
 import com.github.am4dr.rokusho.gui.scene.MainPane
 import com.github.am4dr.rokusho.gui.sidemenu.CharacterIcon
 import com.github.am4dr.rokusho.gui.sidemenu.SideMenuIcon
@@ -34,7 +34,6 @@ import org.apache.commons.cli.Options
 import org.slf4j.LoggerFactory
 import java.nio.file.Files
 import java.nio.file.Paths
-import com.github.am4dr.rokusho.old.core.library.Library as OldLibrary
 
 class GUILauncher : Application() {
 
@@ -46,25 +45,24 @@ class GUILauncher : Application() {
     }
 
     private lateinit var libraryCollection: LibraryCollection
-    private lateinit var oldLibraries: ObservableList<OldLibrary<*>>
+    private lateinit var libraries: ObservableList<Library<*>>
 
     override fun init() {
         log.info("launched with the params: ${parameters.raw}")
-        libraryCollection = com.github.am4dr.rokusho.app.LibraryCollection(listOf(FileSystemBasedLibraryProvider()))
-        oldLibraries = TransformedList(libraryCollection.getLibraries()) { OldLibraryWrapper(it) }
+        libraryCollection = LibraryCollection(listOf(FileSystemBasedLibraryProvider()))
         parseArgs(parameters.raw.toTypedArray()).args
                 .map { Paths.get(it) }
                 .filter { Files.isDirectory(it) }
                 .forEach { libraryCollection.loadPathLibrary(it) }
+        libraries = libraryCollection.getLibraries()
     }
 
     private fun parseArgs(args: Array<String>): CommandLine = DefaultParser().parse(Options(), args)
 
     override fun start(stage: Stage) {
 
-        val librarySelector = LibrarySelectorImpl().apply {
-            Bindings.bindContent(libraries, oldLibraries)
-        }
+        val librarySelector = LibrarySelectorImpl()
+        Bindings.bindContent(librarySelector.libraries, libraries)
         val libraryIcons = createIcons(librarySelector, ::createSideMenuIcon)
         val viewerFactory = MultiPaneLibraryViewerFactory(listOf(ListPaneFactory(), ThumbnailPaneFactory()))
         val viewerCollection = LibraryViewerCollection(librarySelector, viewerFactory)
@@ -98,7 +96,7 @@ class GUILauncher : Application() {
     }
 }
 
-private fun createSideMenuIcon(library: OldLibrary<*>): SideMenuIcon =
+private fun createSideMenuIcon(library: Library<*>): SideMenuIcon =
         CharacterIcon().apply {
             Tooltip.install(this, Tooltip(library.name))
             backgroundProperty().bind(When(selectedProperty)
@@ -108,7 +106,7 @@ private fun createSideMenuIcon(library: OldLibrary<*>): SideMenuIcon =
         }
 
 private fun createIcons(librarySelector: LibrarySelector,
-                        iconFactory: (OldLibrary<*>) -> SideMenuIcon): ObservableList<SideMenuIcon> =
+                        iconFactory: (Library<*>) -> SideMenuIcon): ObservableList<SideMenuIcon> =
         TransformedList(librarySelector.libraries) { library ->
             val libraryIsSelected = librarySelector.selectedProperty().isEqualTo(library)
             iconFactory(library).apply {

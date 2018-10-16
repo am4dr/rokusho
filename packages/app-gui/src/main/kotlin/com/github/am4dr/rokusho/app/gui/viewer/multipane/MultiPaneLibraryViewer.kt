@@ -1,8 +1,8 @@
 package com.github.am4dr.rokusho.app.gui.viewer.multipane
 
 import com.github.am4dr.rokusho.app.gui.LibraryViewer
+import com.github.am4dr.rokusho.core.library.LibraryItem
 import com.github.am4dr.rokusho.gui.scene.ViewSelectorPaneWithSearchBox
-import com.github.am4dr.rokusho.old.core.library.Record
 import javafx.beans.binding.Bindings
 import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections
@@ -16,23 +16,23 @@ class MultiPaneLibraryViewer<T : Any>(panes: List<Pane<T>>) : LibraryViewer<T> {
 
     private val view = ViewSelectorPaneWithSearchBox()
     override val node: Node get() = view
-    override val records: ObservableList<Record<T>> = FXCollections.observableArrayList()
+    override val items: ObservableList<LibraryItem<T>> = FXCollections.observableArrayList()
 
-    private val filteredList = FilteredList(records)
+    private val filteredList = FilteredList(items)
     private val filteredRecords = SimpleListProperty(filteredList)
-    private val filteredPaneRecords: MutableMap<Pane<T>, ObservableList<Record<T>>> = mutableMapOf()
+    private val filteredPaneRecords: MutableMap<Pane<T>, ObservableList<LibraryItem<T>>> = mutableMapOf()
 
     init {
-        val filterPredicate = Predicate { item: Record<*> ->
+        val filterPredicate = Predicate { item: LibraryItem<*> ->
             val input = view.filterTextProperty().get()
             if (input == null || input == "") true
-            else item.itemTags.any { it.tag.id.contains(input) }
+            else item.tags.any { it.base.name.name.contains(input) }
         }
         filteredList.predicateProperty()
                 .bind(Bindings.createObjectBinding(Callable { filterPredicate }, view.filterTextProperty()))
 
         view.apply {
-            totalCountProperty().bind(Bindings.size(records))
+            totalCountProperty().bind(Bindings.size(items))
             filterPassedCountProperty().bind(Bindings.size(filteredRecords))
         }
 
@@ -45,5 +45,5 @@ class MultiPaneLibraryViewer<T : Any>(panes: List<Pane<T>>) : LibraryViewer<T> {
         }
     }
 
-    class Pane<T>(val label: String, val viewer: Node, val records: ObservableList<Record<T>> = FXCollections.observableArrayList(), val filter: ((Record<T>)->Boolean)? = null)
+    class Pane<T : Any>(val label: String, val viewer: Node, val records: ObservableList<LibraryItem<T>> = FXCollections.observableArrayList(), val filter: ((LibraryItem<T>)->Boolean)? = null)
 }

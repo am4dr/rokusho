@@ -3,16 +3,15 @@ package com.github.am4dr.rokusho.app.gui.viewer.multipane.pane
 import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.app.gui.viewer.multipane.MultiPaneLibraryViewer
 import com.github.am4dr.rokusho.app.gui.viewer.multipane.PaneFactory
+import com.github.am4dr.rokusho.core.library.Library
+import com.github.am4dr.rokusho.core.library.LibraryItem
+import com.github.am4dr.rokusho.core.metadata.PatchedTag
 import com.github.am4dr.rokusho.gui.control.ImageOverlay
 import com.github.am4dr.rokusho.gui.control.RemovableTag
 import com.github.am4dr.rokusho.gui.thumbnail.CachedThumbnailFlowPane
 import com.github.am4dr.rokusho.gui.thumbnail.ImageThumbnail
 import com.github.am4dr.rokusho.gui.thumbnail.StackedThumbnail
 import com.github.am4dr.rokusho.gui.thumbnail.ThumbnailTagEditor
-import com.github.am4dr.rokusho.old.core.library.ItemTag
-import com.github.am4dr.rokusho.old.core.library.Library
-import com.github.am4dr.rokusho.old.core.library.Record
-import com.github.am4dr.rokusho.old.core.library.Tag
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.event.EventHandler
 import javafx.scene.image.Image
@@ -44,55 +43,53 @@ class ThumbnailPaneFactory : PaneFactory {
                 ImageUrl::class -> {
                     library as Library<ImageUrl>
                     val viewer = createImageRecordsViewer<ImageUrl>(
-                            { imageLoader.getImage(it.key.url) },
-                            { imageLoader.getImage(it.key.url, thumbnailMaxWidth, thumbnailMaxHeight, true) },
-                            { record, tags -> library.updateItemTags(record.key, tags.map(ThumbnailTag::toItemTag)) })
+                            { imageLoader.getImage(it.get().url) },
+                            { imageLoader.getImage(it.get().url, thumbnailMaxWidth, thumbnailMaxHeight, true) },
+                            { item, tags -> library.update(item.id, tags.map(ThumbnailTag::item).toSet()) },
+                            { library.parseTag(it) })
                     MultiPaneLibraryViewer.Pane("サムネイル", viewer, viewer.records)
                 }
                 Path::class -> {
                     library as Library<Path>
                     val viewer = createImageRecordsViewer<Path>(
-                            { imageLoader.getImage(it.key.toUri().toURL()) },
-                            { imageLoader.getImage(it.key.toUri().toURL(), thumbnailMaxWidth, thumbnailMaxHeight, true) },
-                            { record, tags -> library.updateItemTags(record.key, tags.map(ThumbnailTag::toItemTag)) })
-                    MultiPaneLibraryViewer.Pane("サムネイル", viewer, viewer.records) { isSupportedImageFile(it.key) }
+                            { imageLoader.getImage(it.get().toUri().toURL()) },
+                            { imageLoader.getImage(it.get().toUri().toURL(), thumbnailMaxWidth, thumbnailMaxHeight, true) },
+                            { item, tags -> library.update(item.id, tags.map(ThumbnailTag::item).toSet()) },
+                            { library.parseTag(it) })
+                    MultiPaneLibraryViewer.Pane("サムネイル", viewer, viewer.records) { isSupportedImageFile(it.get()) }
                 }
                 else -> null
             }
 }
 
-private fun itemTagToString(itemTag: ItemTag): String = itemTag.run {
-    when (tag.type) {
-        Tag.Type.TEXT -> value ?: tag.id
-        Tag.Type.VALUE -> "${tag.id} | ${value?.takeIf { it.isNotBlank() } ?: "-"}"
-        Tag.Type.SELECTION -> "${tag.id} | ${value?.takeIf { it.isNotBlank() } ?: "-"}"
-        Tag.Type.OTHERS -> tag.id
+private fun patchedTagToString(tag: PatchedTag): String {
+    val type = tag.data["type"]
+    val value = tag.data["value"]
+    val id = tag.base.name.name
+    return when (type) {
+        "text" -> value ?: id
+        "value" -> "$id | ${value?.takeIf { it.isNotBlank() } ?: "-"}"
+        "selection" -> "$id | ${value?.takeIf { it.isNotBlank() } ?: "-"}"
+        else -> id
     }
 }
-data class ThumbnailTag(val text: String, val item: ItemTag?) {
-    constructor(item: ItemTag) : this(itemTagToString(item), item)
-
-    companion object {
-        fun createBlankFor(text: String): ThumbnailTag = ThumbnailTag(text, null)
-    }
-
-    fun toItemTag(): ItemTag {
-        return item ?: ItemTag(Tag(text, Tag.Type.TEXT, mapOf("value" to text)), null)
-    }
+data class ThumbnailTag(val text: String, val item: PatchedTag) {
+    constructor(item: PatchedTag) : this(patchedTagToString(item), item)
 }
 
-private fun <T> createImageRecordsViewer(getImage: (Record<T>) -> Image,
-                                         getThumbnailImage: (Record<T>) -> Image,
-                                         updateTags: (Record<T>, List<ThumbnailTag>) -> Unit): CachedThumbnailFlowPane<Record<T>> {
+private fun <T : Any> createImageRecordsViewer(getImage: (LibraryItem<T>) -> Image,
+                                               getThumbnailImage: (LibraryItem<T>) -> Image,
+                                               updateTags: (LibraryItem<T>, List<ThumbnailTag>) -> Unit,
+                                               tagStringParser: (String) -> PatchedTag?): CachedThumbnailFlowPane<LibraryItem<T>> {
     val imageViewer = createImageViewer()
-    val thumbnailFactory = { record: Record<T> ->
-        val base = ImageThumbnail(getThumbnailImage(record))
+    val thumbnailFactory = { item: LibraryItem<T> ->
+        val base = ImageThumbnail(getThumbnailImage(item))
         val overlayInputFocused = SimpleBooleanProperty(false)
         val overlaySupplier = {
             ThumbnailTagEditor<ThumbnailTag>().apply {
-                tags.setAll(record.itemTags.map(::ThumbnailTag))
-                onEditEndedProperty.set { new -> updateTags(record, new) }
-                inputParserProperty.set { ThumbnailTag.createBlankFor(it) }
+                tags.setAll(item.tags.map(::ThumbnailTag))
+                onEditEndedProperty.set { new -> updateTags(item, new) }
+                inputParserProperty.set { input -> tagStringParser(input)?.let { ThumbnailTag(it) } }
                 tagNodeFactoryProperty.set { thumbnailTag ->
                     RemovableTag().apply {
                         textProperty().set(thumbnailTag.text)
@@ -103,7 +100,7 @@ private fun <T> createImageRecordsViewer(getImage: (Record<T>) -> Image,
             }
         }
         StackedThumbnail(base, overlaySupplier).apply {
-            setOnMouseClicked { imageViewer.show(getImage(record)) }
+            setOnMouseClicked { imageViewer.show(getImage(item)) }
             overlayVisibilityProperty().bind(hoverProperty().or(overlayInputFocused))
         }
     }

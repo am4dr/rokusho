@@ -1,6 +1,6 @@
 package com.github.am4dr.rokusho.app.gui
 
-import com.github.am4dr.rokusho.old.core.library.Library
+import com.github.am4dr.rokusho.core.library.Library
 
 interface LibraryViewerFactory {
 

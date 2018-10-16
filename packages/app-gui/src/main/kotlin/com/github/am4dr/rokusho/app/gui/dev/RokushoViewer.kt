@@ -1,8 +1,7 @@
 package com.github.am4dr.rokusho.app.gui.dev
 
+import com.github.am4dr.rokusho.core.library.Library
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
-import com.github.am4dr.rokusho.old.core.library.Library
-import com.github.am4dr.rokusho.old.core.library.Record
 import javafx.collections.ObservableList
 import javafx.scene.Scene
 import javafx.scene.control.Hyperlink
@@ -42,8 +41,7 @@ class RokushoViewer(val libraries: ObservableList<Library<*>>) {
                     },
                     Hyperlink("records").apply {
                         setOnMouseClicked {
-                            @Suppress("UNCHECKED_CAST")
-                            RecordsViewer(library.records as ObservableList<Record<*>>).show()
+                            RecordsViewer(library.getItems()).show()
                         }
                     },
                     Label(library.name),

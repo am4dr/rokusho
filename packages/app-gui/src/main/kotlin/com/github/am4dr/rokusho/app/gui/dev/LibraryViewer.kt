@@ -1,11 +1,11 @@
 package com.github.am4dr.rokusho.app.gui.dev
 
-import com.github.am4dr.rokusho.old.core.library.Library
-import com.github.am4dr.rokusho.old.core.library.Tag
+import com.github.am4dr.rokusho.core.library.Library
+import com.github.am4dr.rokusho.core.metadata.BaseTag
 import javafx.collections.FXCollections
-import javafx.collections.MapChangeListener
 import javafx.collections.ObservableList
-import javafx.collections.WeakMapChangeListener
+import javafx.collections.SetChangeListener
+import javafx.collections.WeakSetChangeListener
 import javafx.scene.Scene
 import javafx.scene.control.ListView
 import javafx.scene.layout.VBox
@@ -26,18 +26,21 @@ class LibraryViewer<T : Any>(val library: Library<T>) {
     }
     fun show() = stage.show()
     private fun createScene(w: Double, h: Double): Scene {
-        val tags = library.tags
-        val tagList = object : ObservableList<Tag> by FXCollections.observableArrayList(library.tags.values), MapChangeListener<String, Tag> {
-            override fun onChanged(change: MapChangeListener.Change<out String, out Tag>) {
+        val tags = library.getTags()
+        val tagList = object : ObservableList<BaseTag> by FXCollections.observableArrayList(library.getTags()), SetChangeListener<BaseTag> {
+            override fun onChanged(change: SetChangeListener.Change<out BaseTag>) {
                 when {
-                    change.wasRemoved() && change.wasAdded() -> indexOfFirst { it === change.valueRemoved }.takeIf { it >= 0 }?.let { set(it, change.valueAdded) }
-                    change.wasRemoved() -> remove(change.valueRemoved)
-                    change.wasAdded() -> add(change.valueAdded)
+                    change.wasRemoved() && change.wasAdded() ->
+                        indexOfFirst { it === change.elementRemoved }
+                                .takeIf { it >= 0 }
+                                ?.let { index -> set(index, change.elementAdded) }
+                    change.wasRemoved() -> remove(change.elementRemoved)
+                    change.wasAdded() -> add(change.elementAdded)
                 }
             }
         }
-        tags.addListener(WeakMapChangeListener(tagList))
-        val tagListView = ListView<Tag>(tagList)
+        tags.addListener(WeakSetChangeListener(tagList))
+        val tagListView = ListView<BaseTag>(tagList)
         return Scene(VBox(tagListView), w, h)
     }
 }
