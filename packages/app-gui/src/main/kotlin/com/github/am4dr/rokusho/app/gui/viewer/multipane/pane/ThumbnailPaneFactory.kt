@@ -46,7 +46,7 @@ class ThumbnailPaneFactory : PaneFactory {
                     val viewer = createImageRecordsViewer<ImageUrl>(
                             { imageLoader.getImage(it.key.url) },
                             { imageLoader.getImage(it.key.url, thumbnailMaxWidth, thumbnailMaxHeight, true) },
-                            { record, tags -> library.updateItemTags(record.key, tags) })
+                            { record, tags -> library.updateItemTags(record.key, tags.map(ThumbnailTag::toItemTag)) })
                     MultiPaneLibraryViewer.Pane("サムネイル", viewer, viewer.records)
                 }
                 Path::class -> {
@@ -54,39 +54,49 @@ class ThumbnailPaneFactory : PaneFactory {
                     val viewer = createImageRecordsViewer<Path>(
                             { imageLoader.getImage(it.key.toUri().toURL()) },
                             { imageLoader.getImage(it.key.toUri().toURL(), thumbnailMaxWidth, thumbnailMaxHeight, true) },
-                            { record, tags -> library.updateItemTags(record.key, tags) })
+                            { record, tags -> library.updateItemTags(record.key, tags.map(ThumbnailTag::toItemTag)) })
                     MultiPaneLibraryViewer.Pane("サムネイル", viewer, viewer.records) { isSupportedImageFile(it.key) }
                 }
                 else -> null
             }
 }
 
+private fun itemTagToString(itemTag: ItemTag): String = itemTag.run {
+    when (tag.type) {
+        Tag.Type.TEXT -> value ?: tag.id
+        Tag.Type.VALUE -> "${tag.id} | ${value?.takeIf { it.isNotBlank() } ?: "-"}"
+        Tag.Type.SELECTION -> "${tag.id} | ${value?.takeIf { it.isNotBlank() } ?: "-"}"
+        Tag.Type.OTHERS -> tag.id
+    }
+}
+data class ThumbnailTag(val text: String, val item: ItemTag?) {
+    constructor(item: ItemTag) : this(itemTagToString(item), item)
+
+    companion object {
+        fun createBlankFor(text: String): ThumbnailTag = ThumbnailTag(text, null)
+    }
+
+    fun toItemTag(): ItemTag {
+        return item ?: ItemTag(Tag(text, Tag.Type.TEXT, mapOf("value" to text)), null)
+    }
+}
+
 private fun <T> createImageRecordsViewer(getImage: (Record<T>) -> Image,
                                          getThumbnailImage: (Record<T>) -> Image,
-                                         updateItemTags: (Record<T>, List<ItemTag>) -> Unit): CachedThumbnailFlowPane<Record<T>> {
+                                         updateTags: (Record<T>, List<ThumbnailTag>) -> Unit): CachedThumbnailFlowPane<Record<T>> {
     val imageViewer = createImageViewer()
     val thumbnailFactory = { record: Record<T> ->
         val base = ImageThumbnail(getThumbnailImage(record))
         val overlayInputFocused = SimpleBooleanProperty(false)
         val overlaySupplier = {
-            ThumbnailTagEditor<ItemTag>().apply {
-                tags.setAll(record.itemTags)
-                onEditEndedProperty.set { new -> updateItemTags(record, new) }
-                inputParserProperty.set { text: String -> ItemTag(Tag(text, Tag.Type.TEXT, mapOf("value" to text)), null) }
-                tagNodeFactoryProperty.set { itemTag: ItemTag ->
-                    val text = itemTag.run {
-                        when (tag.type) {
-                            Tag.Type.TEXT -> value ?: tag.id
-                            Tag.Type.VALUE -> "${tag.id} | ${value?.takeIf { it.isNotBlank() } ?: "-"}"
-                            Tag.Type.SELECTION -> "${tag.id} | ${value?.takeIf { it.isNotBlank() } ?: "-"}"
-                            Tag.Type.OTHERS -> tag.id
-                        }
-                    }
+            ThumbnailTagEditor<ThumbnailTag>().apply {
+                tags.setAll(record.itemTags.map(::ThumbnailTag))
+                onEditEndedProperty.set { new -> updateTags(record, new) }
+                inputParserProperty.set { ThumbnailTag.createBlankFor(it) }
+                tagNodeFactoryProperty.set { thumbnailTag ->
                     RemovableTag().apply {
-                        textProperty().set(text)
-                        onRemoved.set {
-                            remove(itemTag)
-                        }
+                        textProperty().set(thumbnailTag.text)
+                        onRemoved.set { remove(thumbnailTag) }
                     }
                 }
                 overlayInputFocused.bind(inputFocusedProperty())
