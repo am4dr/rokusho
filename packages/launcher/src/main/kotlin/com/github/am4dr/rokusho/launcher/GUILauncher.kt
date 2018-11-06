@@ -4,7 +4,6 @@ import com.github.am4dr.rokusho.adapter.DataStoreConverter
 import com.github.am4dr.rokusho.app.FileBasedMetaDataRepositories
 import com.github.am4dr.rokusho.app.FileSystemBasedLibraryProvider
 import com.github.am4dr.rokusho.app.LibraryCollection
-import com.github.am4dr.rokusho.app.gui.GUIPopupPathChooser
 import com.github.am4dr.rokusho.app.gui.LibrarySelector
 import com.github.am4dr.rokusho.app.gui.LibrarySelectorImpl
 import com.github.am4dr.rokusho.app.gui.LibraryViewerCollection
@@ -14,6 +13,7 @@ import com.github.am4dr.rokusho.app.gui.viewer.multipane.pane.ListPaneFactory
 import com.github.am4dr.rokusho.app.gui.viewer.multipane.pane.ThumbnailPaneFactory
 import com.github.am4dr.rokusho.core.datastore.savedata.yaml.YamlSaveDataStore
 import com.github.am4dr.rokusho.core.library.Library
+import com.github.am4dr.rokusho.gui.control.DirectoryPathChooser
 import com.github.am4dr.rokusho.gui.scene.MainPane
 import com.github.am4dr.rokusho.gui.sidemenu.CharacterIcon
 import com.github.am4dr.rokusho.gui.sidemenu.SideMenuIcon
@@ -74,7 +74,7 @@ class GUILauncher : Application() {
         val viewerFactory = MultiPaneLibraryViewerFactory(listOf(ListPaneFactory(), ThumbnailPaneFactory()))
         val viewerCollection = LibraryViewerCollection(librarySelector, viewerFactory)
 
-        val pathChooser = GUIPopupPathChooser(stage)
+        val pathChooser = DirectoryPathChooser(stage)
         fun addPathLibraryViaGUI() = pathChooser.get()?.let(libraryCollection::loadPathLibrary)
 
         val sideMenu = SimpleSideMenu().apply {
