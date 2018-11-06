@@ -1,9 +1,9 @@
-package com.github.am4dr.rokusho.old.core.library
+package com.github.am4dr.rokusho.core.datastore.savedata
 
 data class Tag(
-        val id: String,
-        val type: Type,
-        val data: Map<String, Any>) {
+    val id: String,
+    val type: Type,
+    val data: Map<String, Any>) {
 
     enum class Type {
         TEXT, VALUE, SELECTION, OTHERS;

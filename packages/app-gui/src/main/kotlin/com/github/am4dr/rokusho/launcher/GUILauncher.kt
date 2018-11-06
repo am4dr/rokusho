@@ -1,5 +1,7 @@
 package com.github.am4dr.rokusho.launcher
 
+import com.github.am4dr.rokusho.adapter.DataStoreConverter
+import com.github.am4dr.rokusho.app.FileBasedMetaDataRepositories
 import com.github.am4dr.rokusho.app.FileSystemBasedLibraryProvider
 import com.github.am4dr.rokusho.app.LibraryCollection
 import com.github.am4dr.rokusho.app.gui.GUIPopupPathChooser
@@ -10,6 +12,7 @@ import com.github.am4dr.rokusho.app.gui.dev.RokushoViewer
 import com.github.am4dr.rokusho.app.gui.viewer.multipane.MultiPaneLibraryViewerFactory
 import com.github.am4dr.rokusho.app.gui.viewer.multipane.pane.ListPaneFactory
 import com.github.am4dr.rokusho.app.gui.viewer.multipane.pane.ThumbnailPaneFactory
+import com.github.am4dr.rokusho.core.datastore.savedata.yaml.YamlSaveDataStore
 import com.github.am4dr.rokusho.core.library.Library
 import com.github.am4dr.rokusho.gui.scene.MainPane
 import com.github.am4dr.rokusho.gui.sidemenu.CharacterIcon
@@ -49,7 +52,11 @@ class GUILauncher : Application() {
 
     override fun init() {
         log.info("launched with the params: ${parameters.raw}")
-        libraryCollection = LibraryCollection(listOf(FileSystemBasedLibraryProvider()))
+
+        val fileBasedMetaDataRepositories = FileBasedMetaDataRepositories { savefile ->
+            DataStoreConverter(YamlSaveDataStore(savefile))
+        }
+        libraryCollection = LibraryCollection(listOf(FileSystemBasedLibraryProvider(fileBasedMetaDataRepositories)))
         parseArgs(parameters.raw.toTypedArray()).args
                 .map { Paths.get(it) }
                 .filter { Files.isDirectory(it) }

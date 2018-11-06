@@ -1,6 +1,8 @@
 package com.github.am4dr.rokusho.old.savedata.yaml.v1
 
-import com.github.am4dr.rokusho.old.core.library.Tag
+import com.github.am4dr.rokusho.core.datastore.savedata.Tag
+import com.github.am4dr.rokusho.core.datastore.savedata.yaml.v1.*
+import com.github.am4dr.rokusho.core.datastore.savedata.yaml.v1.V1SaveData.Companion.detectTagType
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.DynamicTest
@@ -30,7 +32,12 @@ class ParserTest {
                 Pair(listOf(), mapOf<Any, Any>()),
                 Pair(listOf(), tags()),
                 Pair(listOf(TagEntry("tagID")), tags(tag("tagID"))),
-                Pair(listOf(TagEntry("tagID", mapOf("type" to "selection"))), tags(tag("tagID", "type" to "selection")))
+                Pair(listOf(
+                    TagEntry(
+                        "tagID",
+                        mapOf("type" to "selection")
+                    )
+                ), tags(tag("tagID", "type" to "selection")))
         ).dynamicTest({ (expectedTags, data) -> "$data is $expectedTags" }) { (expectedTags, data) ->
             val tags = extractTags(data)
             assertEquals(expectedTags.size, tags.size, "number of tags must be same")
@@ -63,8 +70,17 @@ class ParserTest {
                 mapOf<Any, Any>() to listOf(),
                 items() to listOf(),
                 items(item("itemID")) to listOf(ItemEntry("itemID")),
-                items(item("itemID", tags())) to listOf(ItemEntry("itemID")),
-                items(item("itemID", tags(tag("A")))) to listOf(ItemEntry("itemID", listOf(ItemTagEntry("A"))))
+                items(item("itemID", tags())) to listOf(
+                    ItemEntry(
+                        "itemID"
+                    )
+                ),
+                items(item("itemID", tags(tag("A")))) to listOf(
+                    ItemEntry(
+                        "itemID",
+                        listOf(ItemTagEntry("A"))
+                    )
+                )
         ).dynamicTest { (data, expected) ->
             val extracted = extractItems(data)
             assertEquals(expected.size, extracted.size)

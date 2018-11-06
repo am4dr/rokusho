@@ -1,7 +1,11 @@
-package com.github.am4dr.rokusho.old.savedata.yaml.v1
+package com.github.am4dr.rokusho.core.datastore.savedata.yaml.v1
 
 
-fun parse(data: Map<*, *>): V1SaveData = V1SaveData(extractTags(data), extractItems(data))
+fun parse(data: Map<*, *>): V1SaveData =
+    V1SaveData(
+        extractTags(data),
+        extractItems(data)
+    )
 
 
 fun extractTags(data: Map<*, *>): List<TagEntry> {
@@ -29,7 +33,10 @@ fun parseItemEntry(entry: Map.Entry<*, *>): ItemEntry? {
     val id = entry.key as? String ?: return null
     val data = entry.value as? Map<*, *> ?: mapOf<Any, Any>()
     val tags = data["tags"] as? Map<* ,*> ?: mapOf<String, Any>()
-    return ItemEntry(id, tags.mapNotNull(::parseItemTagEntry).toList())
+    return ItemEntry(
+        id,
+        tags.mapNotNull(::parseItemTagEntry).toList()
+    )
 }
 
 fun parseItemTagEntry(entry: Map.Entry<*, *>): ItemTagEntry? {

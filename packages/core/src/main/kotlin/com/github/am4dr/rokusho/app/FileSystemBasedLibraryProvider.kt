@@ -12,7 +12,9 @@ import java.net.URI
 import java.nio.file.Path
 import java.nio.file.Paths
 
-class FileSystemBasedLibraryProvider : LibraryProvider<Path> {
+class FileSystemBasedLibraryProvider(
+    private val metaDataRepositories: FileBasedMetaDataRepositories
+) : LibraryProvider<Path> {
 
     companion object {
         const val descriptorString: String = "rokusho.filesystem.files"
@@ -36,8 +38,6 @@ class FileSystemBasedLibraryProvider : LibraryProvider<Path> {
                     }
                 }
             }
-
-    private val metaDataRepositories = FileBasedMetaDataRepositories()
 
     override fun get(descriptor: LibraryDescriptor): Library<Path>? {
         if (!isAcceptable(descriptor)) return null

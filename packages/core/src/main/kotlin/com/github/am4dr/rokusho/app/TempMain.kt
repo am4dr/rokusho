@@ -1,5 +1,7 @@
 package com.github.am4dr.rokusho.app
 
+import com.github.am4dr.rokusho.adapter.DataStoreConverter
+import com.github.am4dr.rokusho.core.datastore.savedata.yaml.YamlSaveDataStore
 import com.github.am4dr.rokusho.core.library.provider.LibraryProvider
 import java.nio.file.Paths
 
@@ -42,6 +44,8 @@ class TempMain {
         }
 
         private fun loadProviders(): Set<LibraryProvider<*>> =
-                setOf(FileSystemBasedLibraryProvider())
+                setOf(FileSystemBasedLibraryProvider(FileBasedMetaDataRepositories { savefile ->
+                    DataStoreConverter(YamlSaveDataStore(savefile))
+                }))
     }
 }

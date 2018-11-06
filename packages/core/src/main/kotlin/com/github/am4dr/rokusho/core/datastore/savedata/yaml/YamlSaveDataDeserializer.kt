@@ -1,15 +1,15 @@
-package com.github.am4dr.rokusho.old.datastore.file.yaml
+package com.github.am4dr.rokusho.core.datastore.savedata.yaml
 
 import com.github.am4dr.rokusho.core.datastore.file.Deserializer
 import com.github.am4dr.rokusho.core.datastore.file.Deserializer.Result
-import com.github.am4dr.rokusho.old.savedata.SaveData
-import com.github.am4dr.rokusho.old.savedata.yaml.Versions
+import com.github.am4dr.rokusho.core.datastore.savedata.SaveData
 import org.yaml.snakeyaml.Yaml
 import java.nio.charset.StandardCharsets
-import com.github.am4dr.rokusho.old.savedata.yaml.v1.parse as parseV1
+import com.github.am4dr.rokusho.core.datastore.savedata.yaml.v1.parse as parseV1
 
 class YamlSaveDataDeserializer : Deserializer<SaveData> {
-    override fun deserialize(bytes: ByteArray): Result<SaveData> = deserialize(bytes.toString(StandardCharsets.UTF_8))
+    override fun deserialize(bytes: ByteArray): Result<SaveData> =
+        deserialize(bytes.toString(StandardCharsets.UTF_8))
 }
 
 fun deserialize(string: String): Result<SaveData> {

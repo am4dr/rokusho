@@ -1,7 +1,8 @@
 package com.github.am4dr.rokusho.old.datastore.file.yaml
 
 import com.github.am4dr.rokusho.core.datastore.file.Deserializer
-import com.github.am4dr.rokusho.old.savedata.SaveData
+import com.github.am4dr.rokusho.core.datastore.savedata.SaveData
+import com.github.am4dr.rokusho.core.datastore.savedata.yaml.YamlSaveDataDeserializer
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
@@ -67,7 +68,7 @@ class YamlSaveFileParserTest {
             |""".parse().result!!
         assertEquals(1, save.items.size)
         assertNotNull(save.items.find { it.id == "path/to/image" })
-        assert(save.items.find { it.id == "path/to/image" }!!.data.tags.first().tag.id == "tagA")
+        assert(save.items.find { it.id == "path/to/image" }!!.tags.first().tag.id == "tagA")
 
         val withOption = """
             |version: "1"
@@ -76,6 +77,6 @@ class YamlSaveFileParserTest {
             |""".parse().result!!
         assertEquals(1, withOption.items.size)
         assertNotNull(withOption.items.find { it.id == "path/to/image" })
-        assert(withOption.items.find { it.id == "path/to/image" }!!.data.tags.first().tag.id == "tagA")
+        assert(withOption.items.find { it.id == "path/to/image" }!!.tags.first().tag.id == "tagA")
     }
 }

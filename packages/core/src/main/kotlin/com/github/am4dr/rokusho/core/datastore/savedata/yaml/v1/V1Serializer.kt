@@ -1,6 +1,6 @@
-package com.github.am4dr.rokusho.old.savedata.yaml.v1
+package com.github.am4dr.rokusho.core.datastore.savedata.yaml.v1
 
-import com.github.am4dr.rokusho.old.savedata.yaml.Versions
+import com.github.am4dr.rokusho.core.datastore.savedata.yaml.Versions
 import org.yaml.snakeyaml.Yaml
 
 // TODO test
