@@ -5,7 +5,7 @@ plugins {
 }
 
 ext {
-    packageProjects = ['launcher', 'javafx-commons', 'gui', 'core', 'app-gui'].collect { project ":$it" }
+    submoduleProjects = ['launcher', 'javafx-commons', 'javafx-controls', 'core', 'presenter'].collect { project ":$it" }
     libraries = [
             kotlin: [
                     stdlib: 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.51',
@@ -37,7 +37,7 @@ allprojects {
     }
 }
 
-configure(packageProjects) {
+configure(submoduleProjects) {
     apply plugin: 'org.jetbrains.kotlin.jvm'
     apply plugin: 'java-library'
     archivesBaseName = "rokusho-$it.name"
@@ -65,7 +65,7 @@ project(':core') {
         implementation libraries.snakeyaml
     }
 }
-project(':gui') {
+project(':javafx-controls') {
     sourceSets {
         sample
     }
@@ -78,27 +78,28 @@ project(':gui') {
     }
     task runGuiSamples(type: JavaExec, dependsOn: classes) {
         classpath sourceSets.sample.runtimeClasspath
-        main = 'com.github.am4dr.rokusho.gui.sample.GUISamples'
+        main = 'com.github.am4dr.rokusho.javafx.control.sample.GUISamples'
         args = ['--path=build/classes/kotlin/main',
                 '--load-only-path=build/classes/kotlin/sample']
     }
     task runGuiSamplesAllReload(type: JavaExec, dependsOn: classes) {
         classpath sourceSets.sample.runtimeClasspath
-        main = 'com.github.am4dr.rokusho.gui.sample.GUISamples'
+        main = 'com.github.am4dr.rokusho.javafx.control.sample.GUISamples'
         args = ["--path=${['build/classes/kotlin/main', 'build/classes/kotlin/sample'].join(File.pathSeparator)}",
         ]
     }
 }
-project(':app-gui') {
+project(':presenter') {
     dependencies {
         api project(':core')
-        api project(':gui')
+        implementation project(':javafx-controls')
         implementation project(':javafx-commons')
     }
 }
 project(':launcher') {
     dependencies {
-        implementation project(':app-gui')
+        implementation project(':presenter')
+        implementation project(':javafx-controls')
         implementation project(':javafx-commons')
         implementation libraries.commons.cli
     }
@@ -110,7 +111,7 @@ project(':application') {
 
     mainClassName = 'com.github.am4dr.rokusho.launcher.GUILauncher'
     dependencies {
-        runtimeOnly packageProjects
+        runtimeOnly submoduleProjects
     }
     jar {
         onlyIf { false }

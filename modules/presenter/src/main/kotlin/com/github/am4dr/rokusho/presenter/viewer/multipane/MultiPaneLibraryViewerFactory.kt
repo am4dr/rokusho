@@ -1,0 +1,19 @@
+package com.github.am4dr.rokusho.presenter.viewer.multipane
+
+import com.github.am4dr.rokusho.core.library.Library
+import com.github.am4dr.rokusho.presenter.LibraryViewer
+import com.github.am4dr.rokusho.presenter.LibraryViewerFactory
+
+class MultiPaneLibraryViewerFactory(private val paneFactories: List<PaneFactory>) :
+    LibraryViewerFactory {
+
+    override fun <T : Any> create(library: Library<T>): LibraryViewer<T> = createViewer(library)
+
+    private fun <T : Any> createViewer(library: Library<T>): LibraryViewer<T> {
+        @Suppress("UNCHECKED_CAST")
+        val panes = paneFactories
+                .filter { it.isAcceptable(library.type) }
+                .mapNotNull { it.create(library) as? MultiPaneLibraryViewer.Pane<T> }
+        return MultiPaneLibraryViewer(panes)
+    }
+}

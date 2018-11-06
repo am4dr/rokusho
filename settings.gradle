@@ -2,8 +2,8 @@ rootProject.name = 'rokusho'
 
 include 'application'
 
-def packages = ['javafx-commons', 'gui', 'core', 'app-gui', 'launcher']
+def packages = ['javafx-commons', 'javafx-controls', 'core', 'presenter', 'launcher']
 packages.each {
     include it
-    project(':'+it).projectDir = new File(rootProject.projectDir, "packages/$it")
+    project(':'+it).projectDir = new File(rootProject.projectDir, "modules/$it")
 }
