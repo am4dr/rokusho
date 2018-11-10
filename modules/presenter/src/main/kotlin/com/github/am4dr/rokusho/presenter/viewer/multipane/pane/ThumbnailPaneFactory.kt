@@ -1,6 +1,5 @@
 package com.github.am4dr.rokusho.presenter.viewer.multipane.pane
 
-import com.github.am4dr.rokusho.app.ImageUrl
 import com.github.am4dr.rokusho.core.library.Library
 import com.github.am4dr.rokusho.core.library.LibraryItem
 import com.github.am4dr.rokusho.core.metadata.PatchedTag
@@ -10,7 +9,7 @@ import com.github.am4dr.rokusho.javafx.thumbnail.CachedThumbnailFlowPane
 import com.github.am4dr.rokusho.javafx.thumbnail.ImageThumbnail
 import com.github.am4dr.rokusho.javafx.thumbnail.StackedThumbnail
 import com.github.am4dr.rokusho.javafx.thumbnail.ThumbnailTagEditor
-import com.github.am4dr.rokusho.presenter.viewer.multipane.MultiPaneLibraryViewer
+import com.github.am4dr.rokusho.presenter.viewer.multipane.MultiPaneViewer
 import com.github.am4dr.rokusho.presenter.viewer.multipane.PaneFactory
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.event.EventHandler
@@ -30,66 +29,44 @@ class ThumbnailPaneFactory : PaneFactory {
 
     companion object {
         private val imageFileNameMatcher = Regex(".*\\.(bmp|gif|jpe?g|png)$", RegexOption.IGNORE_CASE)
-        fun isSupportedImageFile(path: Path) = Files.isRegularFile(path) && imageFileNameMatcher.matches(path.fileName.toString())
+        fun isSupportedImageFile(path: Path) =
+            Files.isRegularFile(path) && imageFileNameMatcher.matches(path.fileName.toString())
     }
+
     private val imageLoader = UrlImageLoader()
-    private val supportedTypes = listOf(ImageUrl::class, Path::class)
+    private val supportedTypes = listOf(Path::class)
 
     override fun isAcceptable(type: KClass<*>): Boolean = supportedTypes.contains(type)
 
-    override fun create(library: Library<*>): MultiPaneLibraryViewer.Pane<*>? =
-            @Suppress("UNCHECKED_CAST")
-            when (library.type) {
-                ImageUrl::class -> {
-                    library as Library<ImageUrl>
-                    val viewer =
-                        createImageRecordsViewer<ImageUrl>(
-                            { imageLoader.getImage(it.get().url) },
-                            {
-                                imageLoader.getImage(
-                                    it.get().url,
-                                    thumbnailMaxWidth,
-                                    thumbnailMaxHeight,
-                                    true
-                                )
-                            },
-                            { item, tags ->
-                                library.update(
-                                    item.id,
-                                    tags.map(ThumbnailTag::item).toSet()
-                                )
-                            },
-                            { library.parseTag(it) })
-                    MultiPaneLibraryViewer.Pane("サムネイル", viewer, viewer.records)
+    override fun create(library: Library<*>): MultiPaneViewer.Pane<*>? =
+        @Suppress("UNCHECKED_CAST")
+        when (library.type) {
+            Path::class -> {
+                library as Library<Path>
+                val viewer =
+                    createImageRecordsViewer<Path>(
+                        { imageLoader.getImage(it.get().toUri().toURL()) },
+                        {
+                            imageLoader.getImage(
+                                it.get().toUri().toURL(),
+                                thumbnailMaxWidth,
+                                thumbnailMaxHeight,
+                                true
+                            )
+                        },
+                        { item, tags ->
+                            library.update(
+                                item.id,
+                                tags.map(ThumbnailTag::item).toSet()
+                            )
+                        },
+                        { library.parseTag(it) })
+                MultiPaneViewer.Pane("サムネイル", viewer, viewer.records) {
+                    isSupportedImageFile(it.get())
                 }
-                Path::class -> {
-                    library as Library<Path>
-                    val viewer =
-                        createImageRecordsViewer<Path>(
-                            { imageLoader.getImage(it.get().toUri().toURL()) },
-                            {
-                                imageLoader.getImage(
-                                    it.get().toUri().toURL(),
-                                    thumbnailMaxWidth,
-                                    thumbnailMaxHeight,
-                                    true
-                                )
-                            },
-                            { item, tags ->
-                                library.update(
-                                    item.id,
-                                    tags.map(ThumbnailTag::item).toSet()
-                                )
-                            },
-                            { library.parseTag(it) })
-                    MultiPaneLibraryViewer.Pane("サムネイル", viewer, viewer.records) {
-                        isSupportedImageFile(
-                            it.get()
-                        )
-                    }
-                }
-                else -> null
             }
+            else -> null
+        }
 }
 
 private fun patchedTagToString(tag: PatchedTag): String {
@@ -103,30 +80,28 @@ private fun patchedTagToString(tag: PatchedTag): String {
         else -> id
     }
 }
+
 data class ThumbnailTag(val text: String, val item: PatchedTag) {
-    constructor(item: PatchedTag) : this(
-        patchedTagToString(
-            item
-        ), item)
+    constructor(item: PatchedTag) : this(patchedTagToString(item), item)
 }
 
-private fun <T : Any> createImageRecordsViewer(getImage: (LibraryItem<T>) -> Image,
-                                               getThumbnailImage: (LibraryItem<T>) -> Image,
-                                               updateTags: (LibraryItem<T>, List<ThumbnailTag>) -> Unit,
-                                               tagStringParser: (String) -> PatchedTag?): CachedThumbnailFlowPane<LibraryItem<T>> {
+private fun <T : Any> createImageRecordsViewer(
+    getImage: (LibraryItem<out T>) -> Image,
+    getThumbnailImage: (LibraryItem<out T>) -> Image,
+    updateTags: (LibraryItem<out T>, List<ThumbnailTag>) -> Unit,
+    tagStringParser: (String) -> PatchedTag?
+): CachedThumbnailFlowPane<LibraryItem<out T>> {
     val imageViewer = createImageViewer()
-    val thumbnailFactory = { item: LibraryItem<T> ->
+    val thumbnailFactory = { item: LibraryItem<out T> ->
         val base = ImageThumbnail(getThumbnailImage(item))
         val overlayInputFocused = SimpleBooleanProperty(false)
         val overlaySupplier = {
             ThumbnailTagEditor<ThumbnailTag>().apply {
                 tags.setAll(item.tags.map(::ThumbnailTag))
                 onEditEndedProperty.set { new -> updateTags(item, new) }
-                inputParserProperty.set { input -> tagStringParser(input)?.let {
-                    ThumbnailTag(
-                        it
-                    )
-                } }
+                inputParserProperty.set { input ->
+                    tagStringParser(input)?.let { ThumbnailTag(it) }
+                }
                 tagNodeFactoryProperty.set { thumbnailTag ->
                     RemovableTag().apply {
                         textProperty().set(thumbnailTag.text)
@@ -145,8 +120,8 @@ private fun <T : Any> createImageRecordsViewer(getImage: (LibraryItem<T>) -> Ima
 }
 
 private fun createImageViewer(): ImageOverlay =
-        ImageOverlay().apply {
-            isVisible = false
-            background = Background(BackgroundFill(Color.rgb(30, 30, 30, 0.75), null, null))
-            onMouseClicked = EventHandler { hide() }
-        }
+    ImageOverlay().apply {
+        isVisible = false
+        background = Background(BackgroundFill(Color.rgb(30, 30, 30, 0.75), null, null))
+        onMouseClicked = EventHandler { hide() }
+    }

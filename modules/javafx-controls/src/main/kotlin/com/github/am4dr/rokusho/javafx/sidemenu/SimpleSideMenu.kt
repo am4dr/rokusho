@@ -14,9 +14,10 @@ import javafx.scene.control.ScrollPane
 import javafx.scene.layout.*
 import javafx.scene.paint.Color
 
-class SimpleSideMenu : VBox() {
-
+class SimpleSideMenu(
     val icons: ObservableList<SideMenuIcon> = FXCollections.observableArrayList()
+) : VBox() {
+
     val width: DoubleProperty = SimpleDoubleProperty(20.0)
     val onAddClicked: ObjectProperty<()->Unit> = SimpleObjectProperty {}
 

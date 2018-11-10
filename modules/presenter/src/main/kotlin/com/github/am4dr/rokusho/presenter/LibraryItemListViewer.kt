@@ -4,8 +4,8 @@ import com.github.am4dr.rokusho.core.library.LibraryItem
 import javafx.collections.ObservableList
 import javafx.scene.Node
 
-interface LibraryViewer<T : Any> {
+interface LibraryItemListViewer<T : Any> {
 
     val node: Node
-    val items: ObservableList<LibraryItem<T>>
+    val items: ObservableList<LibraryItem<out T>>
 }

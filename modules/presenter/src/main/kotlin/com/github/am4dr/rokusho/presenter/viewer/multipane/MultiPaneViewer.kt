@@ -1,8 +1,8 @@
 package com.github.am4dr.rokusho.presenter.viewer.multipane
 
 import com.github.am4dr.rokusho.core.library.LibraryItem
-import com.github.am4dr.rokusho.javafx.scene.ViewSelectorPaneWithSearchBox
-import com.github.am4dr.rokusho.presenter.LibraryViewer
+import com.github.am4dr.rokusho.presenter.LibraryItemListViewer
+import com.github.am4dr.rokusho.presenter.scene.ViewSelectorPaneWithSearchBox
 import javafx.beans.binding.Bindings
 import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections
@@ -12,16 +12,15 @@ import javafx.scene.Node
 import java.util.concurrent.Callable
 import java.util.function.Predicate
 
-class MultiPaneLibraryViewer<T : Any>(panes: List<Pane<T>>) :
-    LibraryViewer<T> {
+class MultiPaneViewer<T : Any>(panes: List<Pane<T>>) : LibraryItemListViewer<T> {
 
     private val view = ViewSelectorPaneWithSearchBox()
     override val node: Node get() = view
-    override val items: ObservableList<LibraryItem<T>> = FXCollections.observableArrayList()
+    override val items: ObservableList<LibraryItem<out T>> = FXCollections.observableArrayList()
 
     private val filteredList = FilteredList(items)
     private val filteredRecords = SimpleListProperty(filteredList)
-    private val filteredPaneRecords: MutableMap<Pane<T>, ObservableList<LibraryItem<T>>> = mutableMapOf()
+    private val filteredPaneRecords: MutableMap<Pane<T>, ObservableList<LibraryItem<out T>>> = mutableMapOf()
 
     init {
         val filterPredicate = Predicate { item: LibraryItem<*> ->
@@ -46,5 +45,10 @@ class MultiPaneLibraryViewer<T : Any>(panes: List<Pane<T>>) :
         }
     }
 
-    class Pane<T : Any>(val label: String, val viewer: Node, val records: ObservableList<LibraryItem<T>> = FXCollections.observableArrayList(), val filter: ((LibraryItem<T>)->Boolean)? = null)
+    class Pane<T : Any>(
+        val label: String,
+        val viewer: Node,
+        val records: ObservableList<LibraryItem<out T>> = FXCollections.observableArrayList(),
+        val filter: ((LibraryItem<out T>)->Boolean)? = null
+    )
 }

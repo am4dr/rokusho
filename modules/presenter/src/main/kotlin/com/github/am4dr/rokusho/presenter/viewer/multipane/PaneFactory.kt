@@ -7,5 +7,5 @@ interface PaneFactory {
 
     fun isAcceptable(type: KClass<*>): Boolean
 
-    fun create(library: Library<*>): MultiPaneLibraryViewer.Pane<*>?
+    fun create(library: Library<*>): MultiPaneViewer.Pane<*>?
 }

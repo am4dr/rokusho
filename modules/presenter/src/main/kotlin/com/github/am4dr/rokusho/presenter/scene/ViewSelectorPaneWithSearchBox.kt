@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.javafx.scene
+package com.github.am4dr.rokusho.presenter.scene
 
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import javafx.beans.binding.Bindings
@@ -33,7 +33,9 @@ class ViewSelectorPaneWithSearchBox : VBox() {
 
 
     private val filterInputNode = TextField()
-    private val buttons = TransformedList(selections) { Button(it.label).apply { setOnAction { _ -> it.select() } } }
+    private val buttons = TransformedList(selections) { selection ->
+        Button(selection.label).apply { setOnAction { selection.select() } }
+    }
 
     private val selected = ReadOnlyObjectWrapper<Selection>()
 
