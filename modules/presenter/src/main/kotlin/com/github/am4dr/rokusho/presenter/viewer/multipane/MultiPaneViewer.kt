@@ -1,54 +1,70 @@
 package com.github.am4dr.rokusho.presenter.viewer.multipane
 
-import com.github.am4dr.rokusho.core.library.LibraryItem
-import com.github.am4dr.rokusho.presenter.LibraryItemListViewer
+import com.github.am4dr.rokusho.javafx.collection.TransformedList
+import com.github.am4dr.rokusho.presenter.ItemListViewer
+import com.github.am4dr.rokusho.presenter.ItemViewModel
 import com.github.am4dr.rokusho.presenter.scene.ViewSelectorPaneWithSearchBox
+import javafx.beans.binding.Binding
 import javafx.beans.binding.Bindings
-import javafx.beans.property.SimpleListProperty
+import javafx.beans.binding.Bindings.bindContent
+import javafx.beans.binding.Bindings.createObjectBinding
+import javafx.beans.value.ObservableValue
 import javafx.collections.FXCollections
+import javafx.collections.FXCollections.observableList
 import javafx.collections.ObservableList
 import javafx.collections.transformation.FilteredList
 import javafx.scene.Node
 import java.util.concurrent.Callable
 import java.util.function.Predicate
 
-class MultiPaneViewer<T : Any>(panes: List<Pane<T>>) : LibraryItemListViewer<T> {
+class MultiPaneViewer(
+    panes: List<Pane>,
+    view: ViewSelectorPaneWithSearchBox = ViewSelectorPaneWithSearchBox()
+) : ItemListViewer {
 
-    private val view = ViewSelectorPaneWithSearchBox()
-    override val node: Node get() = view
-    override val items: ObservableList<LibraryItem<out T>> = FXCollections.observableArrayList()
+    override val node: Node = view
+    override val items: ObservableList<ItemViewModel<*>> = FXCollections.observableArrayList()
 
     private val filteredList = FilteredList(items)
-    private val filteredRecords = SimpleListProperty(filteredList)
-    private val filteredPaneRecords: MutableMap<Pane<T>, ObservableList<LibraryItem<out T>>> = mutableMapOf()
+    private val filteredListForPane: MutableMap<Pane, ObservableList<ItemViewModel<*>>> = mutableMapOf()
+    private fun getFilteredRecords(pane: Pane): ObservableList<ItemViewModel<*>> {
+        return filteredListForPane.getOrPut(pane) {
+            if (pane.filter != null) {
+                FilteredList(filteredList, pane.filter)
+            }
+            else { filteredList }
+        }
+    }
+    private val selections = TransformedList(observableList(panes)) {
+        bindContent(it.records, getFilteredRecords(it))
+        ViewSelectorPaneWithSearchBox.Selection(it.label, it.viewer)
+    }
 
     init {
-        val filterPredicate = Predicate { item: LibraryItem<*> ->
-            val input = view.filterTextProperty().get()
+        bindWith(view)
+    }
+
+    private fun bindWith(view: ViewSelectorPaneWithSearchBox) {
+        filteredList.predicateProperty().bind(createFilterPredicateBinding(view.filterTextProperty()))
+        view.totalCountProperty().bind(Bindings.size(items))
+        view.filterPassedCountProperty().bind(Bindings.size(filteredList))
+        // FIXME ひとつづつ追加するほかに最初のPaneを選択した状態にするすべがない
+        selections.forEach { view.selections.add(it) }
+    }
+
+    private fun createFilterPredicateBinding(string: ObservableValue<String>): Binding<Predicate<ItemViewModel<*>>> {
+        val filterPredicate = Predicate { item: ItemViewModel<*> ->
+            val input = string.value
             if (input == null || input == "") true
             else item.tags.any { it.base.name.name.contains(input) }
         }
-        filteredList.predicateProperty()
-                .bind(Bindings.createObjectBinding(Callable { filterPredicate }, view.filterTextProperty()))
-
-        view.apply {
-            totalCountProperty().bind(Bindings.size(items))
-            filterPassedCountProperty().bind(Bindings.size(filteredRecords))
-        }
-
-        panes.forEach {
-            filteredPaneRecords[it] =
-                    if (it.filter != null) { FilteredList(filteredList, it.filter) }
-                    else { filteredList }
-            Bindings.bindContent(it.records, filteredPaneRecords[it])
-            view.selections.add(ViewSelectorPaneWithSearchBox.Selection(it.label, it.viewer))
-        }
+        return createObjectBinding(Callable { filterPredicate }, string)
     }
 
-    class Pane<T : Any>(
+    class Pane(
         val label: String,
         val viewer: Node,
-        val records: ObservableList<LibraryItem<out T>> = FXCollections.observableArrayList(),
-        val filter: ((LibraryItem<out T>)->Boolean)? = null
+        val records: ObservableList<ItemViewModel<*>> = FXCollections.observableArrayList(),
+        val filter: ((ItemViewModel<*>)->Boolean)? = null
     )
 }

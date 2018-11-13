@@ -1,6 +1,7 @@
 package com.github.am4dr.rokusho.presenter
 
 import com.github.am4dr.rokusho.core.library.Library
+import javafx.beans.binding.Bindings.bindContent
 import javafx.beans.binding.Bindings.createObjectBinding
 import javafx.beans.binding.ObjectExpression
 import javafx.collections.FXCollections
@@ -10,7 +11,7 @@ import java.nio.file.Path
 
 class Presenter(
     val libraries: ObservableList<Library<*>> = FXCollections.observableArrayList(),
-    viewerFactory: LibraryItemListViewerFactory,
+    viewerFactory: ItemListViewerFactory,
     val addLibraryByPath: (Path) -> Library<*>?,
     val pathChooser: () -> Path?
 ) {
@@ -21,13 +22,16 @@ class Presenter(
         { getOrCreateViewer()?.node },
         arrayOf(selectedLibrary)
     )
-    private val viewerCache = CachedLibraryItemListViewerFactory(viewerFactory)
+    private val itemLists = ItemModelConverter(libraries)
+    private val viewerCache = CachedLibraryViewerFactory(viewerFactory)
 
-    private fun getOrCreateViewer(): LibraryItemListViewer<*>? {
-        return selector.selectedProperty().get()?.let {
-            viewerCache.create(it)
+    private fun getOrCreateViewer(): ItemListViewer? =
+        selector.selectedProperty().get()?.let { library ->
+            viewerCache.getOrNull(library)?.let { return it }
+            viewerCache.getOrCreate(library).apply {
+                bindContent(items, itemLists.getOrCreate(library))
+            }
         }
-    }
 
     fun select(library: Library<*>) {
         selector.select(library)

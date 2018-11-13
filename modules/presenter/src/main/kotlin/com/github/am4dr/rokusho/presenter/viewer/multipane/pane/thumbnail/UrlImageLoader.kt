@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.presenter.viewer.multipane.pane
+package com.github.am4dr.rokusho.presenter.viewer.multipane.pane.thumbnail
 
 import javafx.scene.image.Image
 import java.lang.ref.SoftReference

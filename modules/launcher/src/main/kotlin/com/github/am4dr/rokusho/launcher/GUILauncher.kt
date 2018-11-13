@@ -13,7 +13,9 @@ import com.github.am4dr.rokusho.presenter.scene.module.MainPaneModule
 import com.github.am4dr.rokusho.presenter.scene.module.SideMenuModule
 import com.github.am4dr.rokusho.presenter.viewer.multipane.MultiPaneViewerFactory
 import com.github.am4dr.rokusho.presenter.viewer.multipane.pane.ListPaneFactory
-import com.github.am4dr.rokusho.presenter.viewer.multipane.pane.ThumbnailPaneFactory
+import com.github.am4dr.rokusho.presenter.viewer.multipane.pane.thumbnail.ImageThumbnailFactory
+import com.github.am4dr.rokusho.presenter.viewer.multipane.pane.thumbnail.ThumbnailPaneFactory
+import com.github.am4dr.rokusho.presenter.viewer.multipane.pane.thumbnail.UrlImageLoader
 import javafx.application.Application
 import javafx.collections.ObservableList
 import javafx.scene.Scene
@@ -55,11 +57,14 @@ class GUILauncher : Application() {
     private fun parseArgs(args: Array<String>): CommandLine = DefaultParser().parse(Options(), args)
 
     override fun start(stage: Stage) {
+        val thumbnailMaxWidth = 500.0
+        val thumbnailMaxHeight = 200.0
 
+        val imageLoader = UrlImageLoader()
         val viewerFactory = MultiPaneViewerFactory(
             listOf(
                 ListPaneFactory(),
-                ThumbnailPaneFactory()
+                ThumbnailPaneFactory(listOf(ImageThumbnailFactory(imageLoader, thumbnailMaxWidth, thumbnailMaxHeight)))
             )
         )
         val pathChooser = DirectoryPathChooser(stage)
