@@ -56,7 +56,7 @@ class MultiPaneViewer(
         val filterPredicate = Predicate { item: ItemViewModel<*> ->
             val input = string.value
             if (input == null || input == "") true
-            else item.tags.any { it.base.name.name.contains(input) }
+            else item.tags.any { it.name.contains(input) }
         }
         return createObjectBinding(Callable { filterPredicate }, string)
     }

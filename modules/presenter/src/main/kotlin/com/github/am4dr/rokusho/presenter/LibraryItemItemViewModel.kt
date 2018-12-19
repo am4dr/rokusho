@@ -2,7 +2,7 @@ package com.github.am4dr.rokusho.presenter
 
 import com.github.am4dr.rokusho.core.library.Library
 import com.github.am4dr.rokusho.core.library.LibraryItem
-import com.github.am4dr.rokusho.core.metadata.PatchedTag
+import com.github.am4dr.rokusho.core.library.LibraryItemTag
 
 class LibraryItemItemViewModel(
     private val library: Library<*>,
@@ -10,12 +10,12 @@ class LibraryItemItemViewModel(
 ) : ItemViewModel<Any> {
 
     override val item: Any get() = libraryItem.get()
-    override val tags: List<PatchedTag> get() = libraryItem.tags.toList()
+    override val tags: List<LibraryItemTag> get() = libraryItem.getTags().toList()
 
-    override fun parseTagString(string: String): PatchedTag? =
-        library.parseTag(string)
+    override fun parseTagString(string: String): LibraryItemTag? =
+        library.parseItemTag(string)
 
-    override fun updateTags(tags: List<PatchedTag>) {
-        library.update(libraryItem.id, tags.toSet())
+    override fun updateTags(tags: List<LibraryItemTag>) {
+        libraryItem.updateTags(tags.toSet())
     }
 }

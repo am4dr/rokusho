@@ -37,7 +37,7 @@ class TempMain {
                         |${lib.getTags()}
                         |
                         |ITEMS::
-                        |${lib.getIDs().mapNotNull(lib::get)}
+                        |${lib.getItems().toList()}
                         |""".trimMargin())
                 } ?: println("lib is null")
             }

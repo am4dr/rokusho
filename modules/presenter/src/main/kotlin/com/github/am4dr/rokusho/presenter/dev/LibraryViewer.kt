@@ -1,7 +1,7 @@
 package com.github.am4dr.rokusho.presenter.dev
 
 import com.github.am4dr.rokusho.core.library.Library
-import com.github.am4dr.rokusho.core.metadata.BaseTag
+import com.github.am4dr.rokusho.core.library.LibraryItemTagTemplate
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.collections.SetChangeListener
@@ -30,8 +30,11 @@ class LibraryViewer<T : Any>(val library: Library<T>) {
     fun show() = stage.show()
     private fun createScene(w: Double, h: Double): Scene {
         val tags = library.getTags()
-        val tagList = object : ObservableList<BaseTag> by FXCollections.observableArrayList(library.getTags()), SetChangeListener<BaseTag> {
-            override fun onChanged(change: SetChangeListener.Change<out BaseTag>) {
+        val tagList = object :
+            ObservableList<LibraryItemTagTemplate> by FXCollections.observableArrayList(library.getTags()),
+            SetChangeListener<LibraryItemTagTemplate>
+        {
+            override fun onChanged(change: SetChangeListener.Change<out LibraryItemTagTemplate>) {
                 when {
                     change.wasRemoved() && change.wasAdded() ->
                         indexOfFirst { it === change.elementRemoved }
@@ -43,7 +46,7 @@ class LibraryViewer<T : Any>(val library: Library<T>) {
             }
         }
         tags.addListener(WeakSetChangeListener(tagList))
-        val tagListView = ListView<BaseTag>(tagList)
+        val tagListView = ListView<LibraryItemTagTemplate>(tagList)
         return Scene(VBox(tagListView), w, h)
     }
 }
