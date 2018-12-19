@@ -1,6 +1,7 @@
-package com.github.am4dr.rokusho.core.library
+package com.github.am4dr.rokusho.library.impl
 
 import com.github.am4dr.rokusho.core.metadata.PatchedTag
+import com.github.am4dr.rokusho.library.LibraryItemTag
 
 internal class LibraryItemTagWrapper(val tag: PatchedTag) : LibraryItemTag {
 

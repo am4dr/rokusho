@@ -5,8 +5,8 @@ import com.github.am4dr.rokusho.app.FileBasedMetaDataRepositories
 import com.github.am4dr.rokusho.app.FileSystemBasedLibraryProvider
 import com.github.am4dr.rokusho.app.LibraryCollection
 import com.github.am4dr.rokusho.core.datastore.savedata.yaml.YamlSaveDataStore
-import com.github.am4dr.rokusho.core.library.Library
 import com.github.am4dr.rokusho.javafx.control.DirectoryPathChooser
+import com.github.am4dr.rokusho.library.Library
 import com.github.am4dr.rokusho.presenter.Presenter
 import com.github.am4dr.rokusho.presenter.dev.RokushoViewer
 import com.github.am4dr.rokusho.presenter.scene.module.MainPaneModule

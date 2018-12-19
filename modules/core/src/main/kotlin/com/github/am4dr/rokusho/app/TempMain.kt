@@ -2,7 +2,7 @@ package com.github.am4dr.rokusho.app
 
 import com.github.am4dr.rokusho.adapter.DataStoreConverter
 import com.github.am4dr.rokusho.core.datastore.savedata.yaml.YamlSaveDataStore
-import com.github.am4dr.rokusho.core.library.provider.LibraryProvider
+import com.github.am4dr.rokusho.library.provider.LibraryProvider
 import java.nio.file.Paths
 
 /**

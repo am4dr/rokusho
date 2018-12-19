@@ -1,6 +1,6 @@
-package com.github.am4dr.rokusho.core.library.provider
+package com.github.am4dr.rokusho.library.provider
 
-import com.github.am4dr.rokusho.core.library.Library
+import com.github.am4dr.rokusho.library.Library
 
 interface LibraryProvider<T : Any> {
 

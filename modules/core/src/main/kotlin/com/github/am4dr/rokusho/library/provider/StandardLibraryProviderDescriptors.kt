@@ -1,12 +1,14 @@
-package com.github.am4dr.rokusho.core.library.provider
+package com.github.am4dr.rokusho.library.provider
 
 import kotlin.reflect.KClass
 
 sealed class StandardLibraryProviderDescriptors : LibraryProviderDescriptor {
 
     companion object {
-        fun of(string: String): StandardLibraryProviderDescriptors = StringDescriptor(string)
-        fun of(clazz: KClass<*>): StandardLibraryProviderDescriptors = FQCNDescriptor(clazz)
+        fun of(string: String): StandardLibraryProviderDescriptors =
+            StringDescriptor(string)
+        fun of(clazz: KClass<*>): StandardLibraryProviderDescriptors =
+            FQCNDescriptor(clazz)
     }
 
     data class StringDescriptor(override val value: String) : StandardLibraryProviderDescriptors()

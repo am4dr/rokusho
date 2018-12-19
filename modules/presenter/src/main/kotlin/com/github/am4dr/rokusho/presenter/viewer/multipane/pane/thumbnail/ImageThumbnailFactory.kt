@@ -1,10 +1,10 @@
 package com.github.am4dr.rokusho.presenter.viewer.multipane.pane.thumbnail
 
-import com.github.am4dr.rokusho.core.library.LibraryItemTag
 import com.github.am4dr.rokusho.javafx.thumbnail.ImageThumbnail
 import com.github.am4dr.rokusho.javafx.thumbnail.StackedThumbnail
 import com.github.am4dr.rokusho.javafx.thumbnail.ThumbnailFlowPane
 import com.github.am4dr.rokusho.javafx.thumbnail.ThumbnailTagEditor
+import com.github.am4dr.rokusho.library.LibraryItemTag
 import com.github.am4dr.rokusho.presenter.ItemViewModel
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.scene.image.Image

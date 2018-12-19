@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.core.library
+package com.github.am4dr.rokusho.library
 
 /**
  * ある[Library]に含まれているアイテムについてアイテムのインスタンスを取得したり、

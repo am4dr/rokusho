@@ -1,6 +1,8 @@
-package com.github.am4dr.rokusho.core.library
+package com.github.am4dr.rokusho.library.impl
 
 import com.github.am4dr.rokusho.core.item.Item
+import com.github.am4dr.rokusho.library.LibraryItem
+import com.github.am4dr.rokusho.library.LibraryItemTag
 
 internal class LibraryItemImpl<T : Any>(
     val library: LibraryImpl<T>,

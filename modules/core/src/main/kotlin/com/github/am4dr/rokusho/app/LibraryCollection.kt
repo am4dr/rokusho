@@ -1,8 +1,8 @@
 package com.github.am4dr.rokusho.app
 
-import com.github.am4dr.rokusho.core.library.Library
-import com.github.am4dr.rokusho.core.library.provider.LibraryProvider
-import com.github.am4dr.rokusho.core.library.provider.LibraryProviderCollection
+import com.github.am4dr.rokusho.library.Library
+import com.github.am4dr.rokusho.library.provider.LibraryProvider
+import com.github.am4dr.rokusho.library.provider.LibraryProviderCollection
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections
@@ -14,7 +14,8 @@ import java.nio.file.Path
  */
 class LibraryCollection(libraryProviders: Collection<LibraryProvider<*>>) {
 
-    private val libraryProvider = LibraryProviderCollection(libraryProviders.toSet())
+    private val libraryProvider =
+        LibraryProviderCollection(libraryProviders.toSet())
 
     private val libraries: ObservableList<Library<*>> = FXCollections.observableArrayList()
     fun getLibraries(): ReadOnlyListProperty<Library<*>> = SimpleListProperty<Library<*>>(FXCollections.observableArrayList()).apply { bindContent(libraries) }

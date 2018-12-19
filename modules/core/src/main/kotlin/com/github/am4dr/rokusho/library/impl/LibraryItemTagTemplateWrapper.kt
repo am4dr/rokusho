@@ -1,8 +1,10 @@
-package com.github.am4dr.rokusho.core.library
+package com.github.am4dr.rokusho.library.impl
 
 import com.github.am4dr.rokusho.core.metadata.BaseTag
+import com.github.am4dr.rokusho.library.LibraryItemTagTemplate
 
-internal class LibraryItemTagTemplateWrapper(val tag: BaseTag) : LibraryItemTagTemplate {
+internal class LibraryItemTagTemplateWrapper(val tag: BaseTag) :
+    LibraryItemTagTemplate {
 
     override val name: String
         get() = tag.name.name

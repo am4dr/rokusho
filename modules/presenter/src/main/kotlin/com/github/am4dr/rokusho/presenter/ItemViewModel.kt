@@ -1,6 +1,6 @@
 package com.github.am4dr.rokusho.presenter
 
-import com.github.am4dr.rokusho.core.library.LibraryItemTag
+import com.github.am4dr.rokusho.library.LibraryItemTag
 
 // TODO presenterにおけるItemということが分かる名前にしたい。Itemにしたいがcoreと衝突するので悩ましい
 interface ItemViewModel<T : Any> {

@@ -1,10 +1,11 @@
-package com.github.am4dr.rokusho.core.library.provider
+package com.github.am4dr.rokusho.library.provider
 
-import com.github.am4dr.rokusho.core.library.Library
+import com.github.am4dr.rokusho.library.Library
 
 class LibraryProviderCollection(providers: Set<LibraryProvider<*>>,
                                 override val name: String = "LibraryProviderCollection",
-                                override val description: String = "aggregated LibraryProviders") : LibraryProvider<Any> {
+                                override val description: String = "aggregated LibraryProviders") :
+    LibraryProvider<Any> {
 
     val providers: Set<LibraryProvider<*>> = providers.toSet()
 

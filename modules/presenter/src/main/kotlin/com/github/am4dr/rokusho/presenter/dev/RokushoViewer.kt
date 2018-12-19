@@ -1,7 +1,7 @@
 package com.github.am4dr.rokusho.presenter.dev
 
-import com.github.am4dr.rokusho.core.library.Library
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
+import com.github.am4dr.rokusho.library.Library
 import javafx.collections.ObservableList
 import javafx.scene.Scene
 import javafx.scene.control.Hyperlink

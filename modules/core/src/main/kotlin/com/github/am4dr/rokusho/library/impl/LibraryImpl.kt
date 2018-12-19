@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.core.library
+package com.github.am4dr.rokusho.library.impl
 
 import com.github.am4dr.rokusho.core.item.Item
 import com.github.am4dr.rokusho.core.item.ItemCollection
@@ -8,6 +8,10 @@ import com.github.am4dr.rokusho.core.metadata.PatchedTag
 import com.github.am4dr.rokusho.core.metadata.Record
 import com.github.am4dr.rokusho.core.util.DataObject
 import com.github.am4dr.rokusho.javafx.collection.toObservableList
+import com.github.am4dr.rokusho.library.Library
+import com.github.am4dr.rokusho.library.LibraryItem
+import com.github.am4dr.rokusho.library.LibraryItemTag
+import com.github.am4dr.rokusho.library.LibraryItemTagTemplate
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlyListWrapper
 import javafx.beans.property.ReadOnlySetProperty

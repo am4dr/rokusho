@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.core.library
+package com.github.am4dr.rokusho.library
 
 import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.ReadOnlySetProperty

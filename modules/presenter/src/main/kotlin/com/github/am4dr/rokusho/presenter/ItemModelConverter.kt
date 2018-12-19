@@ -1,7 +1,7 @@
 package com.github.am4dr.rokusho.presenter
 
-import com.github.am4dr.rokusho.core.library.Library
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
+import com.github.am4dr.rokusho.library.Library
 import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
 

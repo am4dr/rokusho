@@ -1,8 +1,8 @@
 package com.github.am4dr.rokusho.presenter
 
-import com.github.am4dr.rokusho.core.library.Library
-import com.github.am4dr.rokusho.core.library.LibraryItem
-import com.github.am4dr.rokusho.core.library.LibraryItemTag
+import com.github.am4dr.rokusho.library.Library
+import com.github.am4dr.rokusho.library.LibraryItem
+import com.github.am4dr.rokusho.library.LibraryItemTag
 
 class LibraryItemItemViewModel(
     private val library: Library<*>,

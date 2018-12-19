@@ -1,10 +1,10 @@
 package com.github.am4dr.rokusho.presenter.scene
 
-import com.github.am4dr.rokusho.core.library.Library
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import com.github.am4dr.rokusho.javafx.sidemenu.CharacterIcon
 import com.github.am4dr.rokusho.javafx.sidemenu.SideMenuIcon
 import com.github.am4dr.rokusho.javafx.sidemenu.SimpleSideMenu
+import com.github.am4dr.rokusho.library.Library
 import javafx.beans.binding.ObjectExpression
 import javafx.beans.binding.When
 import javafx.collections.ObservableList

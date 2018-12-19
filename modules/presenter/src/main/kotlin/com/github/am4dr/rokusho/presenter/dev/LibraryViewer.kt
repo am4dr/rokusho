@@ -1,7 +1,7 @@
 package com.github.am4dr.rokusho.presenter.dev
 
-import com.github.am4dr.rokusho.core.library.Library
-import com.github.am4dr.rokusho.core.library.LibraryItemTagTemplate
+import com.github.am4dr.rokusho.library.Library
+import com.github.am4dr.rokusho.library.LibraryItemTagTemplate
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.collections.SetChangeListener

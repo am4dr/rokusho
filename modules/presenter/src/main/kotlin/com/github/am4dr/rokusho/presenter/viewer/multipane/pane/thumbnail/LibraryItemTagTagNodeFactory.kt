@@ -1,8 +1,8 @@
 package com.github.am4dr.rokusho.presenter.viewer.multipane.pane.thumbnail
 
-import com.github.am4dr.rokusho.core.library.LibraryItemTag
 import com.github.am4dr.rokusho.javafx.control.RemovableTag
 import com.github.am4dr.rokusho.javafx.thumbnail.ThumbnailTagEditor
+import com.github.am4dr.rokusho.library.LibraryItemTag
 
 class LibraryItemTagTagNodeFactory(private val editor: ThumbnailTagEditor<LibraryItemTag>) {
 
