@@ -8,7 +8,7 @@ plugins {
 
 
 val submoduleProjects =
-    listOf("launcher", "javafx-commons", "javafx-controls", "core", "presenter")
+    listOf("launcher", "javafx-commons", "javafx-controls", "core", "presenter", "util")
         .map { project(":$it") }
 
 val javafxClassifier = when(OperatingSystem.current()) {
@@ -25,9 +25,8 @@ allprojects {
         mavenLocal()
         jcenter()
     }
-}
 
-configure(submoduleProjects) {
+
     apply(plugin="org.jetbrains.kotlin.jvm")
     apply(plugin="java-library")
 
@@ -43,6 +42,7 @@ configure(submoduleProjects) {
     dependencies {
         "api"(kotlin("stdlib-jdk8"))
         "implementation"(kotlin("reflect"))
+        "implementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.0")
 
         "testImplementation"("org.junit.jupiter:junit-jupiter-params:5.2.0")
         "testImplementation"("org.junit.jupiter:junit-jupiter-api:5.2.0")
@@ -60,6 +60,7 @@ configure(submoduleProjects) {
         }
     }
 }
+
 project(":core") {
     dependencies {
         "implementation"(project(":javafx-commons"))
