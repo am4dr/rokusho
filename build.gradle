@@ -6,6 +6,8 @@ plugins {
 
 ext {
     submoduleProjects = ['launcher', 'javafx-commons', 'javafx-controls', 'core', 'presenter'].collect { project ":$it" }
+    // TODO あとで置き換える
+    javafxClassifier = 'win'
     libraries = [
             kotlin: [
                     stdlib: 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.51',
@@ -25,6 +27,11 @@ ext {
             ],
             logback: 'ch.qos.logback:logback-classic:1.2.3',
             sample_viewer: 'com.github.am4dr.javafx:gui-sample-viewer:0.4.2-SNAPSHOT',
+            javafx: [
+                    "org.openjfx:javafx-base:11.0.1:$javafxClassifier",
+                    "org.openjfx:javafx-controls:11.0.1:$javafxClassifier",
+                    "org.openjfx:javafx-graphics:11.0.1:$javafxClassifier"
+            ],
     ]
 }
 
@@ -61,6 +68,7 @@ configure(submoduleProjects) {
 }
 project(':core') {
     dependencies {
+        implementation libraries.javafx
         implementation project(':javafx-commons')
         implementation libraries.snakeyaml
     }
@@ -71,6 +79,7 @@ project(':javafx-controls') {
     }
     dependencies {
         implementation project(':javafx-commons')
+        api libraries.javafx
 
         sampleImplementation libraries.kotlin.reflect
         sampleImplementation libraries.sample_viewer
@@ -92,16 +101,23 @@ project(':javafx-controls') {
 project(':presenter') {
     dependencies {
         api project(':core')
+        api libraries.javafx
         implementation project(':javafx-controls')
         implementation project(':javafx-commons')
     }
 }
 project(':launcher') {
     dependencies {
+        api libraries.javafx
         implementation project(':presenter')
         implementation project(':javafx-controls')
         implementation project(':javafx-commons')
         implementation libraries.commons.cli
+    }
+}
+project(':javafx-commons') {
+    dependencies {
+        api libraries.javafx
     }
 }
 
