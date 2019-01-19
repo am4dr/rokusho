@@ -3,9 +3,11 @@ package com.github.am4dr.rokusho.core.metadata
 import com.github.am4dr.rokusho.core.datastore.DataStore
 import com.github.am4dr.rokusho.core.datastore.NullDataStore
 
-class DefaultMetaDataRepositoryImpl(baseTags: Set<BaseTag> = setOf(),
-                                    records: Set<Record> = setOf(),
-                                    private val store: DataStore<MetaDataRepository> = NullDataStore()) : MetaDataRepository {
+class DefaultMetaDataRepositoryImpl(
+    baseTags: Set<BaseTag> = setOf(),
+    records: Set<Record> = setOf(),
+    private val store: DataStore<MetaDataRepository> = NullDataStore()
+) : MetaDataRepository {
 
     private val tags = baseTags.associateByTo(mutableMapOf(), BaseTag::name)
     private val records = records.associateByTo(mutableMapOf(), Record::key)
@@ -30,6 +32,12 @@ class DefaultMetaDataRepositoryImpl(baseTags: Set<BaseTag> = setOf(),
     override fun getRecords(): Set<Record> = records.values.toSet()
     override fun get(key: Record.Key): Record? = records[key]
     override fun add(record: Record): Record? {
+        // TODO test
+        val newBaseTags =
+            record.tags
+                .filter { !tags.containsKey(it.base.name) }
+                .map(PatchedTag::base)
+        newBaseTags.forEach { add(it) }
         val old = records.put(record.key, record)
         if (record.tags != old?.tags) {
             save()
