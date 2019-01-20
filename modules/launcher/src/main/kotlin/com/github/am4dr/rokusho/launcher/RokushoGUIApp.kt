@@ -42,7 +42,7 @@ class RokushoGUIApp : Application() {
     private val libraries: ObservableList<Library<*>> = FXCollections.observableArrayList()
     private lateinit var presenter: Presenter
 
-    private val eventCoroutineContext = Dispatchers.Default
+    private val eventDispatcherContext = Dispatchers.Default
 
     override fun init() {
         log.info("launched with the params: ${parameters.raw}")
@@ -51,8 +51,8 @@ class RokushoGUIApp : Application() {
             DataStoreConverter(YamlSaveDataStore(savefile))
         }
         libraryCollection = LibraryCollection(
-            listOf(FileSystemBasedLibraryProvider(fileBasedMetaDataRepositories)),
-            EventPublisherSupport(eventCoroutineContext)
+            listOf(FileSystemBasedLibraryProvider(fileBasedMetaDataRepositories, eventDispatcherContext)),
+            EventPublisherSupport(eventDispatcherContext)
         )
         parseArgs(parameters.raw.toTypedArray()).args
             .map { Paths.get(it) }

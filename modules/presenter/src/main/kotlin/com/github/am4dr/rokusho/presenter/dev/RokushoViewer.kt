@@ -2,6 +2,9 @@ package com.github.am4dr.rokusho.presenter.dev
 
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import com.github.am4dr.rokusho.library.Library
+import com.github.am4dr.rokusho.library.LibraryItem
+import javafx.application.Platform.runLater
+import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.scene.Scene
 import javafx.scene.control.Hyperlink
@@ -36,8 +39,25 @@ class RokushoViewer(val libraries: ObservableList<Library<*>>) {
         return Scene(libraryList, w, h)
     }
 
+
     private class LibraryListCell(library: Library<*>) : FlowPane() {
+        private val items = FXCollections.observableArrayList<LibraryItem<*>>()
         init {
+            items.addAll(library.getItems())
+            library.subscribeFor(this) { event, cell ->
+                runLater {
+                    val items = cell.items
+                    when (event) {
+                        is Library.Event.AddItem<*> -> items.add(event.item)
+                        is Library.Event.RemoveItem<*> -> items.removeAll(event.item)
+                        is Library.Event.UpdateItem<*> -> {
+                            items.indexOfFirst { it === event.item }
+                                .takeIf { it >= 0 }
+                                ?.let { index -> items.set(index, event.item) }
+                        }
+                    }
+                }
+            }
             children.addAll(
                     Hyperlink("tags").apply {
                         setOnAction {
@@ -46,7 +66,7 @@ class RokushoViewer(val libraries: ObservableList<Library<*>>) {
                     },
                     Hyperlink("records").apply {
                         setOnMouseClicked {
-                            RecordsViewer(library.getItems()).show()
+                            RecordsViewer(items).show()
                         }
                     },
                     Label(library.name),

@@ -63,8 +63,7 @@ allprojects {
 
 project(":core") {
     dependencies {
-        "implementation"(project(":javafx-commons"))
-        "implementation"(project(":util"))
+        "api"(project(":util"))
         "implementation"("org.yaml:snakeyaml:1.21")
     }
 }
@@ -117,7 +116,6 @@ project(":presenter") {
 project(":launcher") {
     dependencies {
         "implementation"(project(":presenter"))
-        "implementation"(project(":util"))
         "implementation"(project(":javafx-controls"))
         "implementation"(project(":javafx-commons"))
         "implementation"("commons-cli:commons-cli:1.4")

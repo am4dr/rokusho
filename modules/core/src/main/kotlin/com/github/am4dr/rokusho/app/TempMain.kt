@@ -3,6 +3,7 @@ package com.github.am4dr.rokusho.app
 import com.github.am4dr.rokusho.adapter.DataStoreConverter
 import com.github.am4dr.rokusho.core.datastore.savedata.yaml.YamlSaveDataStore
 import com.github.am4dr.rokusho.library.provider.LibraryProvider
+import kotlinx.coroutines.Dispatchers
 import java.nio.file.Paths
 
 /**
@@ -16,6 +17,8 @@ import java.nio.file.Paths
 class TempMain {
     companion object {
         const val TEMP_MAIN_TARGET_DIR: String = "TEMP_MAIN_TARGET_DIR"
+        private val eventDispatcherContext = Dispatchers.Default
+
         @JvmStatic
         fun main(args: Array<String>) {
             val targetDir = System.getenv(TEMP_MAIN_TARGET_DIR) ?: error("env $TEMP_MAIN_TARGET_DIR not found")
@@ -44,6 +47,6 @@ class TempMain {
         private fun loadProviders(): Set<LibraryProvider<*>> =
                 setOf(FileSystemBasedLibraryProvider(FileBasedMetaDataRepositories { savefile ->
                     DataStoreConverter(YamlSaveDataStore(savefile))
-                }))
+                }, eventDispatcherContext))
     }
 }
