@@ -7,40 +7,38 @@ import com.github.am4dr.rokusho.core.metadata.MetaDataRepository
 import com.github.am4dr.rokusho.core.metadata.PatchedTag
 import com.github.am4dr.rokusho.core.metadata.Record
 import com.github.am4dr.rokusho.core.util.DataObject
-import com.github.am4dr.rokusho.javafx.collection.toObservableList
 import com.github.am4dr.rokusho.library.Library
 import com.github.am4dr.rokusho.library.LibraryItem
 import com.github.am4dr.rokusho.library.LibraryItemTag
 import com.github.am4dr.rokusho.library.LibraryItemTagTemplate
-import javafx.beans.property.ReadOnlyListProperty
-import javafx.beans.property.ReadOnlyListWrapper
-import javafx.beans.property.ReadOnlySetProperty
-import javafx.beans.property.ReadOnlySetWrapper
-import javafx.collections.FXCollections
+import com.github.am4dr.rokusho.util.event.EventPublisher
+import com.github.am4dr.rokusho.util.event.EventPublisherSupport
+import kotlinx.coroutines.Dispatchers
 import kotlin.reflect.KClass
 
 // TODO 新しい種類のLibraryを実装できるように、ゆくゆくはこれの実装を整理して公開する必要がある
+// TODO テンプレート側のタグが追加されたときの処理を実装する
 internal class LibraryImpl<T : Any>(
     override val name: String,
     override val shortName: String,
     override val type: KClass<T>,
     val itemCollection: ItemCollection<T>,
     val metaDataRepository: MetaDataRepository,
-    val keyConverter: (Item.ID) -> Record.Key?
-) : Library<T> {
+    val keyConverter: (Item.ID) -> Record.Key?,
+    private val events: EventPublisherSupport<Library.Event> = EventPublisherSupport(Dispatchers.Default)
+) : Library<T>, EventPublisher<Library.Event> by events {
 
-    private val items = FXCollections.observableHashMap<Item.ID, LibraryItem<out T>>()
-    override fun getItems(): ReadOnlyListProperty<LibraryItem<out T>> = ReadOnlyListWrapper(toObservableList(items)).readOnlyProperty
+    private val items = mutableMapOf<Item.ID, LibraryItem<out T>>()
+    override fun getItems(): List<LibraryItem<out T>> = items.values.toList()
 
-    private val tags = FXCollections.observableSet<LibraryItemTagTemplate>()
-    override fun getTags(): ReadOnlySetProperty<LibraryItemTagTemplate> = ReadOnlySetWrapper(tags).readOnlyProperty
+    private val tags = mutableSetOf<LibraryItemTagTemplate>()
+    override fun getTags(): Set<LibraryItemTagTemplate> = tags.toSet()
+
     init {
-        itemCollection.ids.forEach(this::updateObservableItemMap)
+        itemCollection.ids.forEach {
+            getOrCreateCache(it)
+        }
         tags.addAll(metaDataRepository.getTags().map(::LibraryItemTagTemplateWrapper))
-    }
-
-    private fun updateObservableItemMap(id: Item.ID) {
-        get(id)?.let { item -> items[id] = item }
     }
 
     private fun updateObservableTagSet(name: BaseTag.Name) {
@@ -48,10 +46,15 @@ internal class LibraryImpl<T : Any>(
         tags.add(LibraryItemTagTemplateWrapper(tag))
     }
 
-    fun get(id: Item.ID): LibraryItem<out T>? {
-        val item = itemCollection.get(id) ?: return null
-        return LibraryItemImpl(this, item)
+    private fun getOrCreateCache(id: Item.ID): LibraryItem<out T>? {
+        if (!itemCollection.has(id)) return null
+        return items.getOrPut(id) {
+            val item = itemCollection.get(id) ?: return null
+            LibraryItemImpl(this, item)
+        }
     }
+
+    fun get(id: Item.ID): LibraryItem<out T>? = getOrCreateCache(id)
 
     fun getItemTags(id: Item.ID): Set<LibraryItemTag>? {
         val item = itemCollection.get(id) ?: return null
@@ -67,7 +70,9 @@ internal class LibraryImpl<T : Any>(
         val added = metaDataRepository.add(Record(recordID, patchedTags))
         val succeeded = added != null
         if (succeeded) {
-            updateObservableItemMap(id)
+            get(id)?.let { item ->
+                events.dispatch(Library.Event.UpdateItem(item))
+            }
         }
         return succeeded
     }

@@ -63,7 +63,7 @@ allprojects {
 
 project(":core") {
     dependencies {
-        "implementation"(project(":javafx-commons"))
+        "api"(project(":util"))
         "implementation"("org.yaml:snakeyaml:1.21")
     }
 }

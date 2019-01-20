@@ -1,17 +1,27 @@
 package com.github.am4dr.rokusho.library
 
-import javafx.beans.property.ReadOnlyListProperty
-import javafx.beans.property.ReadOnlySetProperty
+import com.github.am4dr.rokusho.util.event.EventPublisher
 import kotlin.reflect.KClass
 
-interface Library<T : Any> {
+interface Library<T : Any> : EventPublisher<Library.Event> {
 
     val type: KClass<T>
     val name: String
     val shortName: String
 
-    fun getItems(): ReadOnlyListProperty<LibraryItem<out T>>
-    fun getTags(): ReadOnlySetProperty<LibraryItemTagTemplate>
+    fun getItems(): List<LibraryItem<out T>>
+    fun getTags(): Set<LibraryItemTagTemplate>
     fun contains(item: LibraryItem<*>): Boolean
+
     fun parseItemTag(text: String): LibraryItemTag?
+
+    sealed class Event {
+        class AddItem<T : Any>(val item: LibraryItem<T>) : Event()
+        class RemoveItem<T : Any>(val item: LibraryItem<T>) : Event()
+        class UpdateItem<T : Any>(val item: LibraryItem<T>) : Event()
+
+        class AddTag(val tag: LibraryItemTagTemplate) : Event()
+        class RemoveTag(val tag: LibraryItemTagTemplate) : Event()
+        class UpdateTag(val tag: LibraryItemTagTemplate) : Event()
+    }
 }

@@ -16,10 +16,14 @@ import com.github.am4dr.rokusho.presenter.viewer.multipane.pane.ListPaneFactory
 import com.github.am4dr.rokusho.presenter.viewer.multipane.pane.thumbnail.ImageThumbnailFactory
 import com.github.am4dr.rokusho.presenter.viewer.multipane.pane.thumbnail.ThumbnailPaneFactory
 import com.github.am4dr.rokusho.presenter.viewer.multipane.pane.thumbnail.UrlImageLoader
+import com.github.am4dr.rokusho.util.event.EventPublisherSupport
 import javafx.application.Application
+import javafx.application.Platform.runLater
+import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.scene.Scene
 import javafx.stage.Stage
+import kotlinx.coroutines.Dispatchers
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.Options
@@ -35,8 +39,10 @@ class RokushoGUIApp : Application() {
 
 
     private lateinit var libraryCollection: LibraryCollection
-    private lateinit var libraries: ObservableList<Library<*>>
+    private val libraries: ObservableList<Library<*>> = FXCollections.observableArrayList()
     private lateinit var presenter: Presenter
+
+    private val eventDispatcherContext = Dispatchers.Default
 
     override fun init() {
         log.info("launched with the params: ${parameters.raw}")
@@ -44,17 +50,29 @@ class RokushoGUIApp : Application() {
         val fileBasedMetaDataRepositories = FileBasedMetaDataRepositories { savefile ->
             DataStoreConverter(YamlSaveDataStore(savefile))
         }
-        libraryCollection = LibraryCollection(listOf(FileSystemBasedLibraryProvider(fileBasedMetaDataRepositories)))
+        libraryCollection = LibraryCollection(
+            listOf(FileSystemBasedLibraryProvider(fileBasedMetaDataRepositories, eventDispatcherContext)),
+            EventPublisherSupport(eventDispatcherContext)
+        )
         parseArgs(parameters.raw.toTypedArray()).args
             .map { Paths.get(it) }
             .filter { Files.isDirectory(it) }
             .forEach { libraryCollection.loadPathLibrary(it) }
-        libraries = libraryCollection.getLibraries()
     }
 
     private fun parseArgs(args: Array<String>): CommandLine = DefaultParser().parse(Options(), args)
 
     override fun start(stage: Stage) {
+        libraryCollection.subscribeFor(libraries) { event, libs ->
+            runLater {
+                when (event) {
+                    is LibraryCollection.Event.AddLibrary -> libs.add(event.library)
+                    is LibraryCollection.Event.RemoveLibrary -> libs.remove(event.library)
+                    else -> {}
+                }
+            }
+        }
+
         val thumbnailMaxWidth = 500.0
         val thumbnailMaxHeight = 200.0
 

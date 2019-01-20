@@ -6,14 +6,17 @@ import com.github.am4dr.rokusho.library.impl.LibraryImpl
 import com.github.am4dr.rokusho.library.provider.LibraryDescriptor
 import com.github.am4dr.rokusho.library.provider.LibraryProvider
 import com.github.am4dr.rokusho.library.provider.StandardLibraryProviderDescriptors
+import com.github.am4dr.rokusho.util.event.EventPublisherSupport
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.coroutines.CoroutineContext
 
 class FileSystemBasedLibraryProvider(
-    private val metaDataRepositories: FileBasedMetaDataRepositories
+    private val metaDataRepositories: FileBasedMetaDataRepositories,
+    private val eventDispatcherContext: CoroutineContext
 ) : LibraryProvider<Path> {
 
     companion object {
@@ -55,8 +58,9 @@ class FileSystemBasedLibraryProvider(
             path.fileName.toString(),
             Path::class,
             items,
-            metaRepo
-        ) { Record.Key(it.id) }
+            metaRepo,
+            { Record.Key(it.id) },
+            EventPublisherSupport(eventDispatcherContext))
     }
 
     internal fun getPath(uri: URI): Path? = try {
