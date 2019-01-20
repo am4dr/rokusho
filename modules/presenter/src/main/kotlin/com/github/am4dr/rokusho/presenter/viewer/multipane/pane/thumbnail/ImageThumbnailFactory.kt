@@ -1,9 +1,6 @@
 package com.github.am4dr.rokusho.presenter.viewer.multipane.pane.thumbnail
 
-import com.github.am4dr.rokusho.javafx.thumbnail.ImageThumbnail
-import com.github.am4dr.rokusho.javafx.thumbnail.StackedThumbnail
-import com.github.am4dr.rokusho.javafx.thumbnail.ThumbnailFlowPane
-import com.github.am4dr.rokusho.javafx.thumbnail.ThumbnailTagEditor
+import com.github.am4dr.rokusho.javafx.thumbnail.*
 import com.github.am4dr.rokusho.library.LibraryItemTag
 import com.github.am4dr.rokusho.presenter.ItemViewModel
 import javafx.beans.property.SimpleBooleanProperty
@@ -47,13 +44,15 @@ class ImageThumbnailFactory(
         val base = ImageThumbnail(getThumbnailImage(item.item.toUri().toURL()))
         val overlayInputFocused = SimpleBooleanProperty(false)
         val overlaySupplier = {
-            ThumbnailTagEditor<LibraryItemTag>().apply {
-                val tagNodeFactory = LibraryItemTagTagNodeFactory(this)
-                tags.setAll(item.tags)
+            val vm = ThumbnailTagEditorViewModel<LibraryItemTag>().apply {
+                tags.addAll(item.tags) // TODO bindする
+                tagNodeFactoryProperty.set(LibraryItemTagTagNodeFactory(this)::create)
                 onEditEndedProperty.set { new -> item.updateTags(new) }
                 inputParserProperty.set { input -> item.parseTagString(input) }
-                tagNodeFactoryProperty.set { tag -> tagNodeFactory.create(tag) }
-                overlayInputFocused.bind(inputFocusedProperty())
+            }
+            ThumbnailTagEditor().apply {
+                overlayInputFocused.bind(inputFocusedProperty)
+                vm.bindToView(this)
             }
         }
         return StackedThumbnail(base, overlaySupplier).apply {

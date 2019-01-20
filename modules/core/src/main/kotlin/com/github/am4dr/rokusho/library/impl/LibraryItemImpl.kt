@@ -21,6 +21,8 @@ internal class LibraryItemImpl<T : Any>(
         return library.get(itemID)
     }
 
+    override fun isSame(other: LibraryItem<out T>): Boolean = equals(other)
+
     override fun equals(other: Any?): Boolean = other is LibraryItemImpl<*> && itemID == other.itemID
     override fun hashCode(): Int = itemID.hashCode()
     override fun toString(): String = "LibraryItem($itemID, ${get()}, tags=${getTags()})"

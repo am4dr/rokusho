@@ -10,7 +10,7 @@ class ItemModelConverter(
     libraries: ObservableList<Library<*>>
 ) {
 
-    private val convertedItemModels: MutableMap<Library<*>, ObservableList<ItemViewModel<*>>> = mutableMapOf()
+    private val convertedItemModels: MutableMap<Library<*>, ObservableList<out ItemViewModel<*>>> = mutableMapOf()
 
     init {
         libraries.forEach {
@@ -28,18 +28,18 @@ class ItemModelConverter(
         })
     }
 
-    fun getOrCreate(library: Library<*>): ObservableList<ItemViewModel<*>> =
+    fun getOrCreate(library: Library<*>): ObservableList<out ItemViewModel<*>> =
         convertedItemModels.getOrPut(library) { createItemViewModels(library) }
 
-    private fun createItemViewModels(library: Library<*>): ObservableList<ItemViewModel<*>> {
-        val models = FXCollections.observableArrayList<ItemViewModel<*>>()
+    private fun createItemViewModels(library: Library<*>): ObservableList<out ItemViewModel<*>> {
+        val models = FXCollections.observableArrayList<LibraryItemItemViewModel>()
         library.subscribeFor(models) { event, list ->
             runLater {
                 when (event) {
                     is Library.Event.AddItem<*> -> list.add(LibraryItemItemViewModel(library, event.item))
-                    is Library.Event.RemoveItem<*> -> list.removeAll { it.item === event.item }
+                    is Library.Event.RemoveItem<*> -> list.removeAll { it.has(event.item) }
                     is Library.Event.UpdateItem<*> -> {
-                        list.indexOfFirst { it.item === event.item }
+                        list.indexOfFirst { it.has(event.item) }
                             .takeIf { it >= 0 }
                             ?.let { index -> list[index] = LibraryItemItemViewModel(library, event.item) }
                     }
@@ -48,9 +48,5 @@ class ItemModelConverter(
         }
         models.addAll(library.getItems().map { LibraryItemItemViewModel(library, it) })
         return models
-    }
-
-    fun remove(library: Library<*>) {
-        convertedItemModels.remove(library)
     }
 }

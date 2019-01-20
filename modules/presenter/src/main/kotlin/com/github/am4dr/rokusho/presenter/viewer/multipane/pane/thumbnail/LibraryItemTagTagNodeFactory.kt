@@ -1,10 +1,10 @@
 package com.github.am4dr.rokusho.presenter.viewer.multipane.pane.thumbnail
 
 import com.github.am4dr.rokusho.javafx.control.RemovableTag
-import com.github.am4dr.rokusho.javafx.thumbnail.ThumbnailTagEditor
+import com.github.am4dr.rokusho.javafx.thumbnail.ThumbnailTagEditorViewModel
 import com.github.am4dr.rokusho.library.LibraryItemTag
 
-class LibraryItemTagTagNodeFactory(private val editor: ThumbnailTagEditor<LibraryItemTag>) {
+class LibraryItemTagTagNodeFactory(private val editor: ThumbnailTagEditorViewModel<LibraryItemTag>) {
 
     companion object {
         // TODO 仕様の詳細を知りすぎているので取り除く(typeとかvalueとかのキー名をなぜ知っているのかなど)
@@ -23,7 +23,7 @@ class LibraryItemTagTagNodeFactory(private val editor: ThumbnailTagEditor<Librar
 
     fun create(tag: LibraryItemTag): RemovableTag {
         return RemovableTag().apply {
-            textProperty().set(tagToTagText(tag))
+            textProperty.set(tagToTagText(tag))
             onRemoved.set { editor.remove(tag) }
         }
     }

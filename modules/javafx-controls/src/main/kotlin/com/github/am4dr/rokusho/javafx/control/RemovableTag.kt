@@ -14,23 +14,19 @@ import javafx.scene.text.Font
 
 class RemovableTag : AnchorPane() {
 
-    private val text: StringProperty = SimpleStringProperty()
-    fun textProperty(): StringProperty = text
-
-    val onRemoved: ObjectProperty<(() -> Unit)?> = SimpleObjectProperty()
-
-    val label = createLabel().also { it.textProperty().bind(text) }
-    val button = createRemoveButton()
-
-    private val buttonVisibility = SimpleBooleanProperty(true)
-    fun buttonVisibilityProperty() = buttonVisibility
-
     companion object {
         private val buttonBackground = Background(BackgroundFill(Color.rgb(60, 50, 50), CornerRadii(2.0), null))
         private val buttonBackgroundHovered = Background(BackgroundFill(Color.DARKRED, CornerRadii(2.0), null))
     }
 
+    val textProperty: StringProperty = SimpleStringProperty()
+    val buttonVisibility = SimpleBooleanProperty(true)
+    val onRemoved: ObjectProperty<(() -> Unit)?> = SimpleObjectProperty()
+
     init {
+        val label = createLabel().also { it.textProperty().bind(textProperty) }
+        val button = createRemoveButton()
+
         button.visibleProperty().bind(buttonVisibility)
         prefWidthProperty().bind(label.widthProperty().add(
                 When(button.visibleProperty())

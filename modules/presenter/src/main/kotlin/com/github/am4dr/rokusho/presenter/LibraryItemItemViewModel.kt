@@ -18,4 +18,6 @@ class LibraryItemItemViewModel(
     override fun updateTags(tags: List<LibraryItemTag>) {
         libraryItem.updateTags(tags.toSet())
     }
+
+    fun has(item: LibraryItem<*>): Boolean = libraryItem === item
 }

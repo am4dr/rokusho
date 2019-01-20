@@ -9,4 +9,5 @@ interface LibraryItem<T : Any> {
     fun get(): T
     fun getTags(): Set<LibraryItemTag>
     fun updateTags(tags: Set<LibraryItemTag>): LibraryItem<out T>?
+    fun isSame(other: LibraryItem<out T>): Boolean
 }
