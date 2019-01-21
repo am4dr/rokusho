@@ -16,8 +16,12 @@ import com.github.am4dr.rokusho.util.event.EventPublisherSupport
 import kotlinx.coroutines.Dispatchers
 import kotlin.reflect.KClass
 
-// TODO 新しい種類のLibraryを実装できるように、ゆくゆくはこれの実装を整理して公開する必要がある
-// TODO テンプレート側のタグが追加されたときの処理を実装する
+/**
+ * [MetaDataRepository]と[ItemCollection]による[Library]の実装
+ *
+ * TODO 新しい種類のLibraryを実装できるように、ゆくゆくはこれの実装を整理して公開する必要がある
+ * TODO テンプレート側のタグが追加されたときの処理を実装する
+ */
 internal class LibraryImpl<T : Any>(
     override val name: String,
     override val shortName: String,
