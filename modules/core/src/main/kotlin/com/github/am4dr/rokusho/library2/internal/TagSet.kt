@@ -51,4 +51,8 @@ internal class TagSet(
     fun alreadyExists(tag: Tag): Boolean {
         return tags.any { it.isSameEntity(tag) || it.isSameName(tag) }
     }
+
+    fun get(tag: Tag): Tag? {
+        return tags.find { it.isSameEntity(tag) }
+    }
 }

@@ -1,13 +1,11 @@
 package com.github.am4dr.rokusho.library2
 
+import com.github.am4dr.rokusho.library2.internal.DataLocker
 import com.github.am4dr.rokusho.util.event.EventPublisher
 import com.github.am4dr.rokusho.util.event.EventPublisherSupport
 import com.github.am4dr.rokusho.util.event.EventSubscription
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.nio.file.Path
-import java.util.concurrent.locks.ReentrantReadWriteLock
-import kotlin.concurrent.read
-import kotlin.concurrent.write
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -25,13 +23,11 @@ class LibraryContainer private constructor(
         eventPublisherContext: CoroutineContext
     ) : this(pathLibraryLoader, EventPublisherSupport(eventPublisherContext))
 
-    private val lock = ReentrantReadWriteLock()
-
-    private val libraries = LibrarySet(eventPublisherSupport)
+    private val libraries = DataLocker(LibrarySet(eventPublisherSupport))
 
 
-    fun getAllLibraries(): Set<LoadedLibrary> = lock.read {
-        libraries.asSet()
+    fun getAllLibraries(): Set<LoadedLibrary> = libraries.read {
+        it.asSet()
     }
 
     @ExperimentalCoroutinesApi
@@ -39,17 +35,18 @@ class LibraryContainer private constructor(
         pathLibraryLoader(path)?.also(::addLibrary)
 
     @ExperimentalCoroutinesApi
-    private fun addLibrary(library: LoadedLibrary) = lock.write {
-        libraries.add(library)
+    private fun addLibrary(library: LoadedLibrary) = libraries.write {
+        it.add(library)
         activateAutoSave(library)
     }
 
     // 変更イベントのたびに保存するようにしているが、保存頻度が高いかもしれない
     // ライブラリーへの初期ロード時にこれが誘発しないようにしなければならない
+    @ExperimentalCoroutinesApi
     private fun activateAutoSave(library: LoadedLibrary) {
-        val getCurrentLibraryInstance = { lock.read { libraries.get(library) } }
+        val getCurrentLibraryInstance = { libraries.read { it.get(library) } }
         library.library.subscribe(getCurrentLibraryInstance) { event, currentLibraryInstance ->
-            lock.read {
+            libraries.read {
                 when (event) {
                     is Library.Event.TagEvent.Added,
                     is Library.Event.TagEvent.Removed,
@@ -71,7 +68,7 @@ class LibraryContainer private constructor(
 
     fun getDataAndSubscribe(
         block: EventPublisher<Event>.(Set<LoadedLibrary>) -> EventSubscription
-    ): EventSubscription = lock.read {
+    ): EventSubscription = libraries.read {
         block(this, getAllLibraries())
     }
 

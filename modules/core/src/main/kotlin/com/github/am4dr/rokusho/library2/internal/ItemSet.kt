@@ -12,8 +12,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
  *
  * スレッドセーフではないので同期は外部で行う必要がある
  */
-internal class ItemSet(
-    val eventPublisherSupport: EventPublisherSupport<in Library.Event.ItemEvent>
+internal class ItemSet @ExperimentalCoroutinesApi constructor(
+    val eventPublisherSupport: EventPublisherSupport<in Library.Event.ItemEvent>,
+    val tagSet: TagSet
 ) {
 
     private val items: MutableSet<LibraryItem<*>> = mutableSetOf()
@@ -37,7 +38,13 @@ internal class ItemSet(
 
     @ExperimentalCoroutinesApi
     fun load(item: LibraryItem<*>) {
-        items.putOrReplaceEntity(item)
-        eventPublisherSupport.dispatch(Library.Event.ItemEvent.Loaded(item))
+        val newItemTags = item.tags.map { itemTag ->
+            val currentTagInstance = tagSet.get(itemTag.tag) ?: return@map null
+            itemTag.update(currentTagInstance)
+        }.filterNotNullTo(mutableSetOf())
+        val updatedItem = item.update(newItemTags)
+
+        items.putOrReplaceEntity(updatedItem)
+        eventPublisherSupport.dispatch(Library.Event.ItemEvent.Loaded(updatedItem))
     }
 }
