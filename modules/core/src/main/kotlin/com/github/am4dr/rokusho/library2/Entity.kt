@@ -11,3 +11,11 @@ fun <T : Entity<T>> MutableSet<T>.putOrReplaceEntity(new: T): T? {
     add(new)
     return new
 }
+
+fun <T : Entity<T>> MutableList<T>.addOrReplaceEntity(new: T) {
+    for (i in 0..lastIndex) {
+        if (get(i).isSameEntity(new)) {
+            set(i, new)
+        }
+    }
+}

@@ -1,12 +1,9 @@
 package com.github.am4dr.rokusho.launcher
 
-import com.github.am4dr.rokusho.adapter.DataStoreConverter
-import com.github.am4dr.rokusho.app.FileBasedMetaDataRepositories
-import com.github.am4dr.rokusho.app.FileSystemBasedLibraryProvider
-import com.github.am4dr.rokusho.app.LibraryCollection
-import com.github.am4dr.rokusho.core.datastore.savedata.yaml.YamlSaveDataStore
 import com.github.am4dr.rokusho.javafx.control.DirectoryPathChooser
-import com.github.am4dr.rokusho.library.Library
+import com.github.am4dr.rokusho.library2.LibraryContainer
+import com.github.am4dr.rokusho.library2.LoadedLibrary
+import com.github.am4dr.rokusho.library2.addOrReplaceEntity
 import com.github.am4dr.rokusho.presenter.Presenter
 import com.github.am4dr.rokusho.presenter.dev.RokushoViewer
 import com.github.am4dr.rokusho.presenter.scene.module.MainPaneModule
@@ -16,19 +13,19 @@ import com.github.am4dr.rokusho.presenter.viewer.multipane.pane.ListPaneFactory
 import com.github.am4dr.rokusho.presenter.viewer.multipane.pane.thumbnail.ImageThumbnailFactory
 import com.github.am4dr.rokusho.presenter.viewer.multipane.pane.thumbnail.ThumbnailPaneFactory
 import com.github.am4dr.rokusho.presenter.viewer.multipane.pane.thumbnail.UrlImageLoader
-import com.github.am4dr.rokusho.util.event.EventPublisherSupport
 import javafx.application.Application
-import javafx.application.Platform.runLater
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.scene.Scene
 import javafx.stage.Stage
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.Options
 import org.slf4j.LoggerFactory
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 
 class RokushoGUIApp : Application() {
@@ -38,38 +35,37 @@ class RokushoGUIApp : Application() {
     }
 
 
-    private lateinit var libraryCollection: LibraryCollection
-    private val libraries: ObservableList<Library<*>> = FXCollections.observableArrayList()
+    private lateinit var libraryContainer: LibraryContainer
+    private val libraries2: ObservableList<LoadedLibrary> = FXCollections.observableArrayList()
     private lateinit var presenter: Presenter
 
     private val eventDispatcherContext = Dispatchers.Default
 
+    @ExperimentalCoroutinesApi
     override fun init() {
         log.info("launched with the params: ${parameters.raw}")
 
-        val fileBasedMetaDataRepositories = FileBasedMetaDataRepositories { savefile ->
-            DataStoreConverter(YamlSaveDataStore(savefile))
-        }
-        libraryCollection = LibraryCollection(
-            listOf(FileSystemBasedLibraryProvider(fileBasedMetaDataRepositories, eventDispatcherContext)),
-            EventPublisherSupport(eventDispatcherContext)
-        )
+        // TODO 基本のローダーを初期化してセットする
+        val pathLibraryLoader: (Path) -> LoadedLibrary? = { null }
+        libraryContainer = LibraryContainer(pathLibraryLoader, eventDispatcherContext)
         parseArgs(parameters.raw.toTypedArray()).args
             .map { Paths.get(it) }
             .filter { Files.isDirectory(it) }
-            .forEach { libraryCollection.loadPathLibrary(it) }
+            .forEach { libraryContainer.loadPathLibrary(it) }
     }
 
     private fun parseArgs(args: Array<String>): CommandLine = DefaultParser().parse(Options(), args)
 
+    @ExperimentalCoroutinesApi
     override fun start(stage: Stage) {
-        libraryCollection.subscribeFor(libraries) { event, libs ->
-            runLater {
+        libraryContainer.getDataAndSubscribe { loadedLibraries ->
+            libraries2.addAll(loadedLibraries)
+            subscribeFor(libraries2) { event, libs ->
                 when (event) {
-                    is LibraryCollection.Event.AddLibrary -> libs.add(event.library)
-                    is LibraryCollection.Event.RemoveLibrary -> libs.remove(event.library)
-                    else -> {}
-                }
+                    is LibraryContainer.Event.Added -> libs.add(event.library)
+                    is LibraryContainer.Event.Removed -> libs.remove(event.library)
+                    is LibraryContainer.Event.Updated -> libs.addOrReplaceEntity(event.library)
+                }.let { /* 網羅性チェック */ }
             }
         }
 
@@ -84,7 +80,7 @@ class RokushoGUIApp : Application() {
             )
         )
         val pathChooser = DirectoryPathChooser(stage)
-        presenter = Presenter(libraries, viewerFactory, libraryCollection::loadPathLibrary, pathChooser::get)
+        presenter = Presenter(libraries2, viewerFactory, libraryContainer::loadPathLibrary, pathChooser::get)
 
         val sideMenu = SideMenuModule(presenter)
         val libraryViewerContainer = MainPaneModule(presenter, sideMenu)

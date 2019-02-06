@@ -4,7 +4,7 @@ import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import com.github.am4dr.rokusho.javafx.sidemenu.CharacterIcon
 import com.github.am4dr.rokusho.javafx.sidemenu.SideMenuIcon
 import com.github.am4dr.rokusho.javafx.sidemenu.SimpleSideMenu
-import com.github.am4dr.rokusho.library.Library
+import com.github.am4dr.rokusho.library2.LoadedLibrary
 import javafx.beans.binding.ObjectExpression
 import javafx.beans.binding.When
 import javafx.collections.ObservableList
@@ -17,15 +17,15 @@ import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
 
 class CharacterIconSideMenu(
-    private val libraries: ObservableList<Library<*>>,
-    private val selectLibrary: (Library<*>) -> Unit,
-    private val selectedLibrary: ObjectExpression<Library<*>?>,
+    private val libraries: ObservableList<LoadedLibrary>,
+    private val selectLibrary: (LoadedLibrary) -> Unit,
+    private val selectedLibrary: ObjectExpression<LoadedLibrary?>,
     private val openLibraryChooserAndAddLibrary: () -> Unit,
-    iconFactory: (Library<*>) -> SideMenuIcon = Companion::createCharacterIcon
+    iconFactory: (LoadedLibrary) -> SideMenuIcon = Companion::createCharacterIcon
 ) : StackPane() {
 
     companion object {
-        fun createCharacterIcon(library: Library<*>): SideMenuIcon =
+        fun createCharacterIcon(library: LoadedLibrary): SideMenuIcon =
             CharacterIcon().apply {
                 Tooltip.install(this, Tooltip(library.name))
                 backgroundProperty().bind(
@@ -33,7 +33,7 @@ class CharacterIconSideMenu(
                         .then(Background(BackgroundFill(Color.INDIANRED, CornerRadii(4.0), Insets.EMPTY)))
                         .otherwise(Background(BackgroundFill(Color.ANTIQUEWHITE, CornerRadii(8.0), Insets.EMPTY)))
                 )
-                character.set(library.shortName.first().toString())
+                character.set(library.name.first().toString())
             }
     }
 

@@ -111,13 +111,13 @@ class Library private constructor(
     sealed class Event {
         sealed class TagEvent(val tag: Tag) : Event() {
             class Loaded(tag: Tag) : TagEvent(tag)
-            class Added(tag: Tag) : TagEvent(tag)
+            class Added(tag: Tag)  : TagEvent(tag)
             class Removed(tag: Tag) : TagEvent(tag)
             class Updated(tag: Tag) : TagEvent(tag)
         }
         sealed class ItemEvent(val item: LibraryItem<*>) : Event() {
             class Loaded(item: LibraryItem<*>) : ItemEvent(item)
-            class Added(item: LibraryItem<*>) : ItemEvent(item)
+            class Added(item: LibraryItem<*>)  : ItemEvent(item)
             class Removed(item: LibraryItem<*>) : ItemEvent(item)
             class Updated(item: LibraryItem<*>) : ItemEvent(item)
         }

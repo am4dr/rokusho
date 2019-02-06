@@ -1,7 +1,7 @@
 package com.github.am4dr.rokusho.presenter.viewer.multipane.pane.thumbnail
 
 import com.github.am4dr.rokusho.javafx.thumbnail.*
-import com.github.am4dr.rokusho.library.LibraryItemTag
+import com.github.am4dr.rokusho.presenter.ItemTagData
 import com.github.am4dr.rokusho.presenter.ItemViewModel
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.scene.image.Image
@@ -44,7 +44,7 @@ class ImageThumbnailFactory(
         val base = ImageThumbnail(getThumbnailImage(item.item.toUri().toURL()))
         val overlayInputFocused = SimpleBooleanProperty(false)
         val overlaySupplier = {
-            val vm = ThumbnailTagEditorViewModel<LibraryItemTag>().apply {
+            val vm = ThumbnailTagEditorViewModel<ItemTagData>().apply {
                 tags.addAll(item.tags) // TODO bindする
                 tagNodeFactoryProperty.set(LibraryItemTagTagNodeFactory(this)::create)
                 onEditEndedProperty.set { new -> item.updateTags(new) }

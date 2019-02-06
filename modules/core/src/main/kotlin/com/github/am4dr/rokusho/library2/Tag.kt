@@ -18,6 +18,10 @@ class Tag private constructor(
     fun update(data: TagData): Tag =
         Tag(id, data)
 
+    operator fun get(key: String): String? {
+        return data.obj[key]
+    }
+
     fun isSameName(other: Tag): Boolean =
         other.name == name
 

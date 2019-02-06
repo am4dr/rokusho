@@ -1,6 +1,6 @@
 package com.github.am4dr.rokusho.presenter
 
-import com.github.am4dr.rokusho.library.Library
+import com.github.am4dr.rokusho.library2.LoadedLibrary
 import javafx.beans.binding.Bindings.bindContent
 import javafx.beans.binding.Bindings.createObjectBinding
 import javafx.beans.binding.ObjectExpression
@@ -10,14 +10,14 @@ import javafx.scene.Node
 import java.nio.file.Path
 
 class Presenter(
-    val libraries: ObservableList<Library<*>> = FXCollections.observableArrayList(),
-    viewerFactory: ItemListViewerFactory,
-    val addLibraryByPath: (Path) -> Library<*>?,
+    val libraries: ObservableList<LoadedLibrary> = FXCollections.observableArrayList(),
+    viewerFactory: ItemListViewerFactory2,
+    val addLibraryByPath: (Path) -> LoadedLibrary?,
     val pathChooser: () -> Path?
 ) {
 
     private val selector: LibrarySelector = LibrarySelector(libraries)
-    val selectedLibrary: ObjectExpression<Library<*>?> = selector.selectedProperty()
+    val selectedLibrary: ObjectExpression<LoadedLibrary?> = selector.selectedProperty()
     val selectedViewer: ObjectExpression<Node?> = createObjectBinding(
         { getOrCreateViewer()?.node },
         arrayOf(selectedLibrary)
@@ -33,7 +33,7 @@ class Presenter(
             }
         }
 
-    fun select(library: Library<*>) {
+    fun select(library: LoadedLibrary) {
         selector.select(library)
     }
 
