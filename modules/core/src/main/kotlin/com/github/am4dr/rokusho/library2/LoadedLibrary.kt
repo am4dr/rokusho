@@ -2,13 +2,12 @@ package com.github.am4dr.rokusho.library2
 
 import com.github.am4dr.rokusho.core.datastore.DataStore
 import com.github.am4dr.rokusho.core.datastore.NullDataStore
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-@ExperimentalCoroutinesApi
 class LoadedLibrary private constructor(
     private val id: Any,
     val library: Library,
     val name: String,
+    /* TODO DataStoreは古いinterfaceを流用しているに過ぎないので、適したものを作る */
     private val defaultStore: DataStore<Library.Data> = NullDataStore()
 ) : Entity<LoadedLibrary> {
 

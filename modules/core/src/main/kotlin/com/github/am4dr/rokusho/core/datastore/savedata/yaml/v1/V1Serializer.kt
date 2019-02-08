@@ -14,9 +14,13 @@ fun V1SaveData.toDumpStructure(): Map<Any, Any> {
             )
 }
 
-fun TagEntry.toDumpStructure(): Pair<String, Any> = id to data
+fun TagEntry.toDumpStructure(): Pair<String, Any> =
+    id to if (data.isNotEmpty()) data else mutableMapOf()
+
 fun ItemEntry.toDumpStructure(): Pair<String, Map<String, Any>> {
-    val tags = tags.map { it.toDumpStructure() }.toMap().toMutableMap()
+    val tags = tags.map { it.toDumpStructure() }.toMap()
     return id to if (tags.isNotEmpty()) mapOf("tags" to tags) else mutableMapOf()
 }
-fun ItemTagEntry.toDumpStructure(): Pair<String, Any> = id to data
+
+fun ItemTagEntry.toDumpStructure(): Pair<String, Any> =
+    id to if (data.isNotEmpty()) data else mutableMapOf()

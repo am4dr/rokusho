@@ -85,10 +85,9 @@ class PathLibraryLoader(
         private val yamlSaveDataStore = YamlSaveDataStore(saveFile)
 
         override fun save(data: Library.Data) {
-            convert(data)
-            // TODO コメントを外して保存を有効化する
-            // yamlSaveDataStore.save(convert(data))
+            yamlSaveDataStore.save(convert(data))
         }
+
         override fun load(): Library.Data? {
             val loaded = yamlSaveDataStore.load()
             return convert(loaded)

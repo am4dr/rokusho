@@ -55,4 +55,8 @@ internal class TagSet(
     fun get(tag: Tag): Tag? {
         return tags.find { it.isSameEntity(tag) }
     }
+
+    fun get(name: String): Tag? {
+        return tags.find { it.name == name }
+    }
 }

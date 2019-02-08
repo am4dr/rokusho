@@ -1,5 +1,6 @@
 package com.github.am4dr.rokusho.library2
 
+import com.github.am4dr.rokusho.core.util.DataObject
 import com.github.am4dr.rokusho.library2.internal.DataLocker
 import com.github.am4dr.rokusho.library2.internal.ItemSet
 import com.github.am4dr.rokusho.library2.internal.TagSet
@@ -23,7 +24,6 @@ import kotlin.coroutines.CoroutineContext
  * [Tag]の集合の読み込みはすべて読み込むまで処理を待つが、[LibraryItem]の[Sequence]の読み込みは与えられたcontextのもとで行われる。
  * TODO contextをイベント用とアイテム読み込みようで共用することに問題はないか
  */
-@ExperimentalCoroutinesApi
 class Library private constructor(
     context: CoroutineContext,
     eventPublisherSupport: EventPublisherSupport<Event>,
@@ -94,6 +94,14 @@ class Library private constructor(
         return tag
     }
 
+    fun createItemTagByName(name: String): ItemTag? = locker.write { (tags) ->
+        tags.get(name)?.let {
+            return ItemTag(it, DataObject())
+        }
+        val newTag = Tag(TagData(name, DataObject(mapOf("value" to name))))
+        tags.add(newTag)
+        return ItemTag(newTag, DataObject())
+    }
 
     fun asData(): Data = locker.read { (tags, items) ->
         Data(tags = tags.asSet(), items = items.asSet())

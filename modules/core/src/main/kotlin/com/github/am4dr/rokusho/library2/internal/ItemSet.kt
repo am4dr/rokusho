@@ -12,7 +12,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
  *
  * スレッドセーフではないので同期は外部で行う必要がある
  */
-internal class ItemSet @ExperimentalCoroutinesApi constructor(
+internal class ItemSet constructor(
     val eventPublisherSupport: EventPublisherSupport<in Library.Event.ItemEvent>,
     val tagSet: TagSet
 ) {

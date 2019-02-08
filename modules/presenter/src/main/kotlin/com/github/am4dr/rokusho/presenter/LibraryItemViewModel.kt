@@ -6,7 +6,6 @@ import com.github.am4dr.rokusho.library2.LibraryItem
 import com.github.am4dr.rokusho.library2.TagData
 
 
-// TODO 実装する
 class LibraryItemViewModel(
     private val library: Library,
     private val libraryItem: LibraryItem<*>
@@ -17,9 +16,10 @@ class LibraryItemViewModel(
     override val tags: List<ItemTagData> = _tags
 
     override fun parseTagString(string: String): ItemTagData? {
+        /* TODO この処理はLibraryに実装を移す */
         return string.let(TagData.Companion::parse)
-            ?.let(library::createTag)
-            ?.let(::ItemTag)
+            ?.let(TagData::name)
+            ?.let(library::createItemTagByName)
             ?.let(::LibraryItemTagData)
     }
 
@@ -44,22 +44,3 @@ class LibraryItemViewModel(
         override fun get(key: String): String? = itemTag[key]
     }
 }
-
-// TODO 上の実装で動いたら、これの削除
-//class LibraryItemItemViewModel(
-//    private val library: Library<*>,
-//    private val libraryItem: LibraryItem<*>
-//) : ItemViewModel<Any> {
-//
-//    override val item: Any get() = libraryItem.get()
-//    override val tags: List<LibraryItemTag> get() = libraryItem.getTags().toList()
-//
-//    override fun parseTagString(string: String): LibraryItemTag? =
-//        library.parseItemTag(string)
-//
-//    override fun updateTags(tags: List<LibraryItemTag>) {
-//        libraryItem.updateTags(tags.toSet())
-//    }
-//
-//    fun has(item: LibraryItem<*>): Boolean = libraryItem === item
-//}

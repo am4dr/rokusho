@@ -47,7 +47,6 @@ class RokushoViewer(val libraries: ObservableList<LoadedLibrary>) {
     }
 
 
-    @ExperimentalCoroutinesApi
     private class LibraryListCell(library: LoadedLibrary) : FlowPane() {
         private val items = FXCollections.observableArrayList<LibraryItem<*>>()
         init {
@@ -57,7 +56,7 @@ class RokushoViewer(val libraries: ObservableList<LoadedLibrary>) {
                     runLater {
                         val items = cell.items
                         when (event) {
-                            is Library.Event.TagEvent -> TODO()
+                            is Library.Event.TagEvent -> {}
                             is Library.Event.ItemEvent -> when (event) {
                                 is Library.Event.ItemEvent.Loaded,
                                 is Library.Event.ItemEvent.Added -> items.add(event.item)
