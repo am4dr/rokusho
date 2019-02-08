@@ -4,6 +4,7 @@ import com.github.am4dr.rokusho.javafx.control.DirectoryPathChooser
 import com.github.am4dr.rokusho.library2.LibraryContainer
 import com.github.am4dr.rokusho.library2.LoadedLibrary
 import com.github.am4dr.rokusho.library2.addOrReplaceEntity
+import com.github.am4dr.rokusho.library2.app.PathLibraryLoader
 import com.github.am4dr.rokusho.presenter.Presenter
 import com.github.am4dr.rokusho.presenter.dev.RokushoViewer
 import com.github.am4dr.rokusho.presenter.scene.module.MainPaneModule
@@ -14,6 +15,7 @@ import com.github.am4dr.rokusho.presenter.viewer.multipane.pane.thumbnail.ImageT
 import com.github.am4dr.rokusho.presenter.viewer.multipane.pane.thumbnail.ThumbnailPaneFactory
 import com.github.am4dr.rokusho.presenter.viewer.multipane.pane.thumbnail.UrlImageLoader
 import javafx.application.Application
+import javafx.application.Platform.runLater
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.scene.Scene
@@ -46,7 +48,7 @@ class RokushoGUIApp : Application() {
         log.info("launched with the params: ${parameters.raw}")
 
         // TODO 基本のローダーを初期化してセットする
-        val pathLibraryLoader: (Path) -> LoadedLibrary? = { null }
+        val pathLibraryLoader: (Path) -> LoadedLibrary? = PathLibraryLoader(eventDispatcherContext)::getOrCreate
         libraryContainer = LibraryContainer(pathLibraryLoader, eventDispatcherContext)
         parseArgs(parameters.raw.toTypedArray()).args
             .map { Paths.get(it) }
@@ -61,11 +63,13 @@ class RokushoGUIApp : Application() {
         libraryContainer.getDataAndSubscribe { loadedLibraries ->
             libraries2.addAll(loadedLibraries)
             subscribeFor(libraries2) { event, libs ->
-                when (event) {
-                    is LibraryContainer.Event.Added -> libs.add(event.library)
-                    is LibraryContainer.Event.Removed -> libs.remove(event.library)
-                    is LibraryContainer.Event.Updated -> libs.addOrReplaceEntity(event.library)
-                }.let { /* 網羅性チェック */ }
+                runLater {
+                    when (event) {
+                        is LibraryContainer.Event.Added -> libs.add(event.library)
+                        is LibraryContainer.Event.Removed -> libs.remove(event.library)
+                        is LibraryContainer.Event.Updated -> libs.addOrReplaceEntity(event.library)
+                    }.let { /* 網羅性チェック */ }
+                }
             }
         }
 

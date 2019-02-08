@@ -5,6 +5,7 @@ import com.github.am4dr.rokusho.library2.Library
 import com.github.am4dr.rokusho.library2.LibraryItem
 import com.github.am4dr.rokusho.library2.LoadedLibrary
 import com.github.am4dr.rokusho.library2.addOrReplaceEntity
+import com.github.am4dr.rokusho.util.log.idHash
 import javafx.application.Platform.runLater
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
@@ -70,12 +71,12 @@ class RokushoViewer(val libraries: ObservableList<LoadedLibrary>) {
             children.addAll(
                 Hyperlink("tags").apply {
                     setOnAction {
-//                        LibraryViewer(library).show()
+                        LibraryViewer(library).show()
                     }
                 },
                 Hyperlink("records").apply {
                     setOnMouseClicked {
-//                        RecordsViewer(items).show()
+                        RecordsViewer(library.idHash, items).show()
                     }
                 },
                 Label(library.name),

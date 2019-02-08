@@ -1,24 +1,27 @@
 package com.github.am4dr.rokusho.presenter.dev
 
-import com.github.am4dr.rokusho.library.LibraryItem
-import javafx.collections.FXCollections
-import javafx.collections.ListChangeListener
+import com.github.am4dr.rokusho.library2.LibraryItem
 import javafx.collections.ObservableList
-import javafx.collections.WeakListChangeListener
 import javafx.scene.Scene
 import javafx.scene.control.ListView
 import javafx.stage.Stage
 
-class RecordsViewer(val items: ObservableList<out LibraryItem<out Any>>) {
+class RecordsViewer(
+    val name: String,
+    val items: ObservableList<out LibraryItem<*>>
+) {
+
     companion object {
         const val initialWidth: Double  = 300.0
         const val initialHeight: Double = 300.0
     }
+
     val stage = Stage()
 
     init {
+
         stage.apply {
-            title = "[dev] RecordListWatcher<*>.Records viewer $items"
+            title = "[dev] ItemListViewer - $name"
             scene = createScene(
                 initialWidth,
                 initialHeight
@@ -27,15 +30,6 @@ class RecordsViewer(val items: ObservableList<out LibraryItem<out Any>>) {
     }
     fun show() = stage.show()
     private fun createScene(w: Double, h: Double): Scene {
-        val recordList = object : ObservableList<Any> by FXCollections.observableArrayList(items), ListChangeListener<Any> {
-            override fun onChanged(change: ListChangeListener.Change<out Any>) {
-                while (change.next()) {
-                    removeAll(change.removed)
-                    addAll(change.addedSubList)
-                }
-            }
-        }
-        items.addListener(WeakListChangeListener(recordList))
-        return Scene(ListView<Any>(recordList), w, h)
+        return Scene(ListView(items), w, h)
     }
 }

@@ -27,4 +27,6 @@ class Tag private constructor(
 
     override fun isSameEntity(other: Tag): Boolean =
         other.id === id
+
+    override fun toString(): String = "Tag(${data.name}, ${data.obj})"
 }

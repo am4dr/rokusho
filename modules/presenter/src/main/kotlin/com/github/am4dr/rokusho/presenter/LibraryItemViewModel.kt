@@ -7,7 +7,7 @@ import com.github.am4dr.rokusho.library2.TagData
 
 
 // TODO 実装する
-class Library2ItemViewModel(
+class LibraryItemViewModel(
     private val library: Library,
     private val libraryItem: LibraryItem<*>
 ) : ItemViewModel<Any> {

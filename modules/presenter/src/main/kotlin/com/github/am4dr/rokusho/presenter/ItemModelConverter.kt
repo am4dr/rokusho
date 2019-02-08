@@ -35,21 +35,21 @@ class ItemModelConverter(
 
     @ExperimentalCoroutinesApi
     private fun createItemViewModels(library: Library): ObservableList<out ItemViewModel<*>> {
-        val models = FXCollections.observableArrayList<Library2ItemViewModel>()
+        val models = FXCollections.observableArrayList<LibraryItemViewModel>()
         library.getDataAndSubscribe { data ->
-            models.addAll(data.items.map { Library2ItemViewModel(library, it) })
+            models.addAll(data.items.map { LibraryItemViewModel(library, it) })
 
             subscribeFor(models) { event, list ->
                 runLater {
                     when (event) {
                         is Library.Event.ItemEvent -> when (event) {
                             is Library.Event.ItemEvent.Loaded,
-                            is Library.Event.ItemEvent.Added -> { list.add(Library2ItemViewModel(library, event.item)) }
+                            is Library.Event.ItemEvent.Added -> { list.add(LibraryItemViewModel(library, event.item)) }
                             is Library.Event.ItemEvent.Removed -> { list.removeAll { it.has(event.item) } }
                             is Library.Event.ItemEvent.Updated -> {
                                 for (i in 0..list.lastIndex) {
                                     if (list[i].has(event.item)) {
-                                        list[i] = Library2ItemViewModel(library, event.item)
+                                        list[i] = LibraryItemViewModel(library, event.item)
                                     }
                                 }
                             }

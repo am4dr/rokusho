@@ -24,4 +24,6 @@ class ItemTag(
 
     override fun isSameEntity(other: ItemTag): Boolean =
         other.id === id
+
+    override fun toString(): String = "ItemTag(${tag.name}, $data)"
 }

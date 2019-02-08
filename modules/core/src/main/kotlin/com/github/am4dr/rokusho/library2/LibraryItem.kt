@@ -30,4 +30,6 @@ class LibraryItem<T : Any> private constructor(
 
     override fun isSameEntity(other: LibraryItem<out Any>): Boolean =
         other.id === id
+
+    override fun toString(): String = "LibraryItem(${item.data}, $tags)"
 }
