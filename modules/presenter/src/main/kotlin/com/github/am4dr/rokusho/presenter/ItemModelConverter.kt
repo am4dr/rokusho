@@ -1,16 +1,18 @@
 package com.github.am4dr.rokusho.presenter
 
 import com.github.am4dr.rokusho.library.Library
+import com.github.am4dr.rokusho.library.LoadedLibrary
 import javafx.application.Platform.runLater
 import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 class ItemModelConverter(
-    libraries: ObservableList<Library<*>>
+    libraries: ObservableList<LoadedLibrary>
 ) {
 
-    private val convertedItemModels: MutableMap<Library<*>, ObservableList<out ItemViewModel<*>>> = mutableMapOf()
+    private val convertedItemModels: MutableMap<LoadedLibrary, ObservableList<out ItemViewModel<*>>> = mutableMapOf()
 
     init {
         libraries.forEach {
@@ -28,25 +30,35 @@ class ItemModelConverter(
         })
     }
 
-    fun getOrCreate(library: Library<*>): ObservableList<out ItemViewModel<*>> =
-        convertedItemModels.getOrPut(library) { createItemViewModels(library) }
+    fun getOrCreate(library: LoadedLibrary): ObservableList<out ItemViewModel<*>> =
+        convertedItemModels.getOrPut(library) { createItemViewModels(library.library) }
 
-    private fun createItemViewModels(library: Library<*>): ObservableList<out ItemViewModel<*>> {
-        val models = FXCollections.observableArrayList<LibraryItemItemViewModel>()
-        library.subscribeFor(models) { event, list ->
-            runLater {
-                when (event) {
-                    is Library.Event.AddItem<*> -> list.add(LibraryItemItemViewModel(library, event.item))
-                    is Library.Event.RemoveItem<*> -> list.removeAll { it.has(event.item) }
-                    is Library.Event.UpdateItem<*> -> {
-                        list.indexOfFirst { it.has(event.item) }
-                            .takeIf { it >= 0 }
-                            ?.let { index -> list[index] = LibraryItemItemViewModel(library, event.item) }
-                    }
+    @ExperimentalCoroutinesApi
+    private fun createItemViewModels(library: Library): ObservableList<out ItemViewModel<*>> {
+        val models = FXCollections.observableArrayList<LibraryItemViewModel>()
+        library.getDataAndSubscribe { data ->
+            models.addAll(data.items.map { LibraryItemViewModel(library, it) })
+
+            subscribeFor(models) { event, list ->
+                runLater {
+                    when (event) {
+                        is Library.Event.ItemEvent -> when (event) {
+                            is Library.Event.ItemEvent.Loaded,
+                            is Library.Event.ItemEvent.Added -> { list.add(LibraryItemViewModel(library, event.item)) }
+                            is Library.Event.ItemEvent.Removed -> { list.removeAll { it.has(event.item) } }
+                            is Library.Event.ItemEvent.Updated -> {
+                                for (i in 0..list.lastIndex) {
+                                    if (list[i].has(event.item)) {
+                                        list[i] = LibraryItemViewModel(library, event.item)
+                                    }
+                                }
+                            }
+                        }
+                        is Library.Event.TagEvent -> {}
+                    }.let { /* 網羅性チェック */ }
                 }
             }
         }
-        models.addAll(library.getItems().map { LibraryItemItemViewModel(library, it) })
         return models
     }
 }

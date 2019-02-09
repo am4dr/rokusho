@@ -1,8 +1,8 @@
 package com.github.am4dr.rokusho.old.savedata.yaml.v1
 
-import com.github.am4dr.rokusho.core.datastore.savedata.Tag
-import com.github.am4dr.rokusho.core.datastore.savedata.yaml.v1.*
-import com.github.am4dr.rokusho.core.datastore.savedata.yaml.v1.V1SaveData.Companion.detectTagType
+import com.github.am4dr.rokusho.datastore.savedata.Tag
+import com.github.am4dr.rokusho.datastore.savedata.yaml.v1.*
+import com.github.am4dr.rokusho.datastore.savedata.yaml.v1.V1SaveData.Companion.detectTagType
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.DynamicTest

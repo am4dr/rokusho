@@ -1,8 +1,8 @@
 package com.github.am4dr.rokusho.old.datastore.file.yaml
 
-import com.github.am4dr.rokusho.core.datastore.file.Deserializer
-import com.github.am4dr.rokusho.core.datastore.savedata.SaveData
-import com.github.am4dr.rokusho.core.datastore.savedata.yaml.YamlSaveDataDeserializer
+import com.github.am4dr.rokusho.datastore.file.Deserializer
+import com.github.am4dr.rokusho.datastore.savedata.SaveData
+import com.github.am4dr.rokusho.datastore.savedata.yaml.YamlSaveDataDeserializer
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
