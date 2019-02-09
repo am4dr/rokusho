@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.library2.internal
+package com.github.am4dr.rokusho.library.internal
 
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read

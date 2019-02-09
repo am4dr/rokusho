@@ -1,6 +1,5 @@
 package com.github.am4dr.rokusho.library
 
-import com.github.am4dr.rokusho.library2.DataObject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test

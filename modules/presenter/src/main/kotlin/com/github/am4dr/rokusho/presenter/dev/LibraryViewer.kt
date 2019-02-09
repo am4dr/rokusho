@@ -1,9 +1,9 @@
 package com.github.am4dr.rokusho.presenter.dev
 
-import com.github.am4dr.rokusho.library2.Library
-import com.github.am4dr.rokusho.library2.LoadedLibrary
-import com.github.am4dr.rokusho.library2.Tag
-import com.github.am4dr.rokusho.library2.addOrReplaceEntity
+import com.github.am4dr.rokusho.library.Library
+import com.github.am4dr.rokusho.library.LoadedLibrary
+import com.github.am4dr.rokusho.library.Tag
+import com.github.am4dr.rokusho.library.addOrReplaceEntity
 import javafx.application.Platform.runLater
 import javafx.collections.FXCollections
 import javafx.scene.Scene

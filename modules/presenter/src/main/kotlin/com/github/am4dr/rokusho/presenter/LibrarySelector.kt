@@ -1,6 +1,6 @@
 package com.github.am4dr.rokusho.presenter
 
-import com.github.am4dr.rokusho.library2.LoadedLibrary
+import com.github.am4dr.rokusho.library.LoadedLibrary
 import javafx.beans.property.ReadOnlyObjectProperty
 import javafx.beans.property.ReadOnlyObjectWrapper
 import javafx.collections.FXCollections

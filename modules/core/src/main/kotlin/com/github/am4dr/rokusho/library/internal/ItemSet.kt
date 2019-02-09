@@ -1,8 +1,8 @@
-package com.github.am4dr.rokusho.library2.internal
+package com.github.am4dr.rokusho.library.internal
 
-import com.github.am4dr.rokusho.library2.Library
-import com.github.am4dr.rokusho.library2.LibraryItem
-import com.github.am4dr.rokusho.library2.putOrReplaceEntity
+import com.github.am4dr.rokusho.library.Library
+import com.github.am4dr.rokusho.library.LibraryItem
+import com.github.am4dr.rokusho.library.putOrReplaceEntity
 import com.github.am4dr.rokusho.util.event.EventPublisherSupport
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 

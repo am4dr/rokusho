@@ -1,6 +1,6 @@
 package com.github.am4dr.rokusho.presenter
 
-import com.github.am4dr.rokusho.library2.LoadedLibrary
+import com.github.am4dr.rokusho.library.LoadedLibrary
 import java.lang.ref.SoftReference
 import java.util.*
 

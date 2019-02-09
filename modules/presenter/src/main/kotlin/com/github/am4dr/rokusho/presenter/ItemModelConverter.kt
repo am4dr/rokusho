@@ -1,7 +1,7 @@
 package com.github.am4dr.rokusho.presenter
 
-import com.github.am4dr.rokusho.library2.Library
-import com.github.am4dr.rokusho.library2.LoadedLibrary
+import com.github.am4dr.rokusho.library.Library
+import com.github.am4dr.rokusho.library.LoadedLibrary
 import javafx.application.Platform.runLater
 import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener

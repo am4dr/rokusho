@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.library2
+package com.github.am4dr.rokusho.library
 
 /**
  * ある[Library]におけるある時点での[Item]とそれが持つ[Tag]の集合を表すデータ

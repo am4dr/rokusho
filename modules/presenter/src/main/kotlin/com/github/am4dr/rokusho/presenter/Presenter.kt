@@ -1,6 +1,6 @@
 package com.github.am4dr.rokusho.presenter
 
-import com.github.am4dr.rokusho.library2.LoadedLibrary
+import com.github.am4dr.rokusho.library.LoadedLibrary
 import javafx.beans.binding.Bindings.bindContent
 import javafx.beans.binding.Bindings.createObjectBinding
 import javafx.beans.binding.ObjectExpression

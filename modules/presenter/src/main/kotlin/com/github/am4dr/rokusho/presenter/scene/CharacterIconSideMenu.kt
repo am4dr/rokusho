@@ -4,7 +4,7 @@ import com.github.am4dr.rokusho.javafx.collection.TransformedList
 import com.github.am4dr.rokusho.javafx.sidemenu.CharacterIcon
 import com.github.am4dr.rokusho.javafx.sidemenu.SideMenuIcon
 import com.github.am4dr.rokusho.javafx.sidemenu.SimpleSideMenu
-import com.github.am4dr.rokusho.library2.LoadedLibrary
+import com.github.am4dr.rokusho.library.LoadedLibrary
 import javafx.beans.binding.ObjectExpression
 import javafx.beans.binding.When
 import javafx.collections.ObservableList
@@ -16,6 +16,7 @@ import javafx.scene.layout.CornerRadii
 import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
 
+// TODO このクラスがlibrary2パッケージを参照するのはどうなのか
 class CharacterIconSideMenu(
     private val libraries: ObservableList<LoadedLibrary>,
     private val selectLibrary: (LoadedLibrary) -> Unit,

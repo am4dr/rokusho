@@ -5,7 +5,7 @@
 //import com.github.am4dr.rokusho.core.datastore.NullDataStore
 //import com.github.am4dr.rokusho.core.datastore.savedata.SaveData
 //import com.github.am4dr.rokusho.core.metadata.*
-//import com.github.am4dr.rokusho.library2.DataObject
+//import com.github.am4dr.rokusho.library.DataObject
 //import com.github.am4dr.rokusho.core.datastore.savedata.Item as OldItem
 //import com.github.am4dr.rokusho.core.datastore.savedata.ItemTag as OldItemTag
 //import com.github.am4dr.rokusho.core.datastore.savedata.Tag as OldTag

@@ -1,9 +1,9 @@
 package com.github.am4dr.rokusho.presenter
 
-import com.github.am4dr.rokusho.library2.ItemTag
-import com.github.am4dr.rokusho.library2.Library
-import com.github.am4dr.rokusho.library2.LibraryItem
-import com.github.am4dr.rokusho.library2.TagData
+import com.github.am4dr.rokusho.library.ItemTag
+import com.github.am4dr.rokusho.library.Library
+import com.github.am4dr.rokusho.library.LibraryItem
+import com.github.am4dr.rokusho.library.TagData
 
 
 class LibraryItemViewModel(

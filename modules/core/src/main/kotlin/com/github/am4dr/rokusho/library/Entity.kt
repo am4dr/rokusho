@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.library2
+package com.github.am4dr.rokusho.library
 
 
 interface Entity<T : Entity<T>> {

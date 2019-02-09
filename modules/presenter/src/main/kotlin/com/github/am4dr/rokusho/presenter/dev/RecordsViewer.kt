@@ -1,6 +1,6 @@
 package com.github.am4dr.rokusho.presenter.dev
 
-import com.github.am4dr.rokusho.library2.LibraryItem
+import com.github.am4dr.rokusho.library.LibraryItem
 import javafx.collections.ObservableList
 import javafx.scene.Scene
 import javafx.scene.control.ListView

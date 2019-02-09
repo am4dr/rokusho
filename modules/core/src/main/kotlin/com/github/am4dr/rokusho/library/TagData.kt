@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.library2
+package com.github.am4dr.rokusho.library
 
 /**
  * [Tag]の[Library]に依存しないただのデータとしての部分を持つクラス

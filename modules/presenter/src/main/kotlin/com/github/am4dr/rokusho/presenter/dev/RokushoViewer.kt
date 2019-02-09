@@ -1,10 +1,10 @@
 package com.github.am4dr.rokusho.presenter.dev
 
 import com.github.am4dr.rokusho.javafx.collection.TransformedList
-import com.github.am4dr.rokusho.library2.Library
-import com.github.am4dr.rokusho.library2.LibraryItem
-import com.github.am4dr.rokusho.library2.LoadedLibrary
-import com.github.am4dr.rokusho.library2.addOrReplaceEntity
+import com.github.am4dr.rokusho.library.Library
+import com.github.am4dr.rokusho.library.LibraryItem
+import com.github.am4dr.rokusho.library.LoadedLibrary
+import com.github.am4dr.rokusho.library.addOrReplaceEntity
 import com.github.am4dr.rokusho.util.log.idHash
 import javafx.application.Platform.runLater
 import javafx.collections.FXCollections

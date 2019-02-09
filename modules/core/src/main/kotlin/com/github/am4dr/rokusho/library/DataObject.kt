@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.library2
+package com.github.am4dr.rokusho.library
 
 // TODO StringTagData, MapTagDataからなるsealed class化
 class DataObject(data: Map<String, String> = mapOf()) {

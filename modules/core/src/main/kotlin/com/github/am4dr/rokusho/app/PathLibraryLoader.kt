@@ -3,7 +3,7 @@ package com.github.am4dr.rokusho.app
 import com.github.am4dr.rokusho.datastore.DataStore
 import com.github.am4dr.rokusho.datastore.savedata.SaveData
 import com.github.am4dr.rokusho.datastore.savedata.yaml.YamlSaveDataStore
-import com.github.am4dr.rokusho.library2.*
+import com.github.am4dr.rokusho.library.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.nio.file.Files
 import java.nio.file.Path

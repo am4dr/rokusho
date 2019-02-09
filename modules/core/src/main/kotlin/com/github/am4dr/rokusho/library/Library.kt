@@ -1,8 +1,8 @@
-package com.github.am4dr.rokusho.library2
+package com.github.am4dr.rokusho.library
 
-import com.github.am4dr.rokusho.library2.internal.DataLocker
-import com.github.am4dr.rokusho.library2.internal.ItemSet
-import com.github.am4dr.rokusho.library2.internal.TagSet
+import com.github.am4dr.rokusho.library.internal.DataLocker
+import com.github.am4dr.rokusho.library.internal.ItemSet
+import com.github.am4dr.rokusho.library.internal.TagSet
 import com.github.am4dr.rokusho.util.event.EventPublisher
 import com.github.am4dr.rokusho.util.event.EventPublisherSupport
 import com.github.am4dr.rokusho.util.event.EventSubscription
