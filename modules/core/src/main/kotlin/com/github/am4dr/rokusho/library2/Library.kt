@@ -1,6 +1,5 @@
 package com.github.am4dr.rokusho.library2
 
-import com.github.am4dr.rokusho.core.util.DataObject
 import com.github.am4dr.rokusho.library2.internal.DataLocker
 import com.github.am4dr.rokusho.library2.internal.ItemSet
 import com.github.am4dr.rokusho.library2.internal.TagSet

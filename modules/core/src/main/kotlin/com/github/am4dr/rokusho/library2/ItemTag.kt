@@ -1,7 +1,5 @@
 package com.github.am4dr.rokusho.library2
 
-import com.github.am4dr.rokusho.core.util.DataObject
-
 class ItemTag(
     private val id: Any,
     val tag: Tag,

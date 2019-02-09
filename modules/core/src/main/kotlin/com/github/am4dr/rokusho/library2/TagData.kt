@@ -1,7 +1,5 @@
 package com.github.am4dr.rokusho.library2
 
-import com.github.am4dr.rokusho.core.util.DataObject
-
 /**
  * [Tag]の[Library]に依存しないただのデータとしての部分を持つクラス
  *

@@ -1,9 +1,9 @@
 package com.github.am4dr.rokusho.old.datastore.file.yaml
 
-import com.github.am4dr.rokusho.core.datastore.savedata.SaveData
-import com.github.am4dr.rokusho.core.datastore.savedata.yaml.Versions
-import com.github.am4dr.rokusho.core.datastore.savedata.yaml.deserialize
-import com.github.am4dr.rokusho.core.datastore.savedata.yaml.detectVersion
+import com.github.am4dr.rokusho.datastore.savedata.SaveData
+import com.github.am4dr.rokusho.datastore.savedata.yaml.Versions
+import com.github.am4dr.rokusho.datastore.savedata.yaml.deserialize
+import com.github.am4dr.rokusho.datastore.savedata.yaml.detectVersion
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test

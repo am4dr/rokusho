@@ -1,10 +1,10 @@
 package com.github.am4dr.rokusho.launcher
 
+import com.github.am4dr.rokusho.app.PathLibraryLoader
 import com.github.am4dr.rokusho.javafx.control.DirectoryPathChooser
 import com.github.am4dr.rokusho.library2.LibraryContainer
 import com.github.am4dr.rokusho.library2.LoadedLibrary
 import com.github.am4dr.rokusho.library2.addOrReplaceEntity
-import com.github.am4dr.rokusho.library2.app.PathLibraryLoader
 import com.github.am4dr.rokusho.presenter.Presenter
 import com.github.am4dr.rokusho.presenter.dev.RokushoViewer
 import com.github.am4dr.rokusho.presenter.scene.module.MainPaneModule
@@ -48,7 +48,9 @@ class RokushoGUIApp : Application() {
         log.info("launched with the params: ${parameters.raw}")
 
         // TODO 基本のローダーを初期化してセットする
-        val pathLibraryLoader: (Path) -> LoadedLibrary? = PathLibraryLoader(eventDispatcherContext)::getOrCreate
+        val pathLibraryLoader: (Path) -> LoadedLibrary? = PathLibraryLoader(
+            eventDispatcherContext
+        )::getOrCreate
         libraryContainer = LibraryContainer(pathLibraryLoader, eventDispatcherContext)
         parseArgs(parameters.raw.toTypedArray()).args
             .map { Paths.get(it) }

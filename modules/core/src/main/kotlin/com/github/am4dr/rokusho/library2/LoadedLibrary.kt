@@ -1,7 +1,7 @@
 package com.github.am4dr.rokusho.library2
 
-import com.github.am4dr.rokusho.core.datastore.DataStore
-import com.github.am4dr.rokusho.core.datastore.NullDataStore
+import com.github.am4dr.rokusho.datastore.DataStore
+import com.github.am4dr.rokusho.datastore.NullDataStore
 
 class LoadedLibrary private constructor(
     private val id: Any,
