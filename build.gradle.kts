@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("com.gradle.build-scan") version "2.1"
     id("com.github.ben-manes.versions") version "0.20.0"
-    id("org.jetbrains.kotlin.jvm") version "1.3.11" apply false
+    id("org.jetbrains.kotlin.jvm") version "1.3.21" apply false
 }
 
 buildScan {
@@ -48,11 +48,9 @@ allprojects {
     dependencies {
         "api"(kotlin("stdlib-jdk8"))
         "implementation"(kotlin("reflect"))
-        "implementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.0")
+        "implementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1")
 
-        "testImplementation"("org.junit.jupiter:junit-jupiter-params:5.2.0")
-        "testImplementation"("org.junit.jupiter:junit-jupiter-api:5.2.0")
-        "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:5.2.0")
+        "testImplementation"("org.junit.jupiter:junit-jupiter:5.4.0")
 
         "api"("org.slf4j:slf4j-api:1.7.25")
         "runtimeOnly"("ch.qos.logback:logback-classic:1.2.3")
@@ -70,7 +68,7 @@ allprojects {
 project(":core") {
     dependencies {
         "api"(project(":util"))
-        "implementation"("org.yaml:snakeyaml:1.21")
+        "implementation"("org.yaml:snakeyaml:1.23")
     }
 }
 project(":javafx-controls") {
@@ -82,9 +80,9 @@ project(":javafx-controls") {
     val java = the<JavaPluginConvention>()
     dependencies {
         "implementation"(project(":javafx-commons"))
-        "api"("org.openjfx:javafx-base:11.0.1:$javafxClassifier")
-        "api"("org.openjfx:javafx-controls:11.0.1:$javafxClassifier")
-        "api"("org.openjfx:javafx-graphics:11.0.1:$javafxClassifier")
+        "api"("org.openjfx:javafx-base:11.0.2:$javafxClassifier")
+        "api"("org.openjfx:javafx-controls:11.0.2:$javafxClassifier")
+        "api"("org.openjfx:javafx-graphics:11.0.2:$javafxClassifier")
 
         "sampleImplementation"(kotlin("reflect"))
         "sampleImplementation"("com.github.am4dr.javafx:gui-sample-viewer:0.4.2-SNAPSHOT")
