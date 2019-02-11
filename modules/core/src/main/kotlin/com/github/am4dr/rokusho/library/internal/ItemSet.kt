@@ -2,7 +2,6 @@ package com.github.am4dr.rokusho.library.internal
 
 import com.github.am4dr.rokusho.library.Library
 import com.github.am4dr.rokusho.library.LibraryItem
-import com.github.am4dr.rokusho.library.putOrReplaceEntity
 import com.github.am4dr.rokusho.util.event.EventPublisherSupport
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
@@ -21,8 +20,7 @@ internal class ItemSet constructor(
 
     fun asSet(): Set<LibraryItem<*>> = items.toSet()
 
-    fun has(item: LibraryItem<*>): Boolean =
-        items.any { it.isSameEntity(item) }
+    fun has(item: LibraryItem<*>): Boolean = items.contains(item)
 
     @ExperimentalCoroutinesApi
     fun add(item: LibraryItem<*>) {
@@ -32,19 +30,21 @@ internal class ItemSet constructor(
 
     @ExperimentalCoroutinesApi
     fun update(item: LibraryItem<*>) {
-        items.putOrReplaceEntity(item)
+        items.add(item)
         eventPublisherSupport.dispatch(Library.Event.ItemEvent.Updated(item))
     }
 
     @ExperimentalCoroutinesApi
     fun load(item: LibraryItem<*>) {
         val newItemTags = item.tags.map { itemTag ->
-            val currentTagInstance = tagSet.get(itemTag.tag) ?: return@map null
+            val currentTagInstance = tagSet.get(itemTag.tag) ?: return@map null.also {
+                println("tag not found: ${itemTag.tag}")
+            }
             itemTag.update(currentTagInstance)
         }.filterNotNullTo(mutableSetOf())
         val updatedItem = item.update(newItemTags)
 
-        items.putOrReplaceEntity(updatedItem)
+        items.add(updatedItem)
         eventPublisherSupport.dispatch(Library.Event.ItemEvent.Loaded(updatedItem))
     }
 }

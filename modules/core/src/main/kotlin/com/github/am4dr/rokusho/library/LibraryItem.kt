@@ -15,7 +15,7 @@ class LibraryItem<T : Any> private constructor(
     fun update(tags: Set<ItemTag>): LibraryItem<T> = LibraryItem(id, item, tags)
     fun update(tag: ItemTag): LibraryItem<T> {
         val newTags = tags.toMutableSet()
-        newTags.putOrReplaceEntity(tag)
+        newTags.add(tag)
         return update(tags=newTags)
     }
     fun update(tag: Tag): LibraryItem<T> {
@@ -25,11 +25,16 @@ class LibraryItem<T : Any> private constructor(
         return update(tags=newTags)
     }
 
-    fun has(tag: ItemTag): Boolean = tags.any { it.isSameEntity(tag) }
+    fun has(tag: ItemTag): Boolean = tags.contains(tag)
     fun has(tag: Tag): Boolean = tags.any { it.has(tag) }
 
     override fun isSameEntity(other: LibraryItem<out Any>): Boolean =
         other.id === id
+
+    override fun hashCode(): Int = id.hashCode()
+
+    override fun equals(other: Any?): Boolean =
+        other is LibraryItem<*> && isSameEntity(other)
 
     override fun toString(): String = "LibraryItem(${item.data}, $tags)"
 }

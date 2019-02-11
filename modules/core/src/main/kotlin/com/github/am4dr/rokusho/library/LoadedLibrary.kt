@@ -26,4 +26,9 @@ class LoadedLibrary private constructor(
 
     override fun isSameEntity(other: LoadedLibrary): Boolean =
         other.id === id
+
+    override fun hashCode(): Int = id.hashCode()
+
+    override fun equals(other: Any?): Boolean =
+        other is LoadedLibrary && isSameEntity(other)
 }

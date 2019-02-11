@@ -11,6 +11,7 @@ data class TagData(
 ) {
 
     companion object {
+        // TODO パーサークラスに切り出す
         fun parse(string: String): TagData? =
             TagData(string.trim(), DataObject())
     }

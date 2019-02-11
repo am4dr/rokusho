@@ -34,32 +34,34 @@ class Library private constructor(
         context: CoroutineContext,
         initialTags: Collection<Tag> = setOf(),
         initialItemSequence: Sequence<LibraryItem<*>> = emptySequence()
-    ) : this(context, EventPublisherSupport(context), initialTags, initialItemSequence)
+    ) : this(context, EventPublisherSupport(context, 10000), initialTags, initialItemSequence)
 
-    private val locker: DataLocker<Pair<TagSet, ItemSet>>
+    private val data: DataLocker<Pair<TagSet, ItemSet>> = initDataLocker(eventPublisherSupport)
 
     private val loaderScope = CoroutineScope(context)
     init {
-        val tags = TagSet(eventPublisherSupport)
-        val items = ItemSet(eventPublisherSupport, tags)
-        locker = DataLocker(tags to items)
-        locker.write {
+        data.write { (tags) ->
             initialTags.forEach(tags::load)
         }
         loaderScope.launch {
             initialItemSequence.forEach {
-                locker.write { (_, items) ->
+                data.write { (_, items) ->
                     items.load(it)
                 }
             }
         }
     }
+    private fun initDataLocker(eventPublisherSupport: EventPublisherSupport<Event>): DataLocker<Pair<TagSet, ItemSet>> {
+        val tags = TagSet(eventPublisherSupport)
+        val items = ItemSet(eventPublisherSupport, tags)
+        return DataLocker(tags to items)
+    }
 
-    fun getAllItems(): Set<LibraryItem<*>> = locker.read { (_, items) -> items.asSet() }
-    fun getAllTags(): Set<Tag> = locker.read { (tags) -> tags.asSet() }
+    fun getAllItems(): Set<LibraryItem<*>> = data.read { (_, items) -> items.asSet() }
+    fun getAllTags(): Set<Tag> = data.read { (tags) -> tags.asSet() }
 
     @ExperimentalCoroutinesApi
-    fun update(item: LibraryItem<*>): LibraryItem<*>? = locker.write { (tags, items) ->
+    fun update(item: LibraryItem<*>): LibraryItem<*>? = data.write { (tags, items) ->
         if (!tags.hasAll(item.tags.map(ItemTag::tag))) return null
         if (!items.has(item)) return null
 
@@ -67,10 +69,11 @@ class Library private constructor(
         return item
     }
     @ExperimentalCoroutinesApi
-    fun update(tag: Tag): Tag? = locker.write { (tags, items) ->
+    fun update(tag: Tag): Tag? = data.write { (tags, items) ->
         if (!tags.has(tag) || tags.isInvalidRename(tag)) return null
 
         tags.update(tag)
+        // TODO ItemSetのメソッドにする
         items.asSet()
             .filter { it.has(tag) }
             .forEach { update(it.update(tag)) }
@@ -78,37 +81,37 @@ class Library private constructor(
     }
 
     @ExperimentalCoroutinesApi
-    fun <T : Any> createItem(data: T): LibraryItem<T> = locker.write { (_, items) ->
-        val item = LibraryItem(Item(data), setOf())
+    fun <T : Any> createItem(itemData: T): LibraryItem<T> = data.write { (_, items) ->
+        val item = LibraryItem(Item(itemData), setOf())
         items.add(item)
         return item
     }
 
 
     @ExperimentalCoroutinesApi
-    fun createTag(data: TagData): Tag? = locker.write { (tags) ->
-        val tag = Tag(data)
+    fun createTag(tagData: TagData): Tag? = data.write { (tags) ->
+        val tag = Tag(tagData)
         if (tags.alreadyExists(tag)) return null
         tags.add(tag)
         return tag
     }
 
-    fun createItemTagByName(name: String): ItemTag? = locker.write { (tags) ->
+    fun createItemTagByName(name: String): ItemTag? = data.write { (tags) ->
         tags.get(name)?.let {
             return ItemTag(it, DataObject())
         }
-        val newTag = Tag(TagData(name, DataObject(mapOf("value" to name))))
+        val newTag = Tag(name, DataObject(mapOf("value" to name)))
         tags.add(newTag)
         return ItemTag(newTag, DataObject())
     }
 
-    fun asData(): Data = locker.read { (tags, items) ->
+    fun asData(): Data = data.read { (tags, items) ->
         Data(tags = tags.asSet(), items = items.asSet())
     }
 
     fun getDataAndSubscribe(
         block: EventPublisher<Event>.(Data) -> EventSubscription
-    ): EventSubscription = locker.read {
+    ): EventSubscription = data.read {
         block(this, asData())
     }
 

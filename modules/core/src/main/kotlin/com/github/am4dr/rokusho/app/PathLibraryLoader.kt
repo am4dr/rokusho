@@ -54,15 +54,14 @@ class PathLibraryLoader(
         val store = createDataStore(root)
         val data = store.load()
         val tags  = data?.tags ?: setOf()
-        val itemData = data?.items ?: setOf()
+        val itemData = data?.items?.filter { it.item.data is Path }?.associateBy { it.item.data as Path } ?: mapOf()
         val library = Library(context, tags, createLibraryItemSequence(root, itemData))
         return LoadedLibrary(library, root.fileName.toString(), store)
     }
 
-    private fun createLibraryItemSequence(root: Path, itemData: Set<LibraryItem<*>>): Sequence<LibraryItem<*>> {
+    private fun createLibraryItemSequence(root: Path, itemData: Map<Path, LibraryItem<*>>): Sequence<LibraryItem<*>> {
         return getPathCollection(root).map { path ->
-            itemData.find { it.item.data is Path && Files.isSameFile(it.item.data, path) }
-                ?: LibraryItem(Item(path), setOf())
+            itemData[path] ?: LibraryItem(Item(path), setOf())
         }.asSequence()
     }
 
@@ -114,7 +113,7 @@ class PathLibraryLoader(
         private fun tagToDataTag(tag: Tag): DataTag {
             val id = tag.name
             val type = tag["type"]?.let(DataTag.Type.Companion::from) ?: DataTag.Type.TEXT
-            val data = tag.data.obj.asMap()
+            val data = tag.data.asMap()
             return DataTag(id, type, data)
         }
 
@@ -125,7 +124,7 @@ class PathLibraryLoader(
                     val checkedValue = value as? String ?: return@mapNotNull null
                     key to checkedValue
                 }.toMap()
-                dataTag.id to Tag(TagData(dataTag.id, DataObject(checkedData.toMap())))
+                dataTag.id to Tag(dataTag.id, DataObject(checkedData.toMap()))
             }.toMap()
             val items = dataItems.map { dataItem ->
                 val path = libraryRoot.resolve(dataItem.id)

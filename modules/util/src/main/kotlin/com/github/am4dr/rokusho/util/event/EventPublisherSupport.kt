@@ -8,8 +8,10 @@ import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlin.coroutines.CoroutineContext
 
 
+// TODO イベント量を予期できない場合でも、過剰分を落とさないためにブロックするタイプのdispatchが必要なんじゃないか
 class EventPublisherSupport<E>(
-    val publishingContext: CoroutineContext = Dispatchers.Default
+    val publishingContext: CoroutineContext = Dispatchers.Default,
+    capacity: Int = 100
 ) : EventPublisher<E>, CoroutineScope {
 
     companion object {
@@ -17,7 +19,7 @@ class EventPublisherSupport<E>(
     }
 
     @ExperimentalCoroutinesApi
-    private val channel: BroadcastChannel<E> = BroadcastChannel(100) // 根拠なく適当に決められた値です
+    private val channel: BroadcastChannel<E> = BroadcastChannel(capacity) // 根拠なく適当に決められた値です
 
     override val coroutineContext: CoroutineContext
         get() = publishingContext

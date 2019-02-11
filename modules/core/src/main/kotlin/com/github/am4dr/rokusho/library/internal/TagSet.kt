@@ -2,7 +2,6 @@ package com.github.am4dr.rokusho.library.internal
 
 import com.github.am4dr.rokusho.library.Library
 import com.github.am4dr.rokusho.library.Tag
-import com.github.am4dr.rokusho.library.putOrReplaceEntity
 import com.github.am4dr.rokusho.util.event.EventPublisherSupport
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
@@ -15,48 +14,46 @@ internal class TagSet(
     val eventPublisherSupport: EventPublisherSupport<in Library.Event.TagEvent>
 ) {
 
-    private val tags: MutableSet<Tag> = mutableSetOf()
+    private val tags: MutableMap<Tag, Tag> = mutableMapOf()
+    private val byName: MutableMap<String, Tag> = mutableMapOf()
 
-    fun asSet(): Set<Tag> = tags.toSet()
+    fun asSet(): Set<Tag> = tags.values.toSet()
 
     @ExperimentalCoroutinesApi
     fun add(tag: Tag) {
-        tags.add(tag)
+        tags[tag] = tag
+        byName[tag.name] = tag
         eventPublisherSupport.dispatch(Library.Event.TagEvent.Added(tag))
     }
 
     @ExperimentalCoroutinesApi
     fun update(tag: Tag) {
-        tags.putOrReplaceEntity(tag)
+        tags[tag] = tag
+        byName[tag.name] = tag
         eventPublisherSupport.dispatch(Library.Event.TagEvent.Updated(tag))
     }
 
     @ExperimentalCoroutinesApi
     fun load(tag: Tag) {
-        tags.putOrReplaceEntity(tag)
+        tags[tag] = tag
+        byName[tag.name] = tag
         eventPublisherSupport.dispatch(Library.Event.TagEvent.Loaded(tag))
     }
 
-    fun has(tag: Tag): Boolean {
-        return tags.any { tag.isSameEntity(it) }
-    }
+    fun has(tag: Tag): Boolean = tags.contains(tag)
     fun hasAll(tagCollection: Collection<Tag>): Boolean =
-        tagCollection.all { has(it) }
+        tagCollection.all { tags.contains(it) }
 
     fun isInvalidRename(tag: Tag): Boolean {
-        val renameCollisionDetected = tags.any { it.isSameName(tag) && !it.isSameEntity(tag) }
-        return renameCollisionDetected
+        val sameName = get(tag.name) ?: return false
+        return !sameName.isSameEntity(tag)
     }
 
     fun alreadyExists(tag: Tag): Boolean {
-        return tags.any { it.isSameEntity(tag) || it.isSameName(tag) }
+        return tags.contains(tag) || byName.contains(tag.name)
     }
 
-    fun get(tag: Tag): Tag? {
-        return tags.find { it.isSameEntity(tag) }
-    }
+    fun get(tag: Tag): Tag? = tags[tag]
 
-    fun get(name: String): Tag? {
-        return tags.find { it.name == name }
-    }
+    fun get(name: String): Tag? = byName[name]
 }

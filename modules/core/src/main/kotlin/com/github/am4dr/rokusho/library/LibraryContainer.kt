@@ -91,13 +91,13 @@ class LibraryContainer private constructor(
 
         @ExperimentalCoroutinesApi
         fun add(library: LoadedLibrary) {
-            libraries.putOrReplaceEntity(library)
+            libraries.add(library)
             eventPublisherSupport.dispatch(Event.Added(library))
         }
 
         @ExperimentalCoroutinesApi
         fun update(library: LoadedLibrary) {
-            libraries.putOrReplaceEntity(library)
+            libraries.add(library)
             eventPublisherSupport.dispatch(Event.Updated(library))
         }
     }

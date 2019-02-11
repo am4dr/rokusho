@@ -8,19 +8,18 @@ package com.github.am4dr.rokusho.library
  */
 class Tag private constructor(
     private val id: Any,
-    val data: TagData
+    val name: String,
+    val data: DataObject
 ) : Entity<Tag> {
 
-    constructor(data: TagData) : this(Any(), data)
+    constructor(data: TagData) : this(Any(), data.name, data.obj)
+    constructor(name: String, data: DataObject) : this(Any(), name, data)
 
-    val name: String get() = data.name
 
     fun update(data: TagData): Tag =
-        Tag(id, data)
+        Tag(id, data.name, data.obj)
 
-    operator fun get(key: String): String? {
-        return data.obj[key]
-    }
+    operator fun get(key: String): String? = data[key]
 
     fun isSameName(other: Tag): Boolean =
         other.name == name
@@ -28,5 +27,10 @@ class Tag private constructor(
     override fun isSameEntity(other: Tag): Boolean =
         other.id === id
 
-    override fun toString(): String = "Tag(${data.name}, ${data.obj})"
+    override fun hashCode(): Int = id.hashCode()
+
+    override fun equals(other: Any?): Boolean =
+        other is Tag && isSameEntity(other)
+
+    override fun toString(): String = "Tag($name, $data)"
 }

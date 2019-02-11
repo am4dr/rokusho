@@ -6,7 +6,6 @@ import kotlin.concurrent.write
 
 /**
  * 変更可能な内部データにアクセスする際に確実にロックするためのクラス
- * TagとLibraryItemを個別にロックするとロック順序の管理が面倒なのでひとまずまとめてロックする
  */
 internal class DataLocker<E>(val data: E) {
     private val lock = ReentrantReadWriteLock()
