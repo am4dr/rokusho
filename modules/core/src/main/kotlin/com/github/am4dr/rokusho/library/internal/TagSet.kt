@@ -1,6 +1,7 @@
 package com.github.am4dr.rokusho.library.internal
 
 import com.github.am4dr.rokusho.library.Library
+import com.github.am4dr.rokusho.library.Library.Event.TagEvent.*
 import com.github.am4dr.rokusho.library.Tag
 import com.github.am4dr.rokusho.util.event.EventPublisherSupport
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -11,7 +12,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
  * スレッドセーフではないので同期は外部で行う必要がある
  */
 internal class TagSet(
-    val eventPublisherSupport: EventPublisherSupport<in Library.Event.TagEvent>
+    private val eventPublisherSupport: EventPublisherSupport<in Library.Event.TagEvent>
 ) {
 
     private val tags: MutableMap<Tag, Tag> = mutableMapOf()
@@ -21,39 +22,24 @@ internal class TagSet(
 
     @ExperimentalCoroutinesApi
     fun add(tag: Tag) {
+        val isUpdate = has(tag)
         tags[tag] = tag
         byName[tag.name] = tag
-        eventPublisherSupport.dispatch(Library.Event.TagEvent.Added(tag))
-    }
-
-    @ExperimentalCoroutinesApi
-    fun update(tag: Tag) {
-        tags[tag] = tag
-        byName[tag.name] = tag
-        eventPublisherSupport.dispatch(Library.Event.TagEvent.Updated(tag))
+        eventPublisherSupport.dispatch(if (isUpdate) Updated(tag) else Added(tag))
     }
 
     @ExperimentalCoroutinesApi
     fun load(tag: Tag) {
         tags[tag] = tag
         byName[tag.name] = tag
-        eventPublisherSupport.dispatch(Library.Event.TagEvent.Loaded(tag))
+        eventPublisherSupport.dispatch(Loaded(tag))
     }
 
+    fun has(name: String): Boolean = byName.contains(name)
     fun has(tag: Tag): Boolean = tags.contains(tag)
     fun hasAll(tagCollection: Collection<Tag>): Boolean =
         tagCollection.all { tags.contains(it) }
 
-    fun isInvalidRename(tag: Tag): Boolean {
-        val sameName = get(tag.name) ?: return false
-        return !sameName.isSameEntity(tag)
-    }
-
-    fun alreadyExists(tag: Tag): Boolean {
-        return tags.contains(tag) || byName.contains(tag.name)
-    }
-
     fun get(tag: Tag): Tag? = tags[tag]
-
     fun get(name: String): Tag? = byName[name]
 }

@@ -9,7 +9,7 @@ class LibraryItem<T : Any> private constructor(
     val tags: Set<ItemTag>
 ) : Entity<LibraryItem<*>> {
 
-    constructor(item: Item<T>, tags: Set<ItemTag>) : this(Any(), item, tags.toSet())
+    constructor(item: Item<T>, tags: Set<ItemTag> = setOf()) : this(Any(), item, tags.toSet())
 
 
     fun update(tags: Set<ItemTag>): LibraryItem<T> = LibraryItem(id, item, tags)

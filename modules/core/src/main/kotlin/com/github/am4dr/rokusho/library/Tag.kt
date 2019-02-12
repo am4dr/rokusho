@@ -12,8 +12,8 @@ class Tag private constructor(
     val data: DataObject
 ) : Entity<Tag> {
 
-    constructor(data: TagData) : this(Any(), data.name, data.obj)
-    constructor(name: String, data: DataObject) : this(Any(), name, data)
+    constructor(name: String, data: DataObject = DataObject()) : this(Any(), name, data)
+    constructor(name: String, data: Map<String, String>) : this(Any(), name, DataObject(data))
 
 
     fun update(data: TagData): Tag =

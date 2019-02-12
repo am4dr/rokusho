@@ -1,6 +1,7 @@
 package com.github.am4dr.rokusho.library.internal
 
 import com.github.am4dr.rokusho.library.Library
+import com.github.am4dr.rokusho.library.Library.Event.ItemEvent.*
 import com.github.am4dr.rokusho.library.LibraryItem
 import com.github.am4dr.rokusho.util.event.EventPublisherSupport
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -25,13 +26,13 @@ internal class ItemSet constructor(
     @ExperimentalCoroutinesApi
     fun add(item: LibraryItem<*>) {
         items.add(item)
-        eventPublisherSupport.dispatch(Library.Event.ItemEvent.Added(item))
+        eventPublisherSupport.dispatch(Added(item))
     }
 
     @ExperimentalCoroutinesApi
     fun update(item: LibraryItem<*>) {
         items.add(item)
-        eventPublisherSupport.dispatch(Library.Event.ItemEvent.Updated(item))
+        eventPublisherSupport.dispatch(Updated(item))
     }
 
     @ExperimentalCoroutinesApi
@@ -45,6 +46,6 @@ internal class ItemSet constructor(
         val updatedItem = item.update(newItemTags)
 
         items.add(updatedItem)
-        eventPublisherSupport.dispatch(Library.Event.ItemEvent.Loaded(updatedItem))
+        eventPublisherSupport.dispatch(Loaded(updatedItem))
     }
 }

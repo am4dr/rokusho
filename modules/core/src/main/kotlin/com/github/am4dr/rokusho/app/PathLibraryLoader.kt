@@ -61,7 +61,7 @@ class PathLibraryLoader(
 
     private fun createLibraryItemSequence(root: Path, itemData: Map<Path, LibraryItem<*>>): Sequence<LibraryItem<*>> {
         return getPathCollection(root).map { path ->
-            itemData[path] ?: LibraryItem(Item(path), setOf())
+            itemData[path] ?: LibraryItem(Item(path))
         }.asSequence()
     }
 
@@ -124,13 +124,13 @@ class PathLibraryLoader(
                     val checkedValue = value as? String ?: return@mapNotNull null
                     key to checkedValue
                 }.toMap()
-                dataTag.id to Tag(dataTag.id, DataObject(checkedData.toMap()))
+                dataTag.id to Tag(dataTag.id, checkedData)
             }.toMap()
             val items = dataItems.map { dataItem ->
                 val path = libraryRoot.resolve(dataItem.id)
                 val itemTags = dataItem.tags.mapNotNull dataItemTagLoop@{ dataItemTag ->
                     val tag = tags[dataItemTag.tag.id] ?: return@dataItemTagLoop null
-                    val itemTagData = dataItemTag.value?.let { DataObject(mapOf("value" to it)) } ?: DataObject()
+                    val itemTagData = dataItemTag.value?.let { mapOf("value" to it) } ?: mapOf()
                     ItemTag(tag, itemTagData)
                 }.toSet()
                 LibraryItem(Item(path), itemTags)

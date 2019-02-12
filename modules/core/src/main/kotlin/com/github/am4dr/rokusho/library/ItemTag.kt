@@ -6,7 +6,9 @@ class ItemTag(
     val data: DataObject
 ) : Entity<ItemTag> {
 
+
     constructor(tag: Tag, data: DataObject) : this(Any(), tag, data)
+    constructor(tag: Tag, data: Map<String, String>) : this(Any(), tag, DataObject(data))
     constructor(tag: Tag) : this(tag, DataObject())
 
 

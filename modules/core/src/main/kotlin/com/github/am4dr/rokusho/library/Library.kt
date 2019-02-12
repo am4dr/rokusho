@@ -19,7 +19,7 @@ import kotlin.coroutines.CoroutineContext
  * - [LibraryItem]が持つ[ItemTag]のから参照している[Tag]は[Library]上に存在しなければならない
  * - [Tag]の[Tag.name]はこの[Library]中で一意
  *
- * 初期データとして[Tag]のリストと[LibraryItem]のリストを与えることができ、それらが追加された際のイベントは区別できる。
+ * 初期データとして[Tag]のリストと[LibraryItem]のリストを与えることができ、それらが追加された際のイベントは通常の追加イベントとは区別できる。
  * [Tag]の集合の読み込みはすべて読み込むまで処理を待つが、[LibraryItem]の[Sequence]の読み込みは与えられたcontextのもとで行われる。
  * TODO contextをイベント用とアイテム読み込みようで共用することに問題はないか
  */
@@ -68,42 +68,17 @@ class Library private constructor(
         items.update(item)
         return item
     }
-    @ExperimentalCoroutinesApi
-    fun update(tag: Tag): Tag? = data.write { (tags, items) ->
-        if (!tags.has(tag) || tags.isInvalidRename(tag)) return null
 
-        tags.update(tag)
-        // TODO ItemSetのメソッドにする
-        items.asSet()
-            .filter { it.has(tag) }
-            .forEach { update(it.update(tag)) }
-        return tag
-    }
-
-    @ExperimentalCoroutinesApi
-    fun <T : Any> createItem(itemData: T): LibraryItem<T> = data.write { (_, items) ->
-        val item = LibraryItem(Item(itemData), setOf())
-        items.add(item)
-        return item
-    }
-
-
-    @ExperimentalCoroutinesApi
-    fun createTag(tagData: TagData): Tag? = data.write { (tags) ->
-        val tag = Tag(tagData)
-        if (tags.alreadyExists(tag)) return null
-        tags.add(tag)
-        return tag
-    }
 
     fun createItemTagByName(name: String): ItemTag? = data.write { (tags) ->
-        tags.get(name)?.let {
-            return ItemTag(it, DataObject())
+        tags.get(name)?.let { tag ->
+            return ItemTag(tag)
         }
-        val newTag = Tag(name, DataObject(mapOf("value" to name)))
+        val newTag = Tag(name, mapOf("value" to name))
         tags.add(newTag)
-        return ItemTag(newTag, DataObject())
+        return ItemTag(newTag)
     }
+
 
     fun asData(): Data = data.read { (tags, items) ->
         Data(tags = tags.asSet(), items = items.asSet())

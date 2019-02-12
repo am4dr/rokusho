@@ -40,8 +40,7 @@ class DataObject(data: Map<String, String> = mapOf()) {
     }
 
     override fun equals(other: Any?): Boolean {
-        other as? DataObject ?: return false
-        return diff(other).isNotFound()
+        return other is DataObject && diff(other).isNotFound()
     }
 
     override fun hashCode(): Int {
