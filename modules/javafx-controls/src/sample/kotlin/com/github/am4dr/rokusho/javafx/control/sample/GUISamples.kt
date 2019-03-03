@@ -28,6 +28,10 @@ class GUISamples : SampleApplicationSupport() {
         FittingTextFieldSample.createStates()
     private val ttStates = TagTipSample.createStates()
     private fun createView(): Parent {
+        addSample<MainLayoutSample>()
+        addSample<LeftSideBarSample>()
+        addSample<MainViewSample>()
+        addSample<RightMenuSample>()
         addSample<SampleSample>("sample")
         addSample<FittingTextFieldSample>(ftStates)
         addSample<TagTipSample>(ttStates)
