@@ -10,9 +10,9 @@ import javafx.scene.layout.StackPane
 
 class MainViewSample : StackPane() {
 
+    val vm = TabbedNodeContainerViewModel()
     init {
         padding = Insets(20.0)
-        val vm = TabbedNodeContainerViewModel()
         vm.tabs.addAll(
             TabbedNodeContainerViewModel.TabbedNode(
                 labeledDummy("List View"),
@@ -36,6 +36,7 @@ class MainViewSample : StackPane() {
         }
         vm.injectTo(viewer)
         children.addAll(viewer)
+        System.gc()
     }
 
     fun labeledDummy(label: String): StackPane {

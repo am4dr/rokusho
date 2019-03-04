@@ -45,9 +45,6 @@ class Tab : HBox(5.0) {
         prefHeightProperty().bind(tabHeight)
         fontProperty().bind(createBinding({ Font(tabHeight.value * 0.5) }, tabHeight))
         textProperty().bind(title)
-        tooltip = Tooltip().apply {
-            textProperty().bind(title)
-        }
     }
 
     init {
@@ -60,6 +57,10 @@ class Tab : HBox(5.0) {
         }
         minWidthProperty().bind(tabHeight)
         minHeightProperty().bind(tabHeight)
+
+        Tooltip.install(this, Tooltip().apply {
+            textProperty().bind(this@Tab.title)
+        })
 
         val selectedBorder = Border(BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, null, BorderWidths.DEFAULT))
         val notSelectedBorder = Border(BorderStroke(Color.GRAY, BorderStrokeStyle.SOLID, null, BorderWidths.DEFAULT))

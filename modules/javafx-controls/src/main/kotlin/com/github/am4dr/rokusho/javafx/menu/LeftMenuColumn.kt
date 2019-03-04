@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.javafx.sidemenu.foldable
+package com.github.am4dr.rokusho.javafx.menu
 
 import com.github.am4dr.rokusho.javafx.binding.invoke
 import javafx.beans.binding.When
@@ -9,45 +9,47 @@ import javafx.scene.layout.Region
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 
-class FoldableSideColumn : StackPane() {
+class LeftMenuColumn : StackPane() {
 
-    val folded: BooleanProperty = SimpleBooleanProperty(true)
-    val expandedWidth: DoubleProperty = SimpleDoubleProperty(250.0)
+    val folded: BooleanProperty = SimpleBooleanProperty(false)
+    val expandedWidth: DoubleProperty = SimpleDoubleProperty(200.0)
     val foldedWidth: DoubleProperty = SimpleDoubleProperty(40.0)
 
+    val onSettingsClicked:  ObjectProperty<(() -> Unit)?> = SimpleObjectProperty {}
     val toggleClicked: ObjectProperty<(() -> Unit)?> = SimpleObjectProperty {
         if (!folded.isBound) {
             folded.value = !folded.value
         }
     }
-    val settingsClicked:  ObjectProperty<(() -> Unit)?> = SimpleObjectProperty {}
+
+    val libraryList = LibraryListMenu().apply {
+        folded.bind(this@LeftMenuColumn.folded)
+        VBox.setVgrow(this, Priority.ALWAYS)
+    }
+    val toggle: ToggleMenu
+    val settings: OptionMenu
 
     init {
         val currentWidth = When(folded).then(foldedWidth).otherwise(expandedWidth)
 
-        val toggle = ToggleMenu().apply {
+        toggle = ToggleMenu().apply {
             setMinSize(0.0, 0.0)
             setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE)
             prefWidthProperty().bind(currentWidth)
             prefHeightProperty().bind(foldedWidth)
             onClicked.set { toggleClicked() }
         }
-        val settings = OptionMenu().apply {
+        settings = OptionMenu().apply {
             setMinSize(0.0, 0.0)
             setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE)
             prefWidthProperty().bind(currentWidth)
             prefHeightProperty().bind(foldedWidth)
-            onClicked.set { settingsClicked() }
+            onClicked.set { onSettingsClicked() }
         }
         setMinSize(Region.USE_PREF_SIZE, Region.USE_COMPUTED_SIZE)
         setMaxSize(Region.USE_PREF_SIZE, Region.USE_COMPUTED_SIZE)
         prefWidthProperty().bind(currentWidth)
 
-        val contents = ContentsList().apply {
-            folded.bind(this@FoldableSideColumn.folded)
-        }
-        VBox.setVgrow(contents, Priority.ALWAYS)
-        val base = VBox(toggle, Separator(), contents, Separator(), settings)
-        children.addAll(base)
+        children.addAll(VBox(toggle, Separator(), libraryList, Separator(), settings))
     }
 }

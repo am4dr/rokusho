@@ -1,50 +1,36 @@
 package com.github.am4dr.rokusho.javafx.main
 
+import com.github.am4dr.rokusho.javafx.binding.ObservableSelector
+import com.github.am4dr.rokusho.javafx.binding.createBinding
 import javafx.beans.property.ReadOnlyObjectProperty
-import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.property.ReadOnlyObjectWrapper
 import javafx.scene.Node
 import java.util.*
 
 class TabSelector {
 
-    private val tabs = IdentityHashMap<TabbedNodeContainerViewModel.TabbedNode, Tab>()
+    private val tabToNode = IdentityHashMap<Tab, Node>()
+    private val selector = ObservableSelector<Tab>()
 
-    val selectedTab: ReadOnlyObjectProperty<Tab?> = SimpleObjectProperty()
-    val selectedNode: ReadOnlyObjectProperty<Node?> = SimpleObjectProperty()
+    val selectedTab: ReadOnlyObjectProperty<Tab?> = selector.selected
+    val _selectedNode = ReadOnlyObjectWrapper<Node?>().apply { bind(createBinding({ tabToNode[selectedTab.value]}, selectedTab)) }
+    val selectedNode: ReadOnlyObjectProperty<Node?> = _selectedNode.readOnlyProperty
 
-
-    fun add(node: TabbedNodeContainerViewModel.TabbedNode, tab: Tab) {
-        tabs[node] = tab
-        checkSelection()
+    fun add(tab: Tab, node: Node) {
+        tabToNode[tab] = node
+        selector.list.add(tab)
     }
 
-    fun remove(node: TabbedNodeContainerViewModel.TabbedNode) {
-        tabs.remove(node)
-        checkSelection()
+    fun remove(tab: Tab) {
+        tabToNode.remove(tab)
+        selector.list.remove(tab)
     }
 
-    fun select(node: TabbedNodeContainerViewModel.TabbedNode) {
-        select(node, tabs[node] ?: return)
+    fun select(tab: Tab) {
+        selector.select(tab)
     }
 
-    private fun select(node: TabbedNodeContainerViewModel.TabbedNode?, tab: Tab?) {
-        (selectedTab as SimpleObjectProperty).value = tab
-        (selectedNode as SimpleObjectProperty).value = node?.node
-    }
-
-    private fun clearSelection() {
-        select(null, null)
-    }
-
-    private fun selectFirst() {
-        select(tabs.keys.first())
-    }
-
-    private fun checkSelection() {
-        when (tabs.size) {
-            0 -> clearSelection()
-            1 -> selectFirst()
-            else -> {}
-        }
+    fun select(index: Int) {
+        selector.select(index)
     }
 }

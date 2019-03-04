@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.javafx.main
+package com.github.am4dr.rokusho.javafx.control
 
 import com.github.am4dr.rokusho.javafx.binding.createBinding
 import com.github.am4dr.rokusho.javafx.binding.invoke
@@ -9,9 +9,9 @@ import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.scene.text.Font
 
-class AddViewButton : StackPane() {
+class PlusButton : StackPane() {
 
-    val tabHeight: DoubleProperty = SimpleDoubleProperty(30.0)
+    val size: DoubleProperty = SimpleDoubleProperty(30.0)
     val onClicked: ObjectProperty<(() -> Unit)?> = SimpleObjectProperty {}
     val tabHighlighted: BooleanProperty = SimpleBooleanProperty(false)
 
@@ -19,13 +19,13 @@ class AddViewButton : StackPane() {
     init {
         setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE)
         setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE)
-        prefWidthProperty().bind(tabHeight)
-        prefHeightProperty().bind(tabHeight)
+        prefWidthProperty().bind(size)
+        prefHeightProperty().bind(size)
 
         val addLabel = Label("＋").apply {
             fontProperty().bind(createBinding({
-                Font(tabHeight.multiply(0.8).value)
-            }, tabHeight))
+                Font(size.multiply(0.8).value)
+            }, size))
         }
         setOnMouseClicked {
             it.consume()

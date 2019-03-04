@@ -1,4 +1,4 @@
-package com.github.am4dr.rokusho.javafx.sidemenu.foldable
+package com.github.am4dr.rokusho.javafx.menu
 
 import com.github.am4dr.rokusho.javafx.binding.createBinding
 import com.github.am4dr.rokusho.javafx.binding.invoke
@@ -8,7 +8,6 @@ import javafx.geometry.Pos
 import javafx.scene.layout.HBox
 import javafx.scene.text.Font
 import javafx.scene.text.Text
-import javafx.scene.text.TextAlignment
 import javafx.scene.text.TextFlow
 
 class ToggleMenu : HBox() {
